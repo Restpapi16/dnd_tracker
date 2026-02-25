@@ -22,6 +22,31 @@ def health_check():
     return {"status": "ok"}
 
 
+# ----- USER INFO API -----
+
+@app.get("/me/stats")
+def get_my_stats(
+    db: Session = Depends(get_db),
+    tg_user_id: int = Depends(get_current_tg_user_id),
+):
+    """Получить статистику пользователя: количество GM-кампаний и Observer-кампаний"""
+    # GM-кампании (где я владелец)
+    gm_campaigns = db.query(models.Campaign).filter(
+        models.Campaign.owner_id == tg_user_id
+    ).count()
+    
+    # Observer-кампании (где я observer)
+    observer_campaigns = db.query(models.CampaignMember).filter(
+        models.CampaignMember.user_id == tg_user_id,
+        models.CampaignMember.role == models.MemberRole.observer
+    ).count()
+    
+    return {
+        "gm_campaigns_count": gm_campaigns,
+        "observer_campaigns_count": observer_campaigns
+    }
+
+
 # ----- CAMPAIGNS API -----
 
 @app.post("/campaigns", response_model=schemas.Campaign)
@@ -83,8 +108,7 @@ def generate_campaign_invite(
     # Создаём инвайт (бессрочный, без лимита)
     invite = crud_multiplayer.create_campaign_invite(db, campaign_id)
     
-    # TODO: заменить на реальное имя бота
-    bot_username = "YOUR_BOT_USERNAME"
+    bot_username = "d20_bot"
     invite_url = f"https://t.me/{bot_username}?start=invite_{invite.invite_token}"
     
     return schemas.InviteGenerateResponse(
