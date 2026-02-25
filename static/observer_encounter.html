@@ -88,6 +88,7 @@
             background: linear-gradient(180deg, var(--surface), var(--surface2));
             border: 1px solid var(--stroke);
             position: relative;
+            overflow: hidden;
         }
 
         .participant.current {
@@ -110,14 +111,81 @@
             border-left: 3px solid #2563eb;
         }
 
+        /* Эффекты трещин */
+        .participant::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 14px;
+        }
+
+        /* 50% HP - маленькие трещины */
+        .participant.wounded-50::before {
+            opacity: 0.3;
+            background-image:
+                linear-gradient(135deg, transparent 0%, transparent 45%, rgba(220, 38, 38, 0.4) 45%, rgba(220, 38, 38, 0.4) 46%, transparent 46%),
+                linear-gradient(225deg, transparent 0%, transparent 45%, rgba(220, 38, 38, 0.4) 45%, rgba(220, 38, 38, 0.4) 46%, transparent 46%);
+            background-size: 20px 20px;
+            background-position: top left, top right;
+            background-repeat: no-repeat, no-repeat;
+        }
+
+        /* 25% HP - больше трещин */
+        .participant.wounded-25::before {
+            opacity: 0.5;
+            background-image:
+                linear-gradient(135deg, transparent 0%, transparent 40%, rgba(220, 38, 38, 0.6) 40%, rgba(220, 38, 38, 0.6) 42%, transparent 42%),
+                linear-gradient(225deg, transparent 0%, transparent 40%, rgba(220, 38, 38, 0.6) 40%, rgba(220, 38, 38, 0.6) 42%, transparent 42%),
+                linear-gradient(135deg, transparent 0%, transparent 43%, rgba(220, 38, 38, 0.5) 43%, rgba(220, 38, 38, 0.5) 44%, transparent 44%),
+                linear-gradient(90deg, transparent 0%, transparent 48%, rgba(220, 38, 38, 0.4) 48%, rgba(220, 38, 38, 0.4) 49%, transparent 49%);
+            background-size: 30px 30px, 30px 30px, 25px 25px, 100% 100%;
+            background-position: top left, top right, bottom left, center;
+            background-repeat: no-repeat;
+        }
+
+        /* 10% HP - много трещин, пульсация */
+        .participant.wounded-10::before {
+            opacity: 0.7;
+            background-image:
+                linear-gradient(135deg, transparent 0%, transparent 35%, rgba(220, 38, 38, 0.8) 35%, rgba(220, 38, 38, 0.8) 38%, transparent 38%),
+                linear-gradient(225deg, transparent 0%, transparent 35%, rgba(220, 38, 38, 0.8) 35%, rgba(220, 38, 38, 0.8) 38%, transparent 38%),
+                linear-gradient(135deg, transparent 0%, transparent 40%, rgba(220, 38, 38, 0.7) 40%, rgba(220, 38, 38, 0.7) 42%, transparent 42%),
+                linear-gradient(225deg, transparent 0%, transparent 42%, rgba(220, 38, 38, 0.6) 42%, rgba(220, 38, 38, 0.6) 43%, transparent 43%),
+                linear-gradient(90deg, transparent 0%, transparent 45%, rgba(220, 38, 38, 0.5) 45%, rgba(220, 38, 38, 0.5) 46%, transparent 46%),
+                linear-gradient(180deg, transparent 0%, transparent 47%, rgba(220, 38, 38, 0.4) 47%, rgba(220, 38, 38, 0.4) 48%, transparent 48%);
+            background-size: 40px 40px, 40px 40px, 35px 35px, 30px 30px, 100% 100%, 100% 100%;
+            background-position: top left, top right, bottom left, bottom right, center, center;
+            background-repeat: no-repeat;
+            animation: crack-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes crack-pulse {
+            0%, 100% {
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 0.9;
+            }
+        }
+
         .p-icon {
             font-size: 24px;
             width: 36px;
             text-align: center;
+            position: relative;
+            z-index: 1;
         }
 
         .p-info {
             flex: 1;
+            position: relative;
+            z-index: 1;
         }
 
         .p-name {
@@ -137,6 +205,8 @@
             color: var(--accent);
             min-width: 36px;
             text-align: right;
+            position: relative;
+            z-index: 1;
         }
 
         .hint {
@@ -261,6 +331,19 @@
                 if (isDead) classes += ' dead';
                 if (isEnemy) classes += ' enemy';
                 else classes += ' ally';
+
+                // Добавляем трещины для врагов с низким HP
+                if (isEnemy && !isDead && p.current_hp !== undefined && p.max_hp !== undefined) {
+                    const hpPercent = (p.current_hp / p.max_hp) * 100;
+                    
+                    if (hpPercent <= 10) {
+                        classes += ' wounded-10';
+                    } else if (hpPercent <= 25) {
+                        classes += ' wounded-25';
+                    } else if (hpPercent <= 50) {
+                        classes += ' wounded-50';
+                    }
+                }
 
                 const icon = isEnemy ? '👿' : '🤝';
                 const status = isDead ? ' ☠️' : '';
