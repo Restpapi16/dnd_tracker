@@ -11,6 +11,8 @@ from aiogram.types import (
     ReplyKeyboardMarkup,
     KeyboardButton,
     WebAppInfo,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -20,7 +22,7 @@ API_TOKEN = os.getenv("BOT_TOKEN")
 if not API_TOKEN:
     raise RuntimeError("Не задана переменная окружения BOT_TOKEN")
 
-WEBAPP_URL = "https://pavelcode.ru/static/campaigns.html"
+WEBAPP_URL = "https://pavelcode.ru"
 CRIT_BOT_URL = "https://t.me/dndcriticalsfbot"
 
 D20_PHRASES = [
@@ -64,7 +66,7 @@ INFO_TEXT = (
     "• ❤️ HP и статусы: удобно отмечать кто жив, а кто уже в таверне.\n\n"
     "Как пользоваться:\n"
     "1) Нажми «🎲 Бросить d20» — я пришлю результат.\n"
-    "2) Нажми «📜 Кампании» — откроется Mini App.\n"
+    "2) Нажми «📋 Кампании» — откроется Mini App.\n"
     "3) Нажми «💥 Крит» — откроется бот/чат с критами.\n\n"
     "Подсказка:\n"
     "• Mini App открывается внутри Telegram и не требует установки.\n"
@@ -83,7 +85,6 @@ def main_kb() -> ReplyKeyboardMarkup:
             [KeyboardButton(text=BTN_CRIT)],
         ],
         resize_keyboard=True,
-        # просим клиент держать клавиатуру всегда [web:518]
         is_persistent=False,
         one_time_keyboard=False,
         input_field_placeholder="Выбери действие…",
@@ -112,16 +113,36 @@ async def main():
     await bot.set_my_commands([
         BotCommand(command="roll", description="Бросить d20 🎲"),
         BotCommand(command="info", description="Информация"),
-    ])  # команды задаются отдельно от reply-клавиатуры [web:455]
+    ])
 
     @dp.message(CommandStart())
     async def cmd_start(message: Message):
-        await message.answer(
-            "Кидай d20 — выбери действие на клавиатуре снизу.",
-            reply_markup=main_kb(),
-        )
+        # Проверяем наличие deep link параметра
+        start_param = message.text.split(maxsplit=1)[1] if len(message.text.split()) > 1 else None
+        
+        if start_param and start_param.startswith("invite_"):
+            # Извлекаем токен из invite_{token}
+            invite_token = start_param[7:]  # убираем "invite_"
+            
+            # Создаём inline-кнопку для перехода к join.html
+            join_url = f"{WEBAPP_URL}/static/join.html?token={invite_token}"
+            
+            kb = InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text="✅ Присоединиться к кампании", web_app=WebAppInfo(url=join_url))]
+            ])
+            
+            await message.answer(
+                "🎲 Тебя пригласили в D&D кампанию!\n\n"
+                "Нажми кнопку ниже, чтобы присоединиться как наблюдатель.",
+                reply_markup=kb
+            )
+        else:
+            # Обычный старт
+            await message.answer(
+                "Кидай d20 — выбери действие на клавиатуре снизу.",
+                reply_markup=main_kb(),
+            )
 
-    # Команды (если пользователь всё-таки пишет /roll вручную)
     @dp.message(Command("roll"))
     async def cmd_roll(message: Message):
         await message.answer(roll_d20_text(), reply_markup=main_kb())
@@ -130,7 +151,6 @@ async def main():
     async def cmd_info(message: Message):
         await message.answer(INFO_TEXT, reply_markup=main_kb())
 
-    # Кнопки reply-клавиатуры (они приходят как обычный текст)
     @dp.message(F.text == BTN_ROLL)
     async def on_btn_roll(message: Message):
         await message.answer(roll_d20_text(), reply_markup=main_kb())
