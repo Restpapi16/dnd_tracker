@@ -206,7 +206,7 @@ def get_encounter_state_for_observer(
     db: Session,
     encounter_id: int
 ) -> Optional[schemas.EncounterStateObserver]:
-    """Получить состояние схватки для observer (минимальная информация)"""
+    """Получить состояние схватки для observer (минимальная информация + HP для эффектов)"""
     encounter = (db.query(models.Encounter)
                  .options(joinedload(models.Encounter.campaign))
                  .filter(models.Encounter.id == encounter_id)
@@ -231,7 +231,8 @@ def get_encounter_state_for_observer(
         is_alive = p.current_hp is None or (
             p.current_hp is not None and p.current_hp > 0)
         
-        # Для observer скрываем HP, AC, атаки
+        # Для observer передаём HP для визуальных эффектов (трещины)
+        # но не показываем числа в UI
         items.append(
             schemas.EncounterParticipantObserver(
                 id=p.id,
@@ -240,6 +241,8 @@ def get_encounter_state_for_observer(
                 is_enemy=p.is_enemy,
                 initiative_total=p.initiative_total,
                 is_alive=is_alive,
+                current_hp=p.current_hp,  # Добавлено для трещин
+                max_hp=p.max_hp,          # Добавлено для трещин
             )
         )
     

@@ -207,7 +207,7 @@ class EncounterStatePlayer(EncounterStateBase):
     participants: List[EncounterParticipantPlayer]
 
 
-# Observer view - минимальная информация
+# Observer view - минимальная информация + HP для визуальных эффектов
 class EncounterParticipantObserver(BaseModel):
     id: int
     type: ParticipantType
@@ -215,7 +215,10 @@ class EncounterParticipantObserver(BaseModel):
     is_enemy: bool
     initiative_total: int
     is_alive: bool
-    # HP, AC, attacks - скрыты
+    # HP добавлены для визуальных эффектов (трещины), но не показываем числа в UI
+    current_hp: Optional[int] = None
+    max_hp: Optional[int] = None
+    # AC, attacks - скрыты
 
     class Config:
         orm_mode = True
