@@ -5,4 +5,407 @@
   <title>GM Encounter</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <!-- ... rest is the same ... -->
+  <style>
+    :root {
+      --font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      --bg: #000000;
+      --surface: #070707;
+      --surface2: #0b0b0b;
+      --stroke: #242424;
+      --stroke2: #303030;
+      --text: #f8fafc;
+      --muted: rgba(248, 250, 252, .66);
+      --accent: #fbbf24;
+      --accent2: #f59e0b;
+      --onAccent: #111827;
+      --danger: #ef4444;
+      --danger2: #991b1b;
+      --onDanger: #ffffff;
+      --focus: rgba(251, 191, 36, .55);
+    }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 14px 14px 136px;
+    }
+    .top-card {
+      background: linear-gradient(180deg, #060606, #000000);
+      border: 1px solid rgba(251, 191, 36, .55);
+      border-radius: 14px;
+      padding: 12px 14px;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 10px 30px rgba(0, 0, 0, .55);
+    }
+    .top-title { color: var(--accent); font-weight: 900; }
+    .top-sub { color: var(--muted); }
+    .top-row { display: flex; justify-content: space-between; gap: 10px; align-items: center; margin-top: 10px; }
+    .pill {
+      font-size: 12px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(251, 191, 36, .35);
+      background: radial-gradient(circle at top left, rgba(251, 191, 36, .18) 0, transparent 55%), linear-gradient(180deg, #151515, #070707);
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, .55);
+      white-space: nowrap;
+    }
+    .status-line { font-size: 12px; margin-top: 8px; min-height: 16px; opacity: 0.9; }
+    .section-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.10em; opacity: 0.7; margin: 10px 2px 8px; }
+    .list { display: flex; flex-direction: column; gap: 10px; }
+    .card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 14px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, var(--surface), var(--surface2));
+      border: 1px solid var(--stroke);
+      min-height: 62px;
+      user-select: none;
+    }
+    .card:active { transform: scale(0.99); }
+    .card-main { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .card.current {
+      border-color: var(--accent);
+      box-shadow: 0 0 16px rgba(251, 191, 36, 0.25);
+      background: radial-gradient(circle at top left, rgba(251, 191, 36, 0.14) 0, transparent 45%), linear-gradient(145deg, #0b1220, #020617);
+    }
+    .card.selected { outline: 2px solid rgba(96, 165, 250, 0.85); outline-offset: 0px; }
+    .card.dead { opacity: 0.55; }
+    .title { font-size: 16px; font-weight: 900; line-height: 1.15; }
+    .sub { margin-top: 4px; font-size: 12px; color: var(--muted); }
+    .badges { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke);
+      font-size: 11px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      background: rgba(255, 255, 255, .04);
+    }
+    .badge.enemy { background: rgba(220, 38, 38, .12); border-color: rgba(220, 38, 38, .35); }
+    .badge.pc { background: rgba(37, 99, 235, .12); border-color: rgba(37, 99, 235, .35); }
+    .badge.zero { background: rgba(245, 158, 11, .12); border-color: rgba(245, 158, 11, .35); }
+    .right { text-align: right; min-width: 96px; }
+    .hp { font-size: 14px; font-weight: 900; margin-top: 2px; }
+    .hp.muted { color: var(--muted); font-weight: 700; }
+    .attacks-block {
+      margin-top: 10px;
+      padding: 10px;
+      background: rgba(127, 29, 29, 0.15);
+      border-radius: 10px;
+      border: 1px solid rgba(127, 29, 29, 0.35);
+    }
+    .attacks-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 6px; }
+    .attack-item { margin-top: 6px; padding: 6px 8px; background: rgba(0, 0, 0, 0.3); border-radius: 8px; border: 1px solid rgba(127, 29, 29, 0.25); }
+    .attack-name { font-size: 12px; font-weight: 700; color: var(--text); }
+    .attack-stats { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .bottom-bar {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      background: rgba(2, 6, 23, .92);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--stroke);
+      z-index: 1500;
+    }
+    .bottom-row { display: flex; gap: 10px; }
+    .bottom-row + .bottom-row { margin-top: 10px; }
+    .bottom-row .btn {
+      flex: 1;
+      height: 52px;
+      border-radius: 16px;
+      border: 1px solid #0f172a;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #111827;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.7);
+    }
+    .bottom-row .btn.secondary { background: linear-gradient(135deg, #2a2a2a, #1d1d1d); color: var(--text); border: 1px solid var(--stroke2); }
+    .bottom-row .btn.danger { background: linear-gradient(135deg, var(--danger), var(--danger2)); color: var(--onDanger); border: 1px solid rgba(0, 0, 0, .35); }
+    .bottom-row .btn:active { transform: scale(0.99); }
+    .bottom-row .btn.primary { background: linear-gradient(180deg, #2a2a2a, #151515); color: var(--text); border: 1px solid rgba(251, 191, 36, .55); box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 8px 18px rgba(0, 0, 0, .45); }
+    .toast {
+      position: fixed; left: 50%; bottom: 18px;
+      transform: translateX(-50%) translateY(20px);
+      min-width: 220px; max-width: 90vw;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid #78350f;
+      color: #f9fafb;
+      font-size: 12px;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+      z-index: 2500;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .hpbtn { height: 44px; min-width: 52px; padding: 0 10px; border-radius: 14px; border: 1px solid var(--stroke2); background: linear-gradient(180deg, #222, #111); color: var(--text); font-weight: 900; font-size: 13px; }
+    .hpbtn:active { transform: scale(0.99); }
+    .hpwho { flex: 1; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 14px; border: 1px dashed rgba(251, 191, 36, .35); color: rgba(251, 191, 36, .95); font-weight: 900; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  </style>
+</head>
+<body>
+  <div class="top-card">
+    <div class="top-title" id="encounterName">Схватка</div>
+    <div class="top-sub" id="campaignName">Кампания неизвестна</div>
+    <div class="top-row">
+      <div class="pill" id="roundInfo">Раунд ?</div>
+      <div class="pill" id="turnInfo">Ход ?</div>
+    </div>
+    <div class="status-line" id="statusLine"></div>
+  </div>
+  <div class="section-title">Порядок ходов</div>
+  <div id="participants" class="list"></div>
+  <div class="section-title">HP</div>
+  <div id="hpControls" class="hp-controls"></div>
+  <div class="hint">Тап по участнику выбирает его для изменения HP.</div>
+  <div class="bottom-bar">
+    <div class="bottom-row">
+      <button id="nextTurnBtn" class="btn primary">Следующий</button>
+    </div>
+    <div class="bottom-row" id="hpBarRow" style="display:none;">
+      <button class="hpbtn" data-d="-10">-10</button>
+      <button class="hpbtn" data-d="-5">-5</button>
+      <button class="hpbtn" data-d="-1">-1</button>
+      <div class="hpwho" id="hpWho">HP</div>
+      <button class="hpbtn" data-d="1">+1</button>
+      <button class="hpbtn" data-d="5">+5</button>
+      <button class="hpbtn" data-d="10">+10</button>
+    </div>
+    <div class="bottom-row">
+      <button id="finishBtn" class="btn danger">Завершить</button>
+      <button id="backToCampaignsBtn" class="btn secondary">К кампаниям</button>
+    </div>
+  </div>
+  <div id="toast" class="toast"></div>
+  <script>
+    const tg = window.Telegram.WebApp;
+    function authHeaders() {
+      const initData = tg?.initData || "";
+      return initData ? { "Authorization": "tma " + initData } : {};
+    }
+    const API_BASE = "";
+    const urlParams = new URLSearchParams(window.location.search);
+    let encounterId = urlParams.get("encounter_id") || urlParams.get("tgWebAppStartParam");
+    if (!encounterId && tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
+      encounterId = tg.initDataUnsafe.start_param;
+    }
+    if (!encounterId) document.getElementById("statusLine").innerText = "Нет encounter_id";
+    let currentState = null;
+    let selectedParticipantId = null;
+    async function apiGet(path) {
+      const res = await fetch(API_BASE + path, { headers: { ...authHeaders() } });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return await res.json();
+    }
+    async function apiPost(path, body) {
+      const res = await fetch(API_BASE + path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeaders() },
+        body: body ? JSON.stringify(body) : "{}"
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return await res.json();
+    }
+    function formatDamage(numDice, dieSize, bonus) {
+      let result = '';
+      if (numDice > 0 && dieSize > 0) {
+        result = `${numDice}d${dieSize}`;
+        if (bonus !== 0) result += bonus > 0 ? `+${bonus}` : `${bonus}`;
+      } else if (bonus !== 0) {
+        result = `${bonus}`;
+      } else {
+        result = '0';
+      }
+      return result;
+    }
+    async function loadState() {
+      if (!encounterId) return;
+      setFlavorStatus("loading_state");
+      try {
+        const state = await apiGet(`/encounters/${encounterId}/state?role=gm`);
+        currentState = state;
+        renderState();
+        clearStatus();
+      } catch (e) {
+        console.error(e);
+        setFlavorStatus("error_state");
+      }
+    }
+    function renderState() {
+      if (!currentState) return;
+      document.getElementById("encounterName").innerText = currentState.encounter_name ? currentState.encounter_name : `Схватка #${currentState.encounter_id}`;
+      document.getElementById("campaignName").innerText = currentState.campaign_name ? `Кампания "${currentState.campaign_name}"` : `Кампания #${currentState.campaign_id}`;
+      document.getElementById("roundInfo").innerText = `Раунд ${currentState.round}`;
+      const total = currentState.participants.length;
+      document.getElementById("turnInfo").innerText = `Ход ${currentState.current_index + 1} из ${total}`;
+      const container = document.getElementById("participants");
+      container.innerHTML = "";
+      currentState.participants.forEach((p, index) => {
+        const card = document.createElement("div");
+        card.className = "card" + (index === currentState.current_index ? " current" : "") + (!p.is_alive ? " dead" : "") + (selectedParticipantId === p.id ? " selected" : "");
+        card.onclick = () => {
+          selectedParticipantId = (selectedParticipantId === p.id) ? null : p.id;
+          renderState();
+        };
+        const mainRow = document.createElement("div");
+        mainRow.className = "card-main";
+        const left = document.createElement("div");
+        left.style.flex = "1";
+        const title = document.createElement("div");
+        title.className = "title";
+        title.innerText = p.name;
+        left.appendChild(title);
+        const sub = document.createElement("div");
+        sub.className = "sub";
+        sub.innerText = `Инициатива: ${p.initiative_total}, КД: ${p.ac ?? "-"}`;
+        left.appendChild(sub);
+        const badges = document.createElement("div");
+        badges.className = "badges";
+        const roleBadge = document.createElement("span");
+        roleBadge.className = "badge " + (p.is_enemy ? "enemy" : "pc");
+        roleBadge.innerText = p.is_enemy ? "Враг" : "Игрок";
+        badges.appendChild(roleBadge);
+        if (!p.is_alive) {
+          const deadBadge = document.createElement("span");
+          deadBadge.className = "badge zero";
+          deadBadge.innerText = "0 HP";
+          badges.appendChild(deadBadge);
+        }
+        left.appendChild(badges);
+        const right = document.createElement("div");
+        right.className = "right";
+        const hp = document.createElement("div");
+        hp.className = "hp" + ((p.max_hp == null || p.current_hp == null) ? " muted" : "");
+        if (p.max_hp != null && p.current_hp != null) {
+          hp.innerText = `${p.current_hp}/${p.max_hp}`;
+        } else {
+          hp.innerText = "—";
+        }
+        right.appendChild(hp);
+        mainRow.appendChild(left);
+        mainRow.appendChild(right);
+        card.appendChild(mainRow);
+        if (p.attacks && p.attacks.length > 0) {
+          const attacksBlock = document.createElement("div");
+          attacksBlock.className = "attacks-block";
+          const attacksTitle = document.createElement("div");
+          attacksTitle.className = "attacks-title";
+          attacksTitle.innerText = "⚔️ Атаки";
+          attacksBlock.appendChild(attacksTitle);
+          p.attacks.forEach(attack => {
+            const attackItem = document.createElement("div");
+            attackItem.className = "attack-item";
+            const attackName = document.createElement("div");
+            attackName.className = "attack-name";
+            attackName.innerText = attack.name;
+            const attackStats = document.createElement("div");
+            attackStats.className = "attack-stats";
+            const dmgStr = formatDamage(attack.damage_dice || 0, attack.damage_die || 0, attack.damage_bonus || 0);
+            attackStats.innerText = `+${attack.hit_bonus} попадание, ${dmgStr} урон (${attack.damage_type}), ${attack.range} футов`;
+            attackItem.appendChild(attackName);
+            attackItem.appendChild(attackStats);
+            attacksBlock.appendChild(attackItem);
+          });
+          card.appendChild(attacksBlock);
+        }
+        container.appendChild(card);
+      });
+      const selected = currentState.participants.find(x => x.id === selectedParticipantId);
+      if (selectedParticipantId && selected) {
+        hpBarRow.style.display = "flex";
+        hpWho.innerText = selected.name;
+      } else {
+        hpBarRow.style.display = "none";
+        hpWho.innerText = "HP";
+      }
+    }
+    async function changeHp(participantId, delta) {
+      try {
+        setFlavorStatus("hp_change");
+        await apiPost(`/participants/${participantId}/hp_change`, { delta });
+        await loadState();
+      } catch (e) {
+        console.error(e);
+        setFlavorStatus("error_hp");
+      }
+    }
+    const hpBarRow = document.getElementById("hpBarRow");
+    const hpWho = document.getElementById("hpWho");
+    document.querySelectorAll(".hpbtn").forEach(b => {
+      b.onclick = () => {
+        const d = parseInt(b.dataset.d, 10);
+        if (!selectedParticipantId) return;
+        changeHp(selectedParticipantId, d);
+      };
+    });
+    async function nextTurn() {
+      if (!encounterId) return;
+      try {
+        setFlavorStatus("next_turn");
+        await apiPost(`/encounters/${encounterId}/next_turn`, {});
+        await loadState();
+      } catch (e) {
+        console.error(e);
+        setFlavorStatus("error_next");
+      }
+    }
+    async function finishEncounter() {
+      if (!encounterId) return;
+      const ok = confirm("Завершить схватку?");
+      if (!ok) return;
+      try {
+        setFlavorStatus("finish");
+        await apiPost(`/encounters/${encounterId}/finish`, {});
+        window.location.replace("/static/gm_campaigns.html");
+      } catch (e) {
+        console.error(e);
+        setFlavorStatus("error_state");
+      }
+    }
+    document.getElementById("nextTurnBtn").onclick = nextTurn;
+    document.getElementById("finishBtn").onclick = finishEncounter;
+    document.getElementById("backToCampaignsBtn").onclick = () => {
+      window.location.href = "/static/gm_campaigns.html";
+    };
+    let toastTimeout = null;
+    function showToast(text) {
+      const el = document.getElementById("toast");
+      if (!el) return;
+      el.innerText = text;
+      el.classList.add("show");
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => el.classList.remove("show"), 2200);
+    }
+    function setStatus(text) {
+      const el = document.getElementById("statusLine");
+      if (el) el.innerText = text;
+    }
+    function clearStatus() { setStatus(""); }
+    function setFlavorStatus(type) {
+      switch (type) {
+        case "loading_state": setStatus("Загружаю состояние…"); break;
+        case "next_turn": showToast("Следующий ход…"); break;
+        case "hp_change": showToast("Изменяю HP…"); break;
+        case "finish": showToast("Схватка завершена."); break;
+        case "error_state": showToast("Ошибка. Проверь соединение."); break;
+        case "error_hp": showToast("Не удалось изменить HP."); break;
+        case "error_next": showToast("Не удалось переключить ход."); break;
+      }
+    }
+    if (tg && tg.ready) tg.ready();
+    loadState();
+  </script>
+</body>
+</html>
