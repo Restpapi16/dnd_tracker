@@ -503,6 +503,22 @@
       return await res.json();
     }
 
+    // Helper: форматирование урона в XdY+Z
+    function formatDamage(numDice, dieSize, bonus) {
+      let result = '';
+      if (numDice > 0 && dieSize > 0) {
+        result = `${numDice}d${dieSize}`;
+        if (bonus !== 0) {
+          result += bonus > 0 ? `+${bonus}` : `${bonus}`;
+        }
+      } else if (bonus !== 0) {
+        result = `${bonus}`;
+      } else {
+        result = '0';
+      }
+      return result;
+    }
+
     async function loadState() {
       if (!encounterId) return;
       setFlavorStatus("loading_state");
@@ -616,7 +632,15 @@
 
             const attackStats = document.createElement("div");
             attackStats.className = "attack-stats";
-            attackStats.innerText = `+${attack.hit_bonus} попадание, +${attack.damage_bonus} урон (${attack.damage_type}), ${attack.range}`;
+            
+            // Форматируем урон в XdY+Z
+            const dmgStr = formatDamage(
+              attack.damage_dice || 0, 
+              attack.damage_die || 0, 
+              attack.damage_bonus || 0
+            );
+            
+            attackStats.innerText = `+${attack.hit_bonus} попадание, ${dmgStr} урон (${attack.damage_type}), ${attack.range} футов`;
 
             attackItem.appendChild(attackName);
             attackItem.appendChild(attackStats);
