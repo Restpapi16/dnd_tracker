@@ -36,6 +36,16 @@ def create_campaign(db: Session, campaign: schemas.CampaignCreate, owner_id: int
     db.add(db_campaign)
     db.commit()
     db.refresh(db_campaign)
+    
+    # Автоматически добавляем владельца как GM в campaign_members
+    db_member = models.CampaignMember(
+        campaign_id=db_campaign.id,
+        user_id=owner_id,
+        role=models.MemberRole.gm
+    )
+    db.add(db_member)
+    db.commit()
+    
     return db_campaign
 
 
