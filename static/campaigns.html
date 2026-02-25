@@ -206,6 +206,10 @@
             width: 92px;
         }
 
+        .input.tiny {
+            width: 56px;
+        }
+
         .input:focus {
             outline: 2px solid var(--focus);
             outline-offset: 1px;
@@ -366,6 +370,19 @@
                 box-shadow: 0 0 18px rgba(251, 191, 36, 0.7);
             }
         }
+
+        /* Стиль для dice group */
+        .dice-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dice-separator {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--accent);
+        }
     </style>
 </head>
 
@@ -451,13 +468,21 @@
             <div id="uniqueAttacksSection" class="attacks-section" style="display:none;">
                 <div class="section-title" style="margin: 0 0 8px 0;">⚔️ Атаки моба</div>
                 <div class="row-inline">
-                    <input id="uniqueAttackName" class="input" type="text" placeholder="Название атаки">
+                    <input id="uniqueAttackName" class="input" type="text" placeholder="Название атаки" style="flex:1;">
                     <input id="uniqueAttackHitBonus" class="input small" type="number" placeholder="+Попад">
-                    <input id="uniqueAttackDmgBonus" class="input small" type="number" placeholder="+Урон">
                 </div>
                 <div class="row-inline" style="margin-top: 6px;">
-                    <input id="uniqueAttackDmgType" class="input" type="text" placeholder="Тип урона">
-                    <input id="uniqueAttackRange" class="input" type="text" placeholder="Дальность">
+                    <div class="dice-group">
+                        <input id="uniqueAttackDmgDice" class="input tiny" type="number" placeholder="2">
+                        <span class="dice-separator">d</span>
+                        <input id="uniqueAttackDmgDie" class="input tiny" type="number" placeholder="6">
+                        <span class="dice-separator">+</span>
+                        <input id="uniqueAttackDmgBonus" class="input tiny" type="number" placeholder="3">
+                    </div>
+                    <input id="uniqueAttackDmgType" class="input" type="text" placeholder="Тип урона" style="flex:1;">
+                </div>
+                <div class="row-inline" style="margin-top: 6px;">
+                    <input id="uniqueAttackRange" class="input" type="text" placeholder="Дальность (футов)" style="flex:1;">
                     <button id="addUniqueAttackBtn" class="btn secondary">+ Атака</button>
                 </div>
                 <div id="uniqueAttacksList"></div>
@@ -484,13 +509,21 @@
             <div id="groupAttacksSection" class="attacks-section" style="display:none;">
                 <div class="section-title" style="margin: 0 0 8px 0;">⚔️ Атаки группы</div>
                 <div class="row-inline">
-                    <input id="groupAttackName" class="input" type="text" placeholder="Название атаки">
+                    <input id="groupAttackName" class="input" type="text" placeholder="Название атаки" style="flex:1;">
                     <input id="groupAttackHitBonus" class="input small" type="number" placeholder="+Попад">
-                    <input id="groupAttackDmgBonus" class="input small" type="number" placeholder="+Урон">
                 </div>
                 <div class="row-inline" style="margin-top: 6px;">
-                    <input id="groupAttackDmgType" class="input" type="text" placeholder="Тип урона">
-                    <input id="groupAttackRange" class="input" type="text" placeholder="Дальность">
+                    <div class="dice-group">
+                        <input id="groupAttackDmgDice" class="input tiny" type="number" placeholder="2">
+                        <span class="dice-separator">d</span>
+                        <input id="groupAttackDmgDie" class="input tiny" type="number" placeholder="6">
+                        <span class="dice-separator">+</span>
+                        <input id="groupAttackDmgBonus" class="input tiny" type="number" placeholder="3">
+                    </div>
+                    <input id="groupAttackDmgType" class="input" type="text" placeholder="Тип урона" style="flex:1;">
+                </div>
+                <div class="row-inline" style="margin-top: 6px;">
+                    <input id="groupAttackRange" class="input" type="text" placeholder="Дальность (футов)" style="flex:1;">
                     <button id="addGroupAttackBtn" class="btn secondary">+ Атака</button>
                 </div>
                 <div id="groupAttacksList"></div>
@@ -601,6 +634,22 @@
 
         const startEncounterBtn = document.getElementById("startEncounterBtn");
 
+        // Helper: форматирование урона в XdY+Z
+        function formatDamage(numDice, dieSize, bonus) {
+            let result = '';
+            if (numDice > 0 && dieSize > 0) {
+                result = `${numDice}d${dieSize}`;
+                if (bonus !== 0) {
+                    result += bonus > 0 ? `+${bonus}` : `${bonus}`;
+                }
+            } else if (bonus !== 0) {
+                result = `${bonus}`;
+            } else {
+                result = '0';
+            }
+            return result;
+        }
+
         // === ATTACKS MANAGEMENT - UNIQUE ===
         let uniqueMonsterAttacks = [];
 
@@ -650,7 +699,8 @@
 
                 const statsDiv = document.createElement('div');
                 statsDiv.className = 'attack-stats';
-                statsDiv.innerText = `+${attack.hit_bonus} попадание, +${attack.damage_bonus} урон (${attack.damage_type}), ${attack.range}`;
+                const dmgStr = formatDamage(attack.damage_dice || 0, attack.damage_die || 0, attack.damage_bonus || 0);
+                statsDiv.innerText = `+${attack.hit_bonus} попадание, ${dmgStr} урон (${attack.damage_type}), ${attack.range} футов`;
 
                 infoDiv.appendChild(nameDiv);
                 infoDiv.appendChild(statsDiv);
@@ -676,6 +726,8 @@
         addUniqueAttackBtn.onclick = () => {
             const name = document.getElementById('uniqueAttackName').value.trim();
             const hitBonus = parseInt(document.getElementById('uniqueAttackHitBonus').value) || 0;
+            const dmgDice = parseInt(document.getElementById('uniqueAttackDmgDice').value) || 0;
+            const dmgDie = parseInt(document.getElementById('uniqueAttackDmgDie').value) || 0;
             const dmgBonus = parseInt(document.getElementById('uniqueAttackDmgBonus').value) || 0;
             const dmgType = document.getElementById('uniqueAttackDmgType').value.trim() || 'физический';
             const range = document.getElementById('uniqueAttackRange').value.trim() || 'ближний бой';
@@ -688,6 +740,8 @@
             uniqueMonsterAttacks.push({
                 name,
                 hit_bonus: hitBonus,
+                damage_dice: dmgDice,
+                damage_die: dmgDie,
                 damage_bonus: dmgBonus,
                 damage_type: dmgType,
                 range
@@ -695,6 +749,8 @@
 
             document.getElementById('uniqueAttackName').value = '';
             document.getElementById('uniqueAttackHitBonus').value = '';
+            document.getElementById('uniqueAttackDmgDice').value = '';
+            document.getElementById('uniqueAttackDmgDie').value = '';
             document.getElementById('uniqueAttackDmgBonus').value = '';
             document.getElementById('uniqueAttackDmgType').value = '';
             document.getElementById('uniqueAttackRange').value = '';
@@ -763,7 +819,8 @@
 
                 const statsDiv = document.createElement('div');
                 statsDiv.className = 'attack-stats';
-                statsDiv.innerText = `+${attack.hit_bonus} попадание, +${attack.damage_bonus} урон (${attack.damage_type}), ${attack.range}`;
+                const dmgStr = formatDamage(attack.damage_dice || 0, attack.damage_die || 0, attack.damage_bonus || 0);
+                statsDiv.innerText = `+${attack.hit_bonus} попадание, ${dmgStr} урон (${attack.damage_type}), ${attack.range} футов`;
 
                 infoDiv.appendChild(nameDiv);
                 infoDiv.appendChild(statsDiv);
@@ -789,6 +846,8 @@
         addGroupAttackBtn.onclick = () => {
             const name = document.getElementById('groupAttackName').value.trim();
             const hitBonus = parseInt(document.getElementById('groupAttackHitBonus').value) || 0;
+            const dmgDice = parseInt(document.getElementById('groupAttackDmgDice').value) || 0;
+            const dmgDie = parseInt(document.getElementById('groupAttackDmgDie').value) || 0;
             const dmgBonus = parseInt(document.getElementById('groupAttackDmgBonus').value) || 0;
             const dmgType = document.getElementById('groupAttackDmgType').value.trim() || 'физический';
             const range = document.getElementById('groupAttackRange').value.trim() || 'ближний бой';
@@ -801,6 +860,8 @@
             groupMonsterAttacks.push({
                 name,
                 hit_bonus: hitBonus,
+                damage_dice: dmgDice,
+                damage_die: dmgDie,
                 damage_bonus: dmgBonus,
                 damage_type: dmgType,
                 range
@@ -808,6 +869,8 @@
 
             document.getElementById('groupAttackName').value = '';
             document.getElementById('groupAttackHitBonus').value = '';
+            document.getElementById('groupAttackDmgDice').value = '';
+            document.getElementById('groupAttackDmgDie').value = '';
             document.getElementById('groupAttackDmgBonus').value = '';
             document.getElementById('groupAttackDmgType').value = '';
             document.getElementById('groupAttackRange').value = '';
