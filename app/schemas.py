@@ -2,6 +2,7 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Optional, List
 from enum import Enum
+from datetime import datetime
 
 
 class EncounterStatus(str, Enum):
@@ -14,6 +15,11 @@ class ParticipantType(str, Enum):
     pc = "pc"
     npc_unique = "npc_unique"
     npc_group = "npc_group"
+
+
+class MemberRole(str, Enum):
+    gm = "gm"
+    observer = "observer"
 
 
 # ----- Атаки -----
@@ -44,6 +50,57 @@ class Campaign(CampaignBase):
 
     class Config:
         orm_mode = True
+
+
+class CampaignWithRole(Campaign):
+    """Campaign with user's role (for observer view)"""
+    user_role: MemberRole
+
+
+# ----- Campaign Members -----
+
+class CampaignMember(BaseModel):
+    id: int
+    campaign_id: int
+    user_id: int
+    role: MemberRole
+    joined_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class CampaignMemberInfo(BaseModel):
+    """Simplified member info for display"""
+    user_id: int
+    role: MemberRole
+    joined_at: datetime
+
+
+# ----- Campaign Invites -----
+
+class CampaignInvite(BaseModel):
+    id: int
+    campaign_id: int
+    invite_token: str
+    created_at: datetime
+    expires_at: Optional[datetime]
+    is_active: bool
+    max_uses: Optional[int]
+    current_uses: int
+
+    class Config:
+        orm_mode = True
+
+
+class InviteGenerateResponse(BaseModel):
+    invite_token: str
+    invite_url: str
+    expires_at: Optional[datetime]
+
+
+class InviteJoinRequest(BaseModel):
+    invite_token: str
 
 
 # ----- Персонажи (игроки кампании) -----
@@ -148,6 +205,24 @@ class EncounterParticipantPlayer(BaseModel):
 
 class EncounterStatePlayer(EncounterStateBase):
     participants: List[EncounterParticipantPlayer]
+
+
+# Observer view - минимальная информация
+class EncounterParticipantObserver(BaseModel):
+    id: int
+    type: ParticipantType
+    name: str
+    is_enemy: bool
+    initiative_total: int
+    is_alive: bool
+    # HP, AC, attacks - скрыты
+
+    class Config:
+        orm_mode = True
+
+
+class EncounterStateObserver(EncounterStateBase):
+    participants: List[EncounterParticipantObserver]
 
 
 class EncounterMyItem(BaseModel):
