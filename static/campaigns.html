@@ -125,6 +125,7 @@
             background: rgba(37, 99, 235, .12);
             color: var(--text);
             white-space: nowrap;
+            cursor: pointer;
         }
 
         .pill.ok {
@@ -988,7 +989,6 @@
             campaigns.forEach(c => {
                 const row = document.createElement("div");
                 row.className = "item";
-                row.onclick = () => openCampaign(c.id, c.name);
 
                 const left = document.createElement("div");
                 const name = document.createElement("div");
@@ -1002,9 +1002,31 @@
                 left.appendChild(name);
                 left.appendChild(sub);
 
+                // Правая часть - кнопки
                 const right = document.createElement("div");
-                right.className = "pill";
-                right.innerText = "Открыть";
+                right.style.display = "flex";
+                right.style.gap = "8px";
+
+                // Кнопка "Поделиться"
+                const shareBtn = document.createElement("button");
+                shareBtn.className = "btn secondary";
+                shareBtn.style.height = "44px";
+                shareBtn.style.padding = "0 14px";
+                shareBtn.style.borderRadius = "14px";
+                shareBtn.innerText = "📤";
+                shareBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    window.location.href = `/static/share_campaign.html?campaign_id=${c.id}`;
+                };
+
+                // Кнопка "Открыть"
+                const openPill = document.createElement("div");
+                openPill.className = "pill";
+                openPill.innerText = "Открыть";
+                openPill.onclick = () => openCampaign(c.id, c.name);
+
+                right.appendChild(shareBtn);
+                right.appendChild(openPill);
 
                 row.appendChild(left);
                 row.appendChild(right);
