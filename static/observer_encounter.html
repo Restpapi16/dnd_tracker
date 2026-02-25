@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <title>👁️ Observer - Схватка</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;
+            --bg: #000000;
+            --surface: #070707;
+            --surface2: #0b0b0b;
+            --stroke: #242424;
+            --stroke2: #303030;
+            --text: #f8fafc;
+            --muted: rgba(248, 250, 252, .66);
+            --accent: #fbbf24;
+            --accent2: #f59e0b;
+            --onAccent: #111827;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 14px 14px 70px;
+        }
+
+        .top-card {
+            background: linear-gradient(180deg, #060606, #000000);
+            border: 1px solid rgba(251, 191, 36, .55);
+            border-radius: 14px;
+            padding: 12px 14px;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 10px 30px rgba(0, 0, 0, .55);
+            margin-bottom: 16px;
+        }
+
+        .top-title {
+            color: var(--accent);
+            font-weight: 900;
+            font-size: 18px;
+        }
+
+        .top-sub {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .round-info {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .round-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .section-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.10em;
+            opacity: 0.7;
+            margin: 16px 2px 8px;
+        }
+
+        .list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .participant {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: linear-gradient(180deg, var(--surface), var(--surface2));
+            border: 1px solid var(--stroke);
+            position: relative;
+        }
+
+        .participant.current {
+            border-color: var(--accent);
+            box-shadow: 0 0 18px rgba(251, 191, 36, 0.30);
+            background: radial-gradient(circle at top left, rgba(251, 191, 36, 0.16) 0, transparent 45%),
+                        linear-gradient(145deg, #0b0f18, #020617);
+        }
+
+        .participant.dead {
+            opacity: 0.4;
+            filter: grayscale(1);
+        }
+
+        .participant.enemy {
+            border-left: 3px solid #dc2626;
+        }
+
+        .participant.ally {
+            border-left: 3px solid #2563eb;
+        }
+
+        .p-icon {
+            font-size: 24px;
+            width: 36px;
+            text-align: center;
+        }
+
+        .p-info {
+            flex: 1;
+        }
+
+        .p-name {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .p-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .p-init {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--accent);
+            min-width: 36px;
+            text-align: right;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: var(--muted);
+            margin: 8px 2px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .observer-badge {
+            display: inline-block;
+            background: rgba(100, 116, 139, 0.2);
+            border: 1px solid rgba(100, 116, 139, 0.4);
+            border-radius: 8px;
+            padding: 4px 10px;
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--muted);
+        }
+
+        .btn {
+            height: 48px;
+            width: 100%;
+            padding: 0 16px;
+            border-radius: 14px;
+            border: 1px solid var(--stroke2);
+            background: linear-gradient(135deg, #2a2a2a, #1d1d1d);
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        .btn:active {
+            transform: scale(0.99);
+        }
+    </style>
+</head>
+<body>
+    <div id="content">
+        <div class="loading">Загрузка...</div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        const API_BASE = "";
+
+        function authHeaders() {
+            const initData = tg?.initData || "";
+            return initData ? { "Authorization": "tma " + initData } : {};
+        }
+
+        async function apiGet(path) {
+            const res = await fetch(API_BASE + path, { headers: { ...authHeaders() } });
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return await res.json();
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const encounterId = urlParams.get('encounter_id');
+
+        if (!encounterId) {
+            document.getElementById('content').innerHTML = '<div class="loading">Ошибка: не указан ID схватки</div>';
+        } else {
+            loadEncounter();
+            setInterval(loadEncounter, 3000); // Автообновление каждые 3 секунды
+        }
+
+        async function loadEncounter() {
+            try {
+                const state = await apiGet(`/encounters/${encounterId}/state?role=observer`);
+                renderEncounter(state);
+            } catch (e) {
+                console.error(e);
+                document.getElementById('content').innerHTML = `<div class="loading">Ошибка загрузки: ${e.message}</div>`;
+            }
+        }
+
+        function renderEncounter(state) {
+            const participants = state.participants || [];
+            const currentIdx = state.current_index || 0;
+
+            let html = `
+                <div class="top-card">
+                    <div class="observer-badge">👁️ Observer Mode</div>
+                    <div class="top-title">${state.encounter_name || 'Схватка'}</div>
+                    <div class="top-sub">Кампания: ${state.campaign_name}</div>
+                </div>
+
+                <div class="round-info">
+                    <div class="round-title">🔥 Раунд ${state.round}</div>
+                </div>
+
+                <div class="hint">
+                    👁️ Ты наблюдаешь за схваткой.<br>
+                    HP, КД и атаки скрыты для сохранения интриги.
+                </div>
+
+                <div class="section-title">🎯 Порядок хода</div>
+                <div class="list">
+            `;
+
+            if (participants.length === 0) {
+                html += '<div class="hint">Участников нет</div>';
+            }
+
+            participants.forEach((p, idx) => {
+                const isCurrent = idx === currentIdx;
+                const isDead = !p.is_alive;
+                const isEnemy = p.is_enemy;
+
+                let classes = 'participant';
+                if (isCurrent) classes += ' current';
+                if (isDead) classes += ' dead';
+                if (isEnemy) classes += ' enemy';
+                else classes += ' ally';
+
+                const icon = isEnemy ? '👿' : '🤝';
+                const status = isDead ? ' ☠️' : '';
+
+                html += `
+                    <div class="${classes}">
+                        <div class="p-icon">${icon}</div>
+                        <div class="p-info">
+                            <div class="p-name">${p.name}${status}</div>
+                            <div class="p-sub">${isEnemy ? 'Враг' : 'Союзник'}</div>
+                        </div>
+                        <div class="p-init">${p.initiative_total}</div>
+                    </div>
+                `;
+            });
+
+            html += `
+                </div>
+
+                <div class="hint">
+                    ℹ️ Экран автоматически обновляется каждые 3 секунды
+                </div>
+            `;
+
+            document.getElementById('content').innerHTML = html;
+        }
+
+        if (tg && tg.ready) tg.ready();
+    </script>
+</body>
+</html>
