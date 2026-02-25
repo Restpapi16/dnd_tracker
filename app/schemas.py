@@ -21,7 +21,9 @@ class ParticipantType(str, Enum):
 class Attack(BaseModel):
     name: str
     hit_bonus: int
-    damage_bonus: int
+    damage_dice: int      # количество костей (например, 2 в 2d6)
+    damage_die: int       # размер кости (например, 6 в 2d6)
+    damage_bonus: int     # бонус к урону (например, +3)
     damage_type: str
     range: str
 
