@@ -118,6 +118,37 @@ def generate_campaign_invite(
     )
 
 
+@app.get("/campaigns/invite/{token}")
+def check_campaign_invite(
+    token: str,
+    db: Session = Depends(get_db),
+):
+    """Проверить валидность инвайт-токена и получить информацию о кампании"""
+    invite = crud_multiplayer.get_invite_by_token(db, token)
+    
+    if not invite:
+        raise HTTPException(status_code=404, detail="Инвайт не найден")
+    
+    # Проверяем валидность
+    is_valid, error = crud_multiplayer.validate_invite(invite)
+    if not is_valid:
+        raise HTTPException(status_code=400, detail=error)
+    
+    # Получаем кампанию
+    campaign = db.query(models.Campaign).filter(
+        models.Campaign.id == invite.campaign_id
+    ).first()
+    
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Кампания не найдена")
+    
+    return {
+        "campaign_id": campaign.id,
+        "campaign_name": campaign.name,
+        "valid": True
+    }
+
+
 @app.post("/campaigns/join")
 def join_campaign(
     request: schemas.InviteJoinRequest,
