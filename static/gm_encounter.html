@@ -126,9 +126,8 @@
 
     .card {
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
+      flex-direction: column;
+      gap: 8px;
       padding: 14px 14px;
       border-radius: 16px;
       background: linear-gradient(180deg, var(--surface), var(--surface2));
@@ -141,7 +140,14 @@
       transform: scale(0.99);
     }
 
-    /* Подсветка “текущий ход” */
+    .card-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    /* Подсветка "текущий ход" */
     .card.current {
       border-color: var(--gold);
       box-shadow: 0 0 16px rgba(251, 191, 36, 0.25);
@@ -150,7 +156,7 @@
         linear-gradient(145deg, #0b1220, #020617);
     }
 
-    /* Подсветка “выбран для HP” */
+    /* Подсветка "выбран для HP" */
     .card.selected {
       outline: 2px solid rgba(96, 165, 250, 0.85);
       outline-offset: 0px;
@@ -219,6 +225,44 @@
     .hp.muted {
       color: var(--muted);
       font-weight: 700;
+    }
+
+    /* Attacks section */
+    .attacks-block {
+      margin-top: 10px;
+      padding: 10px;
+      background: rgba(127, 29, 29, 0.15);
+      border-radius: 10px;
+      border: 1px solid rgba(127, 29, 29, 0.35);
+    }
+
+    .attacks-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .attack-item {
+      margin-top: 6px;
+      padding: 6px 8px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      border: 1px solid rgba(127, 29, 29, 0.25);
+    }
+
+    .attack-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .attack-stats {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
     }
 
     /* HP controls */
@@ -502,7 +546,12 @@
           renderState();
         };
 
+        // Main content row
+        const mainRow = document.createElement("div");
+        mainRow.className = "card-main";
+
         const left = document.createElement("div");
+        left.style.flex = "1";
 
         const title = document.createElement("div");
         title.className = "title";
@@ -543,8 +592,40 @@
         }
         right.appendChild(hp);
 
-        card.appendChild(left);
-        card.appendChild(right);
+        mainRow.appendChild(left);
+        mainRow.appendChild(right);
+        card.appendChild(mainRow);
+
+        // Attacks section (if exists)
+        if (p.attacks && p.attacks.length > 0) {
+          const attacksBlock = document.createElement("div");
+          attacksBlock.className = "attacks-block";
+
+          const attacksTitle = document.createElement("div");
+          attacksTitle.className = "attacks-title";
+          attacksTitle.innerText = "⚔️ Атаки";
+          attacksBlock.appendChild(attacksTitle);
+
+          p.attacks.forEach(attack => {
+            const attackItem = document.createElement("div");
+            attackItem.className = "attack-item";
+
+            const attackName = document.createElement("div");
+            attackName.className = "attack-name";
+            attackName.innerText = attack.name;
+
+            const attackStats = document.createElement("div");
+            attackStats.className = "attack-stats";
+            attackStats.innerText = `+${attack.hit_bonus} попадание, +${attack.damage_bonus} урон (${attack.damage_type}), ${attack.range}`;
+
+            attackItem.appendChild(attackName);
+            attackItem.appendChild(attackStats);
+            attacksBlock.appendChild(attackItem);
+          });
+
+          card.appendChild(attacksBlock);
+        }
+
         container.appendChild(card);
       });
 
