@@ -16,6 +16,16 @@ class ParticipantType(str, Enum):
     npc_group = "npc_group"
 
 
+# ----- Атаки -----
+
+class Attack(BaseModel):
+    name: str
+    hit_bonus: int
+    damage_bonus: int
+    damage_type: str
+    range: str
+
+
 # ----- Кампании -----
 
 class CampaignBase(BaseModel):
@@ -108,6 +118,7 @@ class EncounterParticipantGM(BaseModel):
     ac: Optional[int]
     initiative_total: int
     is_alive: bool
+    attacks: Optional[List[Attack]] = None
 
     class Config:
         orm_mode = True
@@ -127,6 +138,7 @@ class EncounterParticipantPlayer(BaseModel):
     ac: Optional[int]
     initiative_total: int
     is_alive: bool
+    attacks: Optional[List[Attack]] = None
 
     class Config:
         orm_mode = True
@@ -174,6 +186,7 @@ class UniqueMonsterInput(BaseModel):
     ac: int
     initiative_mod: int  # модификатор инициативы, сам бросок сделаем на бэке
     is_enemy: bool = True
+    attacks: Optional[List[Attack]] = None
 
 
 class GroupMonsterInput(BaseModel):
@@ -183,6 +196,7 @@ class GroupMonsterInput(BaseModel):
     ac: int
     initiative_mod: int
     is_enemy: bool = True
+    attacks: Optional[List[Attack]] = None
 
 
 class EncounterParticipantsCreate(BaseModel):
