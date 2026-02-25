@@ -5,228 +5,310 @@
   <meta charset="utf-8" />
   <title>GM Encounter</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Telegram Mini App API -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
   <style>
+    :root {
+      /* Base */
+      --font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      --bg: #000000;
+      --surface: #070707;
+      /* карточки */
+      --surface2: #0b0b0b;
+      /* приподнятые */
+      --stroke: #242424;
+      /* границы/разделители */
+      --stroke2: #303030;
+      /* активные границы */
+
+      /* Text */
+      --text: #f8fafc;
+      --muted: rgba(248, 250, 252, .66);
+
+      /* Accent (yellow) */
+      --accent: #fbbf24;
+      /* amber-400 */
+      --accent2: #f59e0b;
+      /* amber-500 */
+      --onAccent: #111827;
+      /* текст на жёлтом */
+
+      /* States */
+      --danger: #ef4444;
+      --danger2: #991b1b;
+      --onDanger: #ffffff;
+
+      --focus: rgba(251, 191, 36, .55);
+    }
+
+
     body {
-      font-family: "Georgia", "Times New Roman", serif;
-      background:
-        radial-gradient(circle at top, rgba(148, 163, 184, 0.16) 0, transparent 55%),
-        radial-gradient(circle at bottom, rgba(15, 23, 42, 0.9) 0, #020617 60%),
-        repeating-linear-gradient(135deg,
-          #020617,
-          #020617 6px,
-          #030711 6px,
-          #030711 12px);
-      color: #e5e7eb;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
       margin: 0;
-      padding: 12px;
+      padding: 14px 14px 136px;
+      /* в gm_encounter оставь своё значение под bottom-bar */
     }
 
-    /* “Пергамент” для верхней карточки */
+
+
+    /* Верхняя карточка */
     .top-card {
-      background:
-        radial-gradient(circle at top left, rgba(250, 250, 249, 0.14) 0, transparent 35%),
-        linear-gradient(135deg, #292524, #1c1917);
-      border-radius: 10px;
-      padding: 10px 12px;
-      border: 1px solid #78350f;
-      box-shadow:
-        0 0 25px rgba(0, 0, 0, 0.65),
-        0 0 0 1px rgba(15, 23, 42, 0.7);
-      margin-bottom: 12px;
-    }
-
-    h1,
-    h2 {
-      margin: 0;
+      background: linear-gradient(180deg, #060606, #000000);
+      border: 1px solid rgba(251, 191, 36, .55);
+      border-radius: 14px;
+      padding: 12px 14px;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 10px 30px rgba(0, 0, 0, .55);
     }
 
     .top-title {
-      font-size: 19px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+      color: var(--accent);
     }
 
     .top-sub {
-      font-size: 12px;
-      opacity: 0.85;
-      margin-top: 2px;
-      font-style: italic;
+      color: var(--muted);
     }
+
 
     .top-row {
       display: flex;
       justify-content: space-between;
+      gap: 10px;
       align-items: center;
-      margin-top: 6px;
+      margin-top: 10px;
     }
 
-    .round-info {
-      font-size: 13px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: #1d283a;
-      border: 1px solid #334155;
+    .top-title {
+      font-weight: 900;
     }
 
-    .turn-info {
-      font-size: 13px;
-      padding: 4px 8px;
+    .item-title,
+    .title {
+      font-weight: 800;
+    }
+
+
+    .pill {
+      font-size: 12px;
+      padding: 9px 12px;
       border-radius: 999px;
-      background: #3b0764;
-      border: 1px solid #a855f7;
+      border: 1px solid rgba(251, 191, 36, .35);
+      background:
+        radial-gradient(circle at top left, rgba(251, 191, 36, .18) 0, transparent 55%),
+        linear-gradient(180deg, #151515, #070707);
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, .55);
+      white-space: nowrap;
     }
 
     .status-line {
       font-size: 12px;
-      margin-top: 4px;
+      margin-top: 8px;
       min-height: 16px;
       opacity: 0.9;
     }
 
-    .participants {
-      margin-top: 8px;
-    }
-
     .section-title {
-      font-size: 13px;
+      font-size: 12px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.10em;
       opacity: 0.7;
-      margin-bottom: 4px;
+      margin: 10px 2px 8px;
     }
 
-    .row {
+    /* Список */
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      padding: 6px 8px;
-      margin-bottom: 4px;
-      border-radius: 8px;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 14px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, var(--surface), var(--surface2));
+      border: 1px solid var(--stroke);
+      min-height: 62px;
+      user-select: none;
+    }
+
+    .card:active {
+      transform: scale(0.99);
+    }
+
+    /* Подсветка “текущий ход” */
+    .card.current {
+      border-color: var(--gold);
+      box-shadow: 0 0 16px rgba(251, 191, 36, 0.25);
       background:
-        linear-gradient(145deg, #020617, #111827);
-      border: 1px solid #1f2937;
-      transition: background 0.1s, transform 0.05s, box-shadow 0.1s;
+        radial-gradient(circle at top left, rgba(251, 191, 36, 0.14) 0, transparent 45%),
+        linear-gradient(145deg, #0b1220, #020617);
     }
 
-    .row.current {
-      background:
-        radial-gradient(circle at top left, rgba(251, 191, 36, 0.15) 0, transparent 40%),
-        linear-gradient(145deg, #1e293b, #020617);
-      border-color: #fbbf24;
-      box-shadow: 0 0 16px rgba(251, 191, 36, 0.4);
-      transform: translateY(-1px);
+    /* Подсветка “выбран для HP” */
+    .card.selected {
+      outline: 2px solid rgba(96, 165, 250, 0.85);
+      outline-offset: 0px;
     }
 
-
-    .row.dead {
-      opacity: 0.5;
+    .card.dead {
+      opacity: 0.55;
     }
 
-    .name {
-      font-weight: 600;
-      font-size: 14px;
+    .title {
+      font-size: 16px;
+      font-weight: 900;
+      line-height: 1.15;
     }
 
-    .meta {
-      font-size: 11px;
-      opacity: 0.8;
+    .sub {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--muted);
     }
 
     .badges {
-      margin-top: 2px;
+      margin-top: 8px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
     }
 
     .badge {
       display: inline-block;
-      padding: 2px 6px;
+      padding: 6px 10px;
       border-radius: 999px;
-      background: #4b5563;
-      color: #e5e7eb;
-      font-size: 10px;
-      margin-right: 4px;
-      margin-top: 2px;
+      border: 1px solid var(--stroke);
+      font-size: 11px;
+      letter-spacing: .06em;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      background: rgba(255, 255, 255, .04);
     }
 
     .badge.enemy {
-      background: #7f1d1d;
+      background: rgba(220, 38, 38, .12);
+      border-color: rgba(220, 38, 38, .35);
     }
 
     .badge.pc {
-      background: #1d4ed8;
+      background: rgba(37, 99, 235, .12);
+      border-color: rgba(37, 99, 235, .35);
     }
 
-    .badge.unconscious {
-      background: #92400e;
+    .badge.zero {
+      background: rgba(245, 158, 11, .12);
+      border-color: rgba(245, 158, 11, .35);
+    }
+
+    .right {
+      text-align: right;
+      min-width: 96px;
     }
 
     .hp {
-      font-size: 13px;
+      font-size: 14px;
+      font-weight: 900;
+      margin-top: 2px;
     }
 
-    .controls {
-      margin-top: 12px;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+    .hp.muted {
+      color: var(--muted);
+      font-weight: 700;
     }
 
-    button {
-      padding: 6px 12px;
-      border-radius: 999px;
-      border: 1px solid #0f172a;
-      background: linear-gradient(135deg, #1d4ed8, #1e40af);
-      color: #f9fafb;
-      font-size: 13px;
+    /* HP controls */
+    .hp-controls .btn {
+      height: 44px;
+      min-width: 62px;
+      border-radius: 14px;
+      font-size: 14px;
+    }
+
+    .hp-controls .btn {
+      height: 54px;
+      min-width: 76px;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: .02em;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: var(--onAccent);
+      border: 1px solid rgba(0, 0, 0, .55);
       cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
       box-shadow: 0 2px 6px rgba(15, 23, 42, 0.7);
     }
 
-    button.danger {
-      background: linear-gradient(135deg, #b91c1c, #7f1d1d);
+    .hp-controls .btn:active {
+      transform: scale(0.99);
     }
 
-    button.secondary {
-      background: linear-gradient(135deg, #4b5563, #374151);
+    /* Нижняя панель */
+    .bottom-bar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      background: rgba(2, 6, 23, .92);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--stroke);
+      z-index: 1500;
     }
 
-    button:hover {
-      filter: brightness(1.05);
-    }
-
-    button:disabled {
-      opacity: 0.5;
-      cursor: default;
-      box-shadow: none;
-    }
-
-    .hp-controls {
-      margin-top: 10px;
+    .bottom-row {
       display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
+      gap: 10px;
     }
 
-    .hp-hint {
-      font-size: 12px;
-      opacity: 0.8;
+    .bottom-row+.bottom-row {
+      margin-top: 10px;
     }
 
+    .bottom-row .btn {
+      flex: 1;
+      height: 52px;
+      border-radius: 16px;
+      border: 1px solid #0f172a;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      color: #111827;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.7);
+    }
+
+    .bottom-row .btn.secondary {
+      background: linear-gradient(135deg, #2a2a2a, #1d1d1d);
+      color: var(--text);
+      border: 1px solid var(--stroke2);
+    }
+
+    .bottom-row .btn.danger {
+      background: linear-gradient(135deg, var(--danger), var(--danger2));
+      color: var(--onDanger);
+      border: 1px solid rgba(0, 0, 0, .35);
+    }
+
+    .bottom-row .btn:active {
+      transform: scale(0.99);
+    }
+
+    /* Toast */
     .toast {
       position: fixed;
       left: 50%;
-      bottom: 16px;
+      bottom: 18px;
       transform: translateX(-50%) translateY(20px);
       min-width: 220px;
       max-width: 90vw;
-      padding: 8px 12px;
+      padding: 10px 14px;
       border-radius: 999px;
       background: rgba(15, 23, 42, 0.95);
       border: 1px solid #78350f;
@@ -236,7 +318,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.25s ease-out, transform 0.25s ease-out;
-      z-index: 1000;
+      z-index: 2500;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
     }
 
@@ -244,8 +326,58 @@
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
-  </style>
 
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .bottom-row .btn.primary {
+      background: linear-gradient(180deg, #2a2a2a, #151515);
+      color: var(--text);
+      border: 1px solid rgba(251, 191, 36, .55);
+      /* жёлтая рамка */
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 8px 18px rgba(0, 0, 0, .45);
+    }
+
+    .bottom-row .btn.primary:active {
+      transform: scale(0.99);
+      filter: brightness(1.06);
+    }
+
+    .hpbtn {
+      height: 44px;
+      min-width: 52px;
+      padding: 0 10px;
+      border-radius: 14px;
+      border: 1px solid var(--stroke2, #303030);
+      background: linear-gradient(180deg, #222, #111);
+      color: var(--text);
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .hpbtn:active {
+      transform: scale(0.99);
+    }
+
+    .hpwho {
+      flex: 1;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      border: 1px dashed rgba(251, 191, 36, .35);
+      color: rgba(251, 191, 36, .95);
+      font-weight: 900;
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  </style>
 </head>
 
 <body>
@@ -253,37 +385,50 @@
     <div class="top-title" id="encounterName">Схватка</div>
     <div class="top-sub" id="campaignName">Кампания неизвестна</div>
     <div class="top-row">
-      <div class="round-info" id="roundInfo">Раунд ?</div>
-      <div class="turn-info" id="turnInfo">Ход ?</div>
+      <div class="pill" id="roundInfo">Раунд ?</div>
+      <div class="pill" id="turnInfo">Ход ?</div>
     </div>
     <div class="status-line" id="statusLine"></div>
   </div>
 
-  <div class="participants">
-    <div class="section-title">Порядок ходов</div>
-    <div id="participants"></div>
+  <div class="section-title">Порядок ходов</div>
+  <div id="participants" class="list"></div>
+
+  <div class="section-title">HP</div>
+  <div id="hpControls" class="hp-controls"></div>
+  <div class="hint">Тап по участнику выбирает его для изменения HP.</div>
+
+  <div class="bottom-bar">
+    <div class="bottom-row">
+      <button id="nextTurnBtn" class="btn primary">Следующий</button>
+    </div>
+    <div class="bottom-row" id="hpBarRow" style="display:none;">
+      <button class="hpbtn" data-d="-10">-10</button>
+      <button class="hpbtn" data-d="-5">-5</button>
+      <button class="hpbtn" data-d="-1">-1</button>
+      <div class="hpwho" id="hpWho">HP</div>
+      <button class="hpbtn" data-d="1">+1</button>
+      <button class="hpbtn" data-d="5">+5</button>
+      <button class="hpbtn" data-d="10">+10</button>
+    </div>
+    <div class="bottom-row">
+      <button id="finishBtn" class="btn danger">Завершить</button>
+      <button id="backToCampaignsBtn" class="btn secondary">К кампаниям</button>
+    </div>
   </div>
 
-  <div class="controls">
-    <button id="nextTurnBtn">Следующий ход</button>
-    <button id="refreshBtn" class="secondary">Обновить</button>
-    <button id="finishBtn" class="danger">Завершить схватку</button>
-    <button class="secondary" id="backToCampaignsBtn">К кампаниям</button>
-  </div>
-
-  <div class="hp-controls" id="hpControls"></div>
+  <div id="toast" class="toast"></div>
 
   <script>
     const tg = window.Telegram.WebApp;
+
     function authHeaders() {
       const initData = tg?.initData || "";
       return initData ? { "Authorization": "tma " + initData } : {};
     }
 
+    const API_BASE = "";
 
-    // ------ настройки ------
-    const API_BASE = ""; // поменяешь на свой backend
-    // encounter_id возьмём из start_param или query-параметра tgWebAppStartParam
     const urlParams = new URLSearchParams(window.location.search);
     let encounterId = urlParams.get("encounter_id") || urlParams.get("tgWebAppStartParam");
 
@@ -299,13 +444,10 @@
     let selectedParticipantId = null;
 
     async function apiGet(path) {
-      const res = await fetch(API_BASE + path, {
-        headers: { ...authHeaders() },
-      });
+      const res = await fetch(API_BASE + path, { headers: { ...authHeaders() } });
       if (!res.ok) throw new Error("HTTP " + res.status);
       return await res.json();
     }
-
 
     async function apiPost(path, body) {
       const res = await fetch(API_BASE + path, {
@@ -316,7 +458,6 @@
       if (!res.ok) throw new Error("HTTP " + res.status);
       return await res.json();
     }
-
 
     async function loadState() {
       if (!encounterId) return;
@@ -335,45 +476,43 @@
     function renderState() {
       if (!currentState) return;
 
-      const roundInfo = document.getElementById("roundInfo");
-      const turnInfo = document.getElementById("turnInfo");
-      const encounterNameEl = document.getElementById("encounterName");
-      const campaignNameEl = document.getElementById("campaignName");
+      document.getElementById("encounterName").innerText =
+        currentState.encounter_name ? currentState.encounter_name : `Схватка #${currentState.encounter_id}`;
+      document.getElementById("campaignName").innerText =
+        currentState.campaign_name ? `Кампания "${currentState.campaign_name}"` : `Кампания #${currentState.campaign_id}`;
 
-      // Можно пока выводить простое имя по id
-      encounterNameEl.innerText = `Схватка #${currentState.encounter_id}`;
-      campaignNameEl.innerText = `Кампания #${currentState.campaign_id}`;
+      document.getElementById("roundInfo").innerText = `Раунд ${currentState.round}`;
 
-      roundInfo.innerText = `Раунд ${currentState.round}`;
       const total = currentState.participants.length;
-      turnInfo.innerText = `Ход ${currentState.current_index + 1} из ${total}`;
+      document.getElementById("turnInfo").innerText = `Ход ${currentState.current_index + 1} из ${total}`;
 
       const container = document.getElementById("participants");
       container.innerHTML = "";
 
       currentState.participants.forEach((p, index) => {
-        const row = document.createElement("div");
-        row.className =
-          "row" +
+        const card = document.createElement("div");
+        card.className =
+          "card" +
           (index === currentState.current_index ? " current" : "") +
-          (!p.is_alive ? " dead" : "");
+          (!p.is_alive ? " dead" : "") +
+          (selectedParticipantId === p.id ? " selected" : "");
 
-        row.onclick = () => {
-          selectedParticipantId = p.id;
+        card.onclick = () => {
+          selectedParticipantId = (selectedParticipantId === p.id) ? null : p.id;
           renderState();
         };
 
         const left = document.createElement("div");
 
-        const name = document.createElement("div");
-        name.className = "name";
-        name.innerText = p.name;
-        left.appendChild(name);
+        const title = document.createElement("div");
+        title.className = "title";
+        title.innerText = p.name;
+        left.appendChild(title);
 
-        const meta = document.createElement("div");
-        meta.className = "meta";
-        meta.innerText = `Инициатива: ${p.initiative_total}, КД: ${p.ac ?? "-"}`;
-        left.appendChild(meta);
+        const sub = document.createElement("div");
+        sub.className = "sub";
+        sub.innerText = `Инициатива: ${p.initiative_total}, КД: ${p.ac ?? "-"}`;
+        left.appendChild(sub);
 
         const badges = document.createElement("div");
         badges.className = "badges";
@@ -385,7 +524,7 @@
 
         if (!p.is_alive) {
           const deadBadge = document.createElement("span");
-          deadBadge.className = "badge unconscious";
+          deadBadge.className = "badge zero";
           deadBadge.innerText = "0 HP";
           badges.appendChild(deadBadge);
         }
@@ -393,46 +532,41 @@
         left.appendChild(badges);
 
         const right = document.createElement("div");
-        right.style.textAlign = "right";
-
-        const backToCampaignsBtn = document.getElementById("backToCampaignsBtn");
-        backToCampaignsBtn.onclick = () => {
-          window.location.href = "/static/campaigns.html";
-        };
-
+        right.className = "right";
 
         const hp = document.createElement("div");
-        hp.className = "hp";
+        hp.className = "hp" + ((p.max_hp == null || p.current_hp == null) ? " muted" : "");
         if (p.max_hp != null && p.current_hp != null) {
-          hp.innerText = `HP: ${p.current_hp}/${p.max_hp}`;
+          hp.innerText = `${p.current_hp}/${p.max_hp}`;
         } else {
-          hp.innerText = "";
+          hp.innerText = "—";
         }
-
-        if (selectedParticipantId === p.id) {
-          row.style.outline = "1px solid #60a5fa";
-        }
-
         right.appendChild(hp);
 
-        row.appendChild(left);
-        row.appendChild(right);
-
-        container.appendChild(row);
+        card.appendChild(left);
+        card.appendChild(right);
+        container.appendChild(card);
       });
 
-      renderHpControls();
+      const selected = currentState.participants.find(x => x.id === selectedParticipantId);
+
+      if (selectedParticipantId && selected) {
+        hpBarRow.style.display = "flex";
+        hpWho.innerText = selected.name;
+      } else {
+        hpBarRow.style.display = "none";
+        hpWho.innerText = "HP";
+      }
     }
 
-
     function renderHpControls() {
-      let hpControls = document.getElementById("hpControls");
+      const hpControls = document.getElementById("hpControls");
       hpControls.innerHTML = "";
 
       if (!selectedParticipantId) {
         const txt = document.createElement("div");
-        txt.className = "hp-hint";
-        txt.innerText = "Выбери участника, чтобы изменить HP.";
+        txt.className = "hint";
+        txt.innerText = "Выбери участника выше.";
         hpControls.appendChild(txt);
         return;
       }
@@ -440,13 +574,12 @@
       const deltas = [-10, -5, -1, +1, +5, +10];
       deltas.forEach(d => {
         const btn = document.createElement("button");
-        btn.className = "secondary";
+        btn.className = "btn";
         btn.innerText = (d > 0 ? "+" + d : d.toString());
         btn.onclick = () => changeHp(selectedParticipantId, d);
         hpControls.appendChild(btn);
       });
     }
-
 
     async function changeHp(participantId, delta) {
       try {
@@ -458,6 +591,17 @@
         setFlavorStatus("error_hp");
       }
     }
+
+    const hpBarRow = document.getElementById("hpBarRow");
+    const hpWho = document.getElementById("hpWho");
+
+    document.querySelectorAll(".hpbtn").forEach(b => {
+      b.onclick = () => {
+        const d = parseInt(b.dataset.d, 10);
+        if (!selectedParticipantId) return;
+        changeHp(selectedParticipantId, d);
+      };
+    });
 
 
     async function nextTurn() {
@@ -472,15 +616,17 @@
       }
     }
 
-
     async function finishEncounter() {
       if (!encounterId) return;
       const ok = confirm("Завершить схватку?");
       if (!ok) return;
+
       try {
         setFlavorStatus("finish");
         await apiPost(`/encounters/${encounterId}/finish`, {});
-        // можно не грузить стейт, бой всё равно завершён
+
+        // Переходим на экран кампаний
+        window.location.replace("/static/campaigns.html");
       } catch (e) {
         console.error(e);
         setFlavorStatus("error_state");
@@ -488,25 +634,23 @@
     }
 
 
-    let toastTimeout = null;
+    document.getElementById("nextTurnBtn").onclick = nextTurn;
+    document.getElementById("finishBtn").onclick = finishEncounter;
+    document.getElementById("backToCampaignsBtn").onclick = () => {
+      window.location.href = "/static/campaigns.html";
+    };
 
+    let toastTimeout = null;
     function showToast(text) {
       const el = document.getElementById("toast");
       if (!el) return;
-
       el.innerText = text;
       el.classList.add("show");
-
-      if (toastTimeout) {
-        clearTimeout(toastTimeout);
-      }
-      toastTimeout = setTimeout(() => {
-        el.classList.remove("show");
-      }, 2200);
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => el.classList.remove("show"), 2200);
     }
 
     function setStatus(text) {
-      // оставим на будущее, если надо будет писать в статус‑линию
       const el = document.getElementById("statusLine");
       if (el) el.innerText = text;
     }
@@ -517,45 +661,33 @@
 
     function setFlavorStatus(type) {
       switch (type) {
-
+        case "loading_state":
+          setStatus("Загружаю состояние…");
+          break;
         case "next_turn":
-          showToast("Песочные часы перевёрнуты. Следующий ход...");
+          showToast("Следующий ход…");
           break;
         case "hp_change":
-          showToast("Кости судьбы перекатываются...");
+          showToast("Изменяю HP…");
           break;
         case "finish":
-          showToast("Эхо битвы затихает. Схватка завершена.");
+          showToast("Схватка завершена.");
           break;
         case "error_state":
-          showToast("Боги кубов недовольны. Проверь подключение.");
+          showToast("Ошибка. Проверь соединение.");
           break;
         case "error_hp":
-          showToast("Магия лечения дала сбой. Попробуй ещё раз.");
+          showToast("Не удалось изменить HP.");
           break;
         case "error_next":
-          showToast("Инициатива запуталась в свитках.");
+          showToast("Не удалось переключить ход.");
           break;
         default:
-          // ничего не делаем
           break;
       }
     }
 
-
-
-
-    // Привязываем кнопки
-    document.getElementById("nextTurnBtn").onclick = nextTurn;
-    document.getElementById("refreshBtn").onclick = loadState;
-    document.getElementById("finishBtn").onclick = finishEncounter;
-
-    // Инициализация Telegram WebApp
-    if (tg && tg.ready) {
-      tg.ready();
-    }
-
-    // стартовая загрузка
+    if (tg && tg.ready) tg.ready();
     loadState();
   </script>
 </body>
