@@ -80,6 +80,9 @@ class Participant(Base):
     initiative_total = Column(Integer, nullable=False)
     group_id = Column(Integer, nullable=True)
     is_enemy = Column(Boolean, nullable=False, default=False)
+    
+    # Новое поле для хранения атак в формате JSON
+    attacks = Column(Text, nullable=True)
 
     encounter = relationship("Encounter", back_populates="participants")
 
