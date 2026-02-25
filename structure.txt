@@ -1,0 +1,15 @@
+dnd_tracker/
+  app/
+    __init__.py
+    main.py          # точка входа FastAPI
+    database.py      # SQLite + Session
+    models.py        # SQLAlchemy-модели
+    schemas.py       # Pydantic-схемы
+    crud.py          # функции работы с БД
+    deps.py          # зависимости (get_db, get_current_user и т.п. позже)
+    routers/
+      __init__.py
+      campaigns.py   # кампании и персонажи
+      encounters.py  # схватки и участники
+  alembic/           # позже, если захочешь миграции
+  dnd.db             # SQLite (после первого запуска)

@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+  <meta charset="utf-8" />
+  <title>GM Encounter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Telegram Mini App API -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      font-family: "Georgia", "Times New Roman", serif;
+      background:
+        radial-gradient(circle at top, rgba(148, 163, 184, 0.16) 0, transparent 55%),
+        radial-gradient(circle at bottom, rgba(15, 23, 42, 0.9) 0, #020617 60%),
+        repeating-linear-gradient(135deg,
+          #020617,
+          #020617 6px,
+          #030711 6px,
+          #030711 12px);
+      color: #e5e7eb;
+      margin: 0;
+      padding: 12px;
+    }
+
+    /* “Пергамент” для верхней карточки */
+    .top-card {
+      background:
+        radial-gradient(circle at top left, rgba(250, 250, 249, 0.14) 0, transparent 35%),
+        linear-gradient(135deg, #292524, #1c1917);
+      border-radius: 10px;
+      padding: 10px 12px;
+      border: 1px solid #78350f;
+      box-shadow:
+        0 0 25px rgba(0, 0, 0, 0.65),
+        0 0 0 1px rgba(15, 23, 42, 0.7);
+      margin-bottom: 12px;
+    }
+
+    h1,
+    h2 {
+      margin: 0;
+    }
+
+    .top-title {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+    }
+
+    .top-sub {
+      font-size: 12px;
+      opacity: 0.85;
+      margin-top: 2px;
+      font-style: italic;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+    }
+
+    .round-info {
+      font-size: 13px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #1d283a;
+      border: 1px solid #334155;
+    }
+
+    .turn-info {
+      font-size: 13px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #3b0764;
+      border: 1px solid #a855f7;
+    }
+
+    .status-line {
+      font-size: 12px;
+      margin-top: 4px;
+      min-height: 16px;
+      opacity: 0.9;
+    }
+
+    .participants {
+      margin-top: 8px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.7;
+      margin-bottom: 4px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 8px;
+      margin-bottom: 4px;
+      border-radius: 8px;
+      background:
+        linear-gradient(145deg, #020617, #111827);
+      border: 1px solid #1f2937;
+      transition: background 0.1s, transform 0.05s, box-shadow 0.1s;
+    }
+
+    .row.current {
+      background:
+        radial-gradient(circle at top left, rgba(251, 191, 36, 0.15) 0, transparent 40%),
+        linear-gradient(145deg, #1e293b, #020617);
+      border-color: #fbbf24;
+      box-shadow: 0 0 16px rgba(251, 191, 36, 0.4);
+      transform: translateY(-1px);
+    }
+
+
+    .row.dead {
+      opacity: 0.5;
+    }
+
+    .name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .meta {
+      font-size: 11px;
+      opacity: 0.8;
+    }
+
+    .badges {
+      margin-top: 2px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #4b5563;
+      color: #e5e7eb;
+      font-size: 10px;
+      margin-right: 4px;
+      margin-top: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .badge.enemy {
+      background: #7f1d1d;
+    }
+
+    .badge.pc {
+      background: #1d4ed8;
+    }
+
+    .badge.unconscious {
+      background: #92400e;
+    }
+
+    .hp {
+      font-size: 13px;
+    }
+
+    .controls {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid #0f172a;
+      background: linear-gradient(135deg, #1d4ed8, #1e40af);
+      color: #f9fafb;
+      font-size: 13px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.7);
+    }
+
+    button.danger {
+      background: linear-gradient(135deg, #b91c1c, #7f1d1d);
+    }
+
+    button.secondary {
+      background: linear-gradient(135deg, #4b5563, #374151);
+    }
+
+    button:hover {
+      filter: brightness(1.05);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .hp-controls {
+      margin-top: 10px;
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .hp-hint {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%) translateY(20px);
+      min-width: 220px;
+      max-width: 90vw;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid #78350f;
+      color: #f9fafb;
+      font-size: 12px;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+      z-index: 1000;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+
+</head>
+
+<body>
+  <div class="top-card">
+    <div class="top-title" id="encounterName">Схватка</div>
+    <div class="top-sub" id="campaignName">Кампания неизвестна</div>
+    <div class="top-row">
+      <div class="round-info" id="roundInfo">Раунд ?</div>
+      <div class="turn-info" id="turnInfo">Ход ?</div>
+    </div>
+    <div class="status-line" id="statusLine"></div>
+  </div>
+
+  <div class="participants">
+    <div class="section-title">Порядок ходов</div>
+    <div id="participants"></div>
+  </div>
+
+  <div class="controls">
+    <button id="nextTurnBtn">Следующий ход</button>
+    <button id="refreshBtn" class="secondary">Обновить</button>
+    <button id="finishBtn" class="danger">Завершить схватку</button>
+    <button class="secondary" id="backToCampaignsBtn">К кампаниям</button>
+  </div>
+
+  <div class="hp-controls" id="hpControls"></div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    function authHeaders() {
+      const initData = tg?.initData || "";
+      return initData ? { "Authorization": "tma " + initData } : {};
+    }
+
+
+    // ------ настройки ------
+    const API_BASE = ""; // поменяешь на свой backend
+    // encounter_id возьмём из start_param или query-параметра tgWebAppStartParam
+    const urlParams = new URLSearchParams(window.location.search);
+    let encounterId = urlParams.get("encounter_id") || urlParams.get("tgWebAppStartParam");
+
+    if (!encounterId && tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
+      encounterId = tg.initDataUnsafe.start_param;
+    }
+
+    if (!encounterId) {
+      document.getElementById("statusLine").innerText = "Нет encounter_id";
+    }
+
+    let currentState = null;
+    let selectedParticipantId = null;
+
+    async function apiGet(path) {
+      const res = await fetch(API_BASE + path, {
+        headers: { ...authHeaders() },
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return await res.json();
+    }
+
+
+    async function apiPost(path, body) {
+      const res = await fetch(API_BASE + path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeaders() },
+        body: body ? JSON.stringify(body) : "{}",
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return await res.json();
+    }
+
+
+    async function loadState() {
+      if (!encounterId) return;
+      setFlavorStatus("loading_state");
+      try {
+        const state = await apiGet(`/encounters/${encounterId}/state?role=gm`);
+        currentState = state;
+        renderState();
+        clearStatus();
+      } catch (e) {
+        console.error(e);
+        setFlavorStatus("error_state");
+      }
+    }
+
+    function renderState() {
+      if (!currentState) return;
+
+      const roundInfo = document.getElementById("roundInfo");
+      const turnInfo = document.getElementById("turnInfo");
+      const encounterNameEl = document.getElementById("encounterName");
+      const campaignNameEl = document.getElementById("campaignName");
+
+      // Можно пока выводить простое имя по id
+      encounterNameEl.innerText = `Схватка #${currentState.encounter_id}`;
+      campaignNameEl.innerText = `Кампания #${currentState.campaign_id}`;
+
+      roundInfo.innerText = `Раунд ${currentState.round}`;
+      const total = currentState.participants.length;
+      turnInfo.innerText = `Ход ${currentState.current_index + 1} из ${total}`;
+
+      const container = document.getElementById("participants");
+      container.innerHTML = "";
+
+      currentState.participants.forEach((p, index) => {
+        const row = document.createElement("div");
+        row.className =
+          "row" +
+          (index === currentState.current_index ? " current" : "") +
+          (!p.is_alive ? " dead" : "");
+
+        row.onclick = () => {
+          selectedParticipantId = p.id;
+          renderState();
+        };
+
+        const left = document.createElement("div");
+
+        const name = document.createElement("div");
+        name.className = "name";
+        name.innerText = p.name;
+        left.appendChild(name);
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.innerText = `Инициатива: ${p.initiative_total}, КД: ${p.ac ?? "-"}`;
+        left.appendChild(meta);
+
+        const badges = document.createElement("div");
+        badges.className = "badges";
+
+        const roleBadge = document.createElement("span");
+        roleBadge.className = "badge " + (p.is_enemy ? "enemy" : "pc");
+        roleBadge.innerText = p.is_enemy ? "Враг" : "Игрок";
+        badges.appendChild(roleBadge);
+
+        if (!p.is_alive) {
+          const deadBadge = document.createElement("span");
+          deadBadge.className = "badge unconscious";
+          deadBadge.innerText = "0 HP";
+          badges.appendChild(deadBadge);
+        }
+
+        left.appendChild(badges);
+
+        const right = document.createElement("div");
+        right.style.textAlign = "right";
+
+        const backToCampaignsBtn = document.getElementById("backToCampaignsBtn");
+        backToCampaignsBtn.onclick = () => {
+          window.location.href = "/static/campaigns.html";
+        };
+
+
+        const hp = document.createElement("div");
+        hp.className = "hp";
+        if (p.max_hp != null && p.current_hp != null) {
+          hp.innerText = `HP: ${p.current_hp}/${p.max_hp}`;
+        } else {
+          hp.innerText = "";
+        }
+
+        if (selectedParticipantId === p.id) {
+          row.style.outline = "1px solid #60a5fa";
+        }
+
+        right.appendChild(hp);
+
+        row.appendChild(left);
+        row.appendChild(right);
+
+        container.appendChild(row);
+      });
+
+      renderHpControls();
+    }
+
+
+    function renderHpControls() {
+      let hpControls = document.getElementById("hpControls");
+      hpControls.innerHTML = "";
+
+      if (!selectedParticipantId) {
+        const txt = document.createElement("div");
+        txt.className = "hp-hint";
+        txt.innerText = "Выбери участника, чтобы изменить HP.";
+        hpControls.appendChild(txt);
+        return;
+      }
+
+      const deltas = [-10, -5, -1, +1, +5, +10];
+      deltas.forEach(d => {
+        const btn = document.createElement("button");
+        btn.className = "secondary";
+        btn.innerText = (d > 0 ? "+" + d : d.toString());
+        btn.onclick = () => changeHp(selectedParticipantId, d);
+        hpControls.appendChild(btn);
+      });
+    }
+
+
+    async function changeHp(participantId, delta) {
+      try {
+        setFlavorStatus("hp_change");
+        await apiPost(`/participants/${participantId}/hp_change`, { delta });
+        await loadState();
+      } catch (e) {
+        console.error(e);
+        setFlavorStatus("error_hp");
+      }
+    }
+
+
+    async function nextTurn() {
+      if (!encounterId) return;
+      try {
+        setFlavorStatus("next_turn");
+        await apiPost(`/encounters/${encounterId}/next_turn`, {});
+        await loadState();
+      } catch (e) {
+        console.error(e);
+        setFlavorStatus("error_next");
+      }
+    }
+
+
+    async function finishEncounter() {
+      if (!encounterId) return;
+      const ok = confirm("Завершить схватку?");
+      if (!ok) return;
+      try {
+        setFlavorStatus("finish");
+        await apiPost(`/encounters/${encounterId}/finish`, {});
+        // можно не грузить стейт, бой всё равно завершён
+      } catch (e) {
+        console.error(e);
+        setFlavorStatus("error_state");
+      }
+    }
+
+
+    let toastTimeout = null;
+
+    function showToast(text) {
+      const el = document.getElementById("toast");
+      if (!el) return;
+
+      el.innerText = text;
+      el.classList.add("show");
+
+      if (toastTimeout) {
+        clearTimeout(toastTimeout);
+      }
+      toastTimeout = setTimeout(() => {
+        el.classList.remove("show");
+      }, 2200);
+    }
+
+    function setStatus(text) {
+      // оставим на будущее, если надо будет писать в статус‑линию
+      const el = document.getElementById("statusLine");
+      if (el) el.innerText = text;
+    }
+
+    function clearStatus() {
+      setStatus("");
+    }
+
+    function setFlavorStatus(type) {
+      switch (type) {
+
+        case "next_turn":
+          showToast("Песочные часы перевёрнуты. Следующий ход...");
+          break;
+        case "hp_change":
+          showToast("Кости судьбы перекатываются...");
+          break;
+        case "finish":
+          showToast("Эхо битвы затихает. Схватка завершена.");
+          break;
+        case "error_state":
+          showToast("Боги кубов недовольны. Проверь подключение.");
+          break;
+        case "error_hp":
+          showToast("Магия лечения дала сбой. Попробуй ещё раз.");
+          break;
+        case "error_next":
+          showToast("Инициатива запуталась в свитках.");
+          break;
+        default:
+          // ничего не делаем
+          break;
+      }
+    }
+
+
+
+
+    // Привязываем кнопки
+    document.getElementById("nextTurnBtn").onclick = nextTurn;
+    document.getElementById("refreshBtn").onclick = loadState;
+    document.getElementById("finishBtn").onclick = finishEncounter;
+
+    // Инициализация Telegram WebApp
+    if (tg && tg.ready) {
+      tg.ready();
+    }
+
+    // стартовая загрузка
+    loadState();
+  </script>
+</body>
+
+</html>
