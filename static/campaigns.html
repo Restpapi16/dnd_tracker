@@ -6,229 +6,219 @@
     <title>Кампании</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
     <style>
-        body {
-            font-family: "Georgia", "Times New Roman", serif;
-            background:
-                radial-gradient(circle at top, rgba(148, 163, 184, 0.16) 0, transparent 55%),
-                radial-gradient(circle at bottom, rgba(15, 23, 42, 0.9) 0, #020617 60%),
-                repeating-linear-gradient(135deg,
-                    #020617,
-                    #020617 6px,
-                    #030711 6px,
-                    #030711 12px);
-            color: #e5e7eb;
-            margin: 0;
-            padding: 12px;
+        :root {
+            /* Base */
+            --font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            --bg: #000000;
+            --surface: #070707;
+            /* карточки */
+            --surface2: #0b0b0b;
+            /* приподнятые */
+            --stroke: #242424;
+            /* границы/разделители */
+            --stroke2: #303030;
+            /* активные границы */
+
+            /* Text */
+            --text: #f8fafc;
+            --muted: rgba(248, 250, 252, .66);
+
+            /* Accent (yellow) */
+            --accent: #fbbf24;
+            /* amber-400 */
+            --accent2: #f59e0b;
+            /* amber-500 */
+            --onAccent: #111827;
+            /* текст на жёлтом */
+
+            /* States */
+            --danger: #ef4444;
+            --danger2: #991b1b;
+            --onDanger: #ffffff;
+
+            --focus: rgba(251, 191, 36, .55);
         }
+
+
+
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 14px 14px 108px;
+            /* в gm_encounter оставь своё значение под bottom-bar */
+        }
+
 
         /* “Пергамент” для верхней карточки */
         .top-card {
-            background:
-                radial-gradient(circle at top left, rgba(250, 250, 249, 0.14) 0, transparent 35%),
-                linear-gradient(135deg, #292524, #1c1917);
-            border-radius: 10px;
-            padding: 10px 12px;
-            border: 1px solid #78350f;
-            box-shadow:
-                0 0 25px rgba(0, 0, 0, 0.65),
-                0 0 0 1px rgba(15, 23, 42, 0.7);
-            margin-bottom: 12px;
-        }
-
-        h1,
-        h2 {
-            margin: 0;
+            background: linear-gradient(180deg, #060606, #000000);
+            border: 1px solid rgba(251, 191, 36, .55);
+            border-radius: 14px;
+            padding: 12px 14px;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 10px 30px rgba(0, 0, 0, .55);
         }
 
         .top-title {
-            font-size: 19px;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+            color: var(--accent);
         }
 
         .top-sub {
-            font-size: 12px;
-            opacity: 0.85;
-            margin-top: 2px;
-            font-style: italic;
+            color: var(--muted);
         }
 
-
-
-
-        .top-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 6px;
-        }
-
-        .round-info {
-            font-size: 13px;
-            padding: 4px 8px;
-            border-radius: 999px;
-            background: #1d283a;
-            border: 1px solid #334155;
-        }
-
-        .turn-info {
-            font-size: 13px;
-            padding: 4px 8px;
-            border-radius: 999px;
-            background: #3b0764;
-            border: 1px solid #a855f7;
-        }
-
-        .status-line {
-            font-size: 12px;
-            margin-top: 4px;
-            min-height: 16px;
-            opacity: 0.9;
-        }
-
-        .participants {
-            margin-top: 8px;
-        }
 
         .section-title {
-            font-size: 13px;
+            font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.10em;
             opacity: 0.7;
-            margin-bottom: 4px;
+            margin: 10px 2px 8px;
         }
 
-        .row {
+        .list {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .item {
+            display: flex;
             align-items: center;
-            padding: 6px 8px;
-            margin-bottom: 4px;
-            border-radius: 8px;
-            background:
-                linear-gradient(145deg, #020617, #111827);
-            border: 1px solid #1f2937;
-            transition: background 0.1s, transform 0.05s, box-shadow 0.1s;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 14px;
+            border-radius: 16px;
+            background: linear-gradient(180deg, var(--surface), var(--surface2));
+            border: 1px solid var(--stroke);
+            border-color: #27272a;
+            min-height: 58px;
+            user-select: none;
         }
 
-        .row.current {
-            background:
-                radial-gradient(circle at top left, rgba(251, 191, 36, 0.15) 0, transparent 40%),
-                linear-gradient(145deg, #1e293b, #020617);
-            border-color: #fbbf24;
-            box-shadow: 0 0 16px rgba(251, 191, 36, 0.4);
-            transform: translateY(-1px);
+        .item:active {
+            transform: scale(0.99);
         }
 
-
-        .row.dead {
-            opacity: 0.5;
+        .item-title {
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 1.2;
         }
 
-        .name {
-            font-weight: 600;
-            font-size: 14px;
+        .item-sub {
+            margin-top: 3px;
+            font-size: 12px;
+            color: var(--muted);
         }
 
-        .meta {
-            font-size: 11px;
-            opacity: 0.8;
-        }
-
-        .badges {
-            margin-top: 2px;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 2px 6px;
+        .pill {
+            font-size: 12px;
+            padding: 9px 12px;
             border-radius: 999px;
-            background: #4b5563;
-            color: #e5e7eb;
-            font-size: 10px;
-            margin-right: 4px;
-            margin-top: 2px;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
+            border: 1px solid var(--stroke);
+            background: rgba(37, 99, 235, .12);
+            color: var(--text);
+            white-space: nowrap;
         }
 
-        .badge.enemy {
-            background: #7f1d1d;
+        .pill.ok {
+            background: rgba(34, 197, 94, .12);
         }
 
-        .badge.pc {
-            background: #1d4ed8;
+        .pill.warn {
+            background: rgba(245, 158, 11, .12);
         }
 
-        .badge.unconscious {
-            background: #92400e;
-        }
-
-        .hp {
-            font-size: 13px;
-        }
-
-        .controls {
-            margin-top: 12px;
+        .row-inline {
             display: flex;
-            gap: 8px;
+            gap: 10px;
+            align-items: center;
             flex-wrap: wrap;
+            margin-top: 10px;
         }
 
-        button {
-            padding: 6px 12px;
-            border-radius: 999px;
-            border: 1px solid #0f172a;
-            background: linear-gradient(135deg, #1d4ed8, #1e40af);
-            color: #f9fafb;
-            font-size: 13px;
-            cursor: pointer;
+        .btn {
+            height: 54px;
+            padding: 0 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, .55);
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: var(--onAccent);
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: .06em;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            cursor: pointer;
             box-shadow: 0 2px 6px rgba(15, 23, 42, 0.7);
         }
 
-        button.danger {
-            background: linear-gradient(135deg, #b91c1c, #7f1d1d);
+        .top-title {
+            font-weight: 900;
         }
 
-        button.secondary {
-            background: linear-gradient(135deg, #4b5563, #374151);
+        .item-title,
+        .title {
+            font-weight: 800;
         }
 
-        button:hover {
-            filter: brightness(1.05);
+
+        .btn:active {
+            transform: scale(0.99);
         }
 
-        button:disabled {
+        .btn.secondary {
+            background: linear-gradient(135deg, #2a2a2a, #1d1d1d);
+            color: var(--text);
+            border: 1px solid var(--stroke2);
+        }
+
+        .btn.danger {
+            background: linear-gradient(135deg, var(--danger), var(--danger2));
+            color: var(--onDanger);
+            border: 1px solid rgba(0, 0, 0, .35);
+        }
+
+        .btn:disabled {
             opacity: 0.5;
             cursor: default;
             box-shadow: none;
         }
 
-        .hp-controls {
-            margin-top: 10px;
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
+        .input {
+            height: 54px;
+            padding: 0 14px;
+            border-radius: 16px;
+            border: 1px solid var(--stroke2);
+            background: #000;
+            color: var(--text);
+            font-size: 16px;
+            outline: none;
+            box-sizing: border-box;
         }
 
-        .hp-hint {
-            font-size: 12px;
-            opacity: 0.8;
+        .input.small {
+            width: 92px;
+        }
+
+        .input:focus {
+            outline: 2px solid var(--focus);
+            outline-offset: 1px;
         }
 
         .toast {
             position: fixed;
             left: 50%;
-            bottom: 16px;
+            bottom: 18px;
             transform: translateX(-50%) translateY(20px);
             min-width: 220px;
             max-width: 90vw;
-            padding: 8px 12px;
+            padding: 10px 14px;
             border-radius: 999px;
             background: rgba(15, 23, 42, 0.95);
             border: 1px solid #78350f;
@@ -238,7 +228,7 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.25s ease-out, transform 0.25s ease-out;
-            z-index: 1000;
+            z-index: 2000;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
         }
 
@@ -247,114 +237,53 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        :root{
-  --card:#0b1220;
-  --card2:#0a1020;
-  --stroke:#1f2a3a;
-  --text:#e5e7eb;
-  --muted:rgba(229,231,235,.7);
-  --brand:#2563eb;
-  --brand2:#1d4ed8;
-  --danger:#b91c1c;
-}
+        /* Нижняя панель */
+        .bottom-bar {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+            background: rgba(2, 6, 23, .92);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--stroke);
+            z-index: 1500;
+        }
 
-body{ padding: 14px 14px 96px; } /* место под нижнюю панель */
+        .bottom-row {
+            display: flex;
+            gap: 10px;
+        }
 
-.card{
-  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
-  border: 1px solid var(--stroke);
-  border-radius: 14px;
-  padding: 12px;
-}
+        .bottom-row .input {
+            flex: 1;
+        }
 
-.list{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
+        .hint {
+            font-size: 12px;
+            color: var(--muted);
+            margin: 6px 2px 0;
+        }
 
-.item{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding:14px 14px;
-  border-radius:14px;
-  border: 1px solid var(--stroke);
-  background: linear-gradient(145deg, #050b16, #0b1325);
-  min-height:56px; /* крупная зона тапа */
-}
+        .chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
 
-.item:active{ transform: scale(0.99); }
+        /* Подсветка выбранного игрока в подготовке схватки */
+        .item.pick {
+            transition: transform .05s, box-shadow .12s, border-color .12s, background .12s;
+        }
 
-.item-title{
-  font-size:16px;
-  font-weight:700;
-  line-height:1.2;
-}
-
-.item-sub{
-  margin-top:2px;
-  font-size:12px;
-  color: var(--muted);
-}
-
-.pill{
-  font-size:12px;
-  padding:8px 10px;
-  border-radius:999px;
-  border:1px solid var(--stroke);
-  background: rgba(37,99,235,.12);
-  color: var(--text);
-  white-space:nowrap;
-}
-
-.bottom-bar{
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
-  background: rgba(2,6,23,.92);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid var(--stroke);
-}
-
-.bottom-row{
-  display:flex;
-  gap:10px;
-}
-
-.input{
-  flex:1;
-  height:52px;
-  padding: 0 14px;
-  border-radius: 14px;
-  border:1px solid var(--stroke);
-  background:#020617;
-  color:var(--text);
-  font-size:16px;
-}
-
-.btn{
-  height:52px;
-  padding: 0 16px;
-  border-radius: 14px;
-  border: 1px solid #0f172a;
-  background: linear-gradient(135deg, var(--brand), var(--brand2));
-  color: #f9fafb;
-  font-size:14px;
-  font-weight:800;
-  letter-spacing:.06em;
-  text-transform: uppercase;
-}
-
-.btn:active{ transform: scale(0.99); }
-.btn.secondary{
-  background: linear-gradient(135deg, #4b5563, #374151);
-}
-.btn.danger{
-  background: linear-gradient(135deg, #dc2626, var(--danger));
-}
-
+        .item.pick.selected {
+            border-color: var(--brand);
+            box-shadow: 0 0 18px rgba(251, 191, 36, 0.30);
+            background:
+                radial-gradient(circle at top left, rgba(251, 191, 36, 0.16) 0, transparent 45%),
+                linear-gradient(145deg, #0b0f18, #020617);
+        }
     </style>
 </head>
 
@@ -364,19 +293,23 @@ body{ padding: 14px 14px 96px; } /* место под нижнюю панель 
     <!-- Экран A: кампании -->
     <div id="screenCampaigns">
         <div class="top-card">
-            <div class="top-title">Campaigns</div>
-            <div class="top-sub">Ваши приключения</div>
+            <div class="top-title">Кампейны</div>
+            <div class="top-sub" id="topSubtitle">Ваши приключения</div>
         </div>
 
-        <div class="participants">
-            <div class="section-title">Список кампаний</div>
-            <div id="campaignList"></div>
-        </div>
+        <div class="section-title">Список кампаний</div>
+        <div id="campaignList" class="list"></div>
+        <div class="section-title">Мои схватки</div>
+        <div id="myEncountersList" class="list"></div>
 
-        <div class="controls">
-            <input id="newCampaignName" type="text" placeholder="Название кампании"
-                style="flex:1; padding:6px 8px; border-radius:6px; border:1px solid #4b5563; background:#020617; color:#e5e7eb; font-size:13px;">
-            <button id="createCampaignBtn">Создать</button>
+        <div class="hint">Создание — снизу. Тап по кампании открывает персонажей.</div>
+
+        <!-- Нижняя панель: создать кампанию -->
+        <div class="bottom-bar">
+            <div class="bottom-row">
+                <input id="newCampaignName" class="input" type="text" placeholder="Название кампании">
+                <button id="createCampaignBtn" class="btn">Создать</button>
+            </div>
         </div>
     </div>
 
@@ -387,26 +320,23 @@ body{ padding: 14px 14px 96px; } /* место под нижнюю панель 
             <div class="top-sub" id="campaignSubtitle">Персонажи</div>
         </div>
 
-        <div class="participants">
-            <div class="section-title">Персонажи</div>
-            <div id="characterList"></div>
+        <div class="section-title">Персонажи</div>
+        <div id="characterList" class="list"></div>
+
+        <div class="chips">
+            <button id="startSetupBtn" class="btn">Схватка</button>
+            <button class="btn secondary" id="backToCampaignsBtn">← Кампании</button>
         </div>
 
-        <div class="controls">
-            <input id="newCharName" type="text" placeholder="Имя"
-                style="flex:1; padding:6px 8px; border-radius:6px; border:1px solid #4b5563; background:#020617; color:#e5e7eb; font-size:13px;">
-            <input id="newCharAC" type="number" placeholder="КД"
-                style="width:70px; padding:6px 8px; border-radius:6px; border:1px solid #4b5563; background:#020617; color:#e5e7eb; font-size:13px;">
-            <input id="newCharInit" type="number" placeholder="ИНИЦ"
-                style="width:80px; padding:6px 8px; border-radius:6px; border:1px solid #4b5563; background:#020617; color:#e5e7eb; font-size:13px;">
-            <button id="createCharBtn">Добавить</button>
+        <!-- Нижняя панель: добавить персонажа -->
+        <div class="bottom-bar">
+            <div class="bottom-row" style="flex-wrap:wrap;">
+                <input id="newCharName" class="input" type="text" placeholder="Имя">
+                <input id="newCharAC" class="input small" type="number" placeholder="КД">
+                <input id="newCharInit" class="input small" type="number" placeholder="ИНИЦ">
+                <button id="createCharBtn" class="btn">Добавить</button>
+            </div>
         </div>
-
-        <div class="controls">
-            <button id="startSetupBtn">Начать схватку</button>
-            <button class="secondary" id="backToCampaignsBtn">← К кампаниям</button>
-        </div>
-
     </div>
 
     <!-- Экран C: подготовка схватки -->
@@ -416,58 +346,48 @@ body{ padding: 14px 14px 96px; } /* место под нижнюю панель 
             <div class="top-sub" id="encSetupSubtitle">Выберите участников</div>
         </div>
 
-        <div class="participants">
-            <div class="section-title">Игроки кампании</div>
-            <div id="encPlayersList"></div>
+        <div class="section-title">Игроки кампании</div>
+        <div id="encPlayersList" class="list"></div>
+
+        <div class="section-title" style="margin-top:14px;">Уникальные мобы</div>
+        <div id="encUniqueMonsters" class="list"></div>
+
+        <div class="row-inline">
+            <input id="uniqueName" class="input" type="text" placeholder="Имя">
+            <input id="uniqueHP" class="input small" type="number" placeholder="ХП">
+            <input id="uniqueAC" class="input small" type="number" placeholder="КД">
+            <input id="uniqueInitMod" class="input small" type="number" placeholder="ИНИЦ+">
+            <button id="addUniqueBtn" class="btn secondary">+ Моб</button>
         </div>
 
-        <div class="participants" style="margin-top:10px;">
-            <div class="section-title">Уникальные мобы</div>
-            <div id="encUniqueMonsters"></div>
-            <div class="controls">
-                <input id="uniqueName" type="text" placeholder="Имя"
-                    style="flex:1; padding:6px 8px; border-radius:6px; border:1px solid #4b5563; background:#020617; color:#e5e7eb; font-size:13px;">
-                <input id="uniqueHP" type="number" placeholder="ХП"
-                    style="width:70px; padding:6px 8px; border-radius:6px; border:1px solid #4b5563; background:#020617; color:#e5e7eb; font-size:13px;">
-                <input id="uniqueAC" type="number" placeholder="КД"
-                    style="width:70px; padding:6px 8px; border-radius:6px; border:1px solid #4b5563; background:#020617; color:#e5e7eb; font-size:13px;">
-                <input id="uniqueInitMod" type="number" placeholder="ИНИЦ мод"
-                    style="width:90px; padding:6px 8px; border-radius:6px; border:1px solid #4b5563; background:#020617; color:#e5e7eb; font-size:13px;">
-                <button id="addUniqueBtn" class="secondary">+ Моб</button>
-            </div>
+        <div class="section-title" style="margin-top:14px;">Группы мобов</div>
+        <div id="encGroupMonsters" class="list"></div>
+
+        <div class="row-inline">
+            <input id="groupName" class="input" type="text" placeholder="Имя группы">
+            <input id="groupCount" class="input small" type="number" placeholder="xN">
+            <input id="groupHP" class="input small" type="number" placeholder="ХП">
+            <input id="groupAC" class="input small" type="number" placeholder="КД">
+            <input id="groupInitMod" class="input small" type="number" placeholder="ИНИЦ+">
+            <button id="addGroupBtn" class="btn secondary">+ Группа</button>
         </div>
 
-        <div class="participants" style="margin-top:10px;">
-            <div class="section-title">Группы мобов</div>
-            <div id="encGroupMonsters"></div>
-            <div class="controls">
-                <input id="groupName" type="text" placeholder="Имя группы"
-                    style="flex:1; padding:6px 8px; border-radius:6px; border:1px solid #4b5563; background:#020617; color:#e5e7eb; font-size:13px;">
-                <input id="groupCount" type="number" placeholder="Кол-во"
-                    style="width:80px; padding:6px 8px; border-radius:6px; border:1px solid #4b5563; background:#020617; color:#e5e7eb; font-size:13px;">
-                <input id="groupHP" type="number" placeholder="ХП"
-                    style="width:70px; padding:6px 8px; border-radius:6px; border:1px solid #4b5563; background:#020617; color:#e5e7eb; font-size:13px;">
-                <input id="groupAC" type="number" placeholder="КД"
-                    style="width:70px; padding:6px 8px; border-radius:6px; border:1px solid #4b5563; background:#020617; color:#e5e7eb; font-size:13px;">
-                <input id="groupInitMod" type="number" placeholder="ИНИЦ мод"
-                    style="width:90px; padding:6px 8px; border-radius:6px; border:1px solid #4b5563; background:#020617; color:#e5e7eb; font-size:13px;">
-                <button id="addGroupBtn" class="secondary">+ Группа</button>
-            </div>
-        </div>
-
-        <div class="controls" style="margin-top:12px;">
-            <button id="startEncounterBtn">Начать схватку</button>
-            <button class="secondary" id="backToCharsBtn">← Назад к персонажам</button>
+        <div class="chips" style="margin-top:14px;">
+            <button id="startEncounterBtn" class="btn">Начать</button>
+            <button class="btn secondary" id="backToCharsBtn">← Персонажи</button>
         </div>
     </div>
 
-
     <script>
         const tg = window.Telegram.WebApp;
+
         function authHeaders() {
             const initData = tg?.initData || "";
             return initData ? { "Authorization": "tma " + initData } : {};
         }
+
+
+
         const API_BASE = "";
 
         let toastTimeout = null;
@@ -480,13 +400,11 @@ body{ padding: 14px 14px 96px; } /* место под нижнюю панель 
             toastTimeout = setTimeout(() => el.classList.remove("show"), 2200);
         }
 
-        // Простые вызовы API
         async function apiGet(path) {
             const res = await fetch(API_BASE + path, { headers: { ...authHeaders() } });
             if (!res.ok) throw new Error("HTTP " + res.status);
             return await res.json();
         }
-
 
         async function apiPost(path, body) {
             const res = await fetch(API_BASE + path, {
@@ -498,7 +416,6 @@ body{ padding: 14px 14px 96px; } /* место под нижнюю панель 
             return await res.json();
         }
 
-
         async function apiPut(path, body) {
             const res = await fetch(API_BASE + path, {
                 method: "PUT",
@@ -509,7 +426,6 @@ body{ padding: 14px 14px 96px; } /* место под нижнюю панель 
             return await res.json();
         }
 
-
         async function apiDelete(path) {
             const res = await fetch(API_BASE + path, {
                 method: "DELETE",
@@ -519,87 +435,31 @@ body{ padding: 14px 14px 96px; } /* место под нижнюю панель 
             return await res.json();
         }
 
-
         const screenCampaigns = document.getElementById("screenCampaigns");
         const screenCharacters = document.getElementById("screenCharacters");
+        const screenEncounterSetup = document.getElementById("screenEncounterSetup");
+
         const campaignListEl = document.getElementById("campaignList");
         const newCampaignNameInput = document.getElementById("newCampaignName");
         const createCampaignBtn = document.getElementById("createCampaignBtn");
 
-        let setupPlayers = [];        // { character_id, name, ac, base_initiative, include, initiative_total }
-        let setupUniqueMonsters = []; // { name, max_hp, ac, initiative_mod }
-        let setupGroupMonsters = [];  // { name, count, max_hp, ac, initiative_mod }
-        let currentCampaignId = null;
-        let currentCampaignName = "";
+        const characterListEl = document.getElementById("characterList");
+        const campaignTitleEl = document.getElementById("campaignTitle");
+        const campaignSubtitleEl = document.getElementById("campaignSubtitle");
 
-        async function loadCampaigns() {
-            try {
-                const campaigns = await apiGet("/campaigns");
-                renderCampaigns(campaigns);
-            } catch (e) {
-                console.error(e);
-                showToast("Не удалось загрузить кампании");
-            }
-        }
+        const newCharNameInput = document.getElementById("newCharName");
+        const newCharACInput = document.getElementById("newCharAC");
+        const newCharInitInput = document.getElementById("newCharInit");
+        const createCharBtn = document.getElementById("createCharBtn");
 
-        function renderCampaigns(campaigns) {
-            campaignListEl.innerHTML = "";
-            if (campaigns.length === 0) {
-                const empty = document.createElement("div");
-                empty.className = "hp-hint";
-                empty.innerText = "Кампаний пока нет. Создайте первую.";
-                campaignListEl.appendChild(empty);
-                return;
-            }
-
-            campaigns.forEach(c => {
-                const row = document.createElement("div");
-                row.className = "row";
-                row.onclick = () => openCampaign(c.id, c.name);
-
-                const left = document.createElement("div");
-                const name = document.createElement("div");
-                name.className = "name";
-                name.innerText = c.name;
-                left.appendChild(name);
-                row.appendChild(left);
-                campaignListEl.appendChild(row);
-            });
-        }
-
-        async function createCampaign() {
-            const name = newCampaignNameInput.value.trim();
-            if (!name) {
-                showToast("Введите название кампании");
-                return;
-            }
-            try {
-                const created = await apiPost("/campaigns", { name });
-                newCampaignNameInput.value = "";
-                showToast("Кампания создана");
-                await loadCampaigns();
-            } catch (e) {
-                console.error(e);
-                showToast("Ошибка создания кампании");
-            }
-        }
-
-        createCampaignBtn.onclick = createCampaign;
-
-        const screenEncounterSetup = document.getElementById("screenEncounterSetup");
         const startSetupBtn = document.getElementById("startSetupBtn");
+        const backToCampaignsBtn = document.getElementById("backToCampaignsBtn");
         const backToCharsBtn = document.getElementById("backToCharsBtn");
 
-        startSetupBtn.onclick = () => openEncounterSetup();
-        backToCharsBtn.onclick = () => {
-            screenEncounterSetup.style.display = "none";
-            screenCharacters.style.display = "block";
-        };
-
-
+        const encPlayersList = document.getElementById("encPlayersList");
         const encUniqueMonstersEl = document.getElementById("encUniqueMonsters");
         const encGroupMonstersEl = document.getElementById("encGroupMonsters");
-
+        const myEncountersListEl = document.getElementById("myEncountersList");
         const uniqueNameInput = document.getElementById("uniqueName");
         const uniqueHPInput = document.getElementById("uniqueHP");
         const uniqueACInput = document.getElementById("uniqueAC");
@@ -613,15 +473,149 @@ body{ padding: 14px 14px 96px; } /* место под нижнюю панель 
         const groupInitModInput = document.getElementById("groupInitMod");
         const addGroupBtn = document.getElementById("addGroupBtn");
 
-        const characterListEl = document.getElementById("characterList");
-        const backBtn = document.getElementById("backToCampaignsBtn");
-        const campaignTitleEl = document.getElementById("campaignTitle");
-        const campaignSubtitleEl = document.getElementById("campaignSubtitle");
+        const startEncounterBtn = document.getElementById("startEncounterBtn");
 
-        const newCharNameInput = document.getElementById("newCharName");
-        const newCharACInput = document.getElementById("newCharAC");
-        const newCharInitInput = document.getElementById("newCharInit");
-        const createCharBtn = document.getElementById("createCharBtn");
+        let setupPlayers = [];
+        let setupUniqueMonsters = [];
+        let setupGroupMonsters = [];
+        let currentCampaignId = null;
+        let currentCampaignName = "";
+
+        async function loadCampaigns() {
+            try {
+                const campaigns = await apiGet("/campaigns");
+                renderCampaigns(campaigns);
+            } catch (e) {
+                console.error(e);
+                showToast("Не удалось загрузить кампании");
+            }
+        }
+
+        async function loadMyEncounters() {
+            try {
+                const encs = await apiGet("/encounters/my"); // draft + active
+                renderMyEncounters(encs);
+            } catch (e) {
+                console.error(e);
+                // не спамим тостами, чтобы не раздражать
+            }
+        }
+
+        function statusLabel(st) {
+            if (st === "draft") return "Черновик";
+            if (st === "active") return "Активна";
+            if (st === "finished") return "Завершена";
+            return st || "?";
+        }
+
+        function renderMyEncounters(encs) {
+            myEncountersListEl.innerHTML = "";
+
+            if (!encs || encs.length === 0) {
+                const empty = document.createElement("div");
+                empty.className = "item";
+                empty.innerHTML = `
+      <div>
+        <div class="item-title">Нет незавершённых схваток</div>
+        <div class="item-sub">Когда начнёшь бой — он появится здесь</div>
+      </div>
+      <div class="pill">OK</div>
+    `;
+                myEncountersListEl.appendChild(empty);
+                return;
+            }
+
+            encs.forEach(e => {
+                const row = document.createElement("div");
+                row.className = "item";
+                row.onclick = () => {
+                    window.location.href = `/static/gm_encounter.html?encounter_id=${e.id}`;
+                };
+
+                const left = document.createElement("div");
+                const title = document.createElement("div");
+                title.className = "item-title";
+                title.innerText = e.name ? e.name : `Схватка #${e.id}`;
+
+                const sub = document.createElement("div");
+                sub.className = "item-sub";
+                sub.innerText = `Кампания "${e.campaign_name}" • ${statusLabel(e.status)}`;
+
+                left.appendChild(title);
+                left.appendChild(sub);
+
+                const right = document.createElement("div");
+                right.className = "pill " + (e.status === "active" ? "ok" : "warn");
+                right.innerText = "Продолжить";
+
+                row.appendChild(left);
+                row.appendChild(right);
+                myEncountersListEl.appendChild(row);
+            });
+        }
+
+        function renderCampaigns(campaigns) {
+            campaignListEl.innerHTML = "";
+
+            if (!campaigns || campaigns.length === 0) {
+                const empty = document.createElement("div");
+                empty.className = "item";
+                empty.innerHTML = `
+          <div>
+            <div class="item-title">Пока пусто</div>
+            <div class="item-sub">Создай первую кампанию снизу</div>
+          </div>
+          <div class="pill warn">Нет кампаний</div>
+        `;
+                campaignListEl.appendChild(empty);
+                return;
+            }
+
+            campaigns.forEach(c => {
+                const row = document.createElement("div");
+                row.className = "item";
+                row.onclick = () => openCampaign(c.id, c.name);
+
+                const left = document.createElement("div");
+                const name = document.createElement("div");
+                name.className = "item-title";
+                name.innerText = c.name;
+
+                const sub = document.createElement("div");
+                sub.className = "item-sub";
+                sub.innerText = `ID: ${c.id}`;
+
+                left.appendChild(name);
+                left.appendChild(sub);
+
+                const right = document.createElement("div");
+                right.className = "pill";
+                right.innerText = "Открыть";
+
+                row.appendChild(left);
+                row.appendChild(right);
+                campaignListEl.appendChild(row);
+            });
+        }
+
+        async function createCampaign() {
+            const name = newCampaignNameInput.value.trim();
+            if (!name) {
+                showToast("Введите название кампании");
+                return;
+            }
+            try {
+                await apiPost("/campaigns", { name });
+                newCampaignNameInput.value = "";
+                showToast("Кампания создана");
+                await loadCampaigns();
+            } catch (e) {
+                console.error(e);
+                showToast("Ошибка создания кампании");
+            }
+        }
+
+        createCampaignBtn.onclick = createCampaign;
 
         async function openCampaign(id, name) {
             currentCampaignId = id;
@@ -631,17 +625,139 @@ body{ padding: 14px 14px 96px; } /* место под нижнюю панель 
             campaignSubtitleEl.innerText = `Персонажи кампании #${id}`;
 
             screenCampaigns.style.display = "none";
+            screenEncounterSetup.style.display = "none";
             screenCharacters.style.display = "block";
 
             await loadCharacters();
         }
+
+        async function loadCharacters() {
+            if (!currentCampaignId) return;
+            try {
+                const chars = await apiGet(`/campaigns/${currentCampaignId}/characters`);
+                renderCharacters(chars);
+            } catch (e) {
+                console.error(e);
+                showToast("Не удалось загрузить персонажей");
+            }
+        }
+
+        function renderCharacters(chars) {
+            characterListEl.innerHTML = "";
+
+            if (!chars || chars.length === 0) {
+                const empty = document.createElement("div");
+                empty.className = "item";
+                empty.innerHTML = `
+          <div>
+            <div class="item-title">Персонажей нет</div>
+            <div class="item-sub">Добавь первого снизу</div>
+          </div>
+          <div class="pill warn">Пусто</div>
+        `;
+                characterListEl.appendChild(empty);
+                return;
+            }
+
+            chars.forEach(ch => {
+                const row = document.createElement("div");
+                row.className = "item";
+
+                const left = document.createElement("div");
+                const name = document.createElement("div");
+                name.className = "item-title";
+                name.innerText = ch.name;
+
+                const sub = document.createElement("div");
+                sub.className = "item-sub";
+                sub.innerText = `КД: ${ch.ac}, ИНИЦ: ${ch.base_initiative}`;
+
+                left.appendChild(name);
+                left.appendChild(sub);
+
+                const right = document.createElement("div");
+                right.style.display = "flex";
+                right.style.gap = "8px";
+
+                const editBtn = document.createElement("button");
+                editBtn.className = "btn secondary";
+                editBtn.style.height = "44px";
+                editBtn.style.padding = "0 14px";
+                editBtn.style.borderRadius = "14px";
+                editBtn.innerText = "✎";
+                editBtn.onclick = (e) => { e.stopPropagation(); editCharacterPrompt(ch); };
+
+                const delBtn = document.createElement("button");
+                delBtn.className = "btn danger";
+                delBtn.style.height = "44px";
+                delBtn.style.padding = "0 14px";
+                delBtn.style.borderRadius = "14px";
+                delBtn.innerText = "✕";
+                delBtn.onclick = async (e) => { e.stopPropagation(); await deleteCharacter(ch.id); };
+
+                right.appendChild(editBtn);
+                right.appendChild(delBtn);
+
+                row.appendChild(left);
+                row.appendChild(right);
+                characterListEl.appendChild(row);
+            });
+        }
+
+        async function createCharacter() {
+            if (!currentCampaignId) return;
+
+            const name = newCharNameInput.value.trim();
+            const ac = parseInt(newCharACInput.value, 10);
+            const init = parseInt(newCharInitInput.value, 10);
+
+            if (!name || isNaN(ac) || isNaN(init)) {
+                showToast("Имя, КД и ИНИЦ обязательны");
+                return;
+            }
+
+            try {
+                await apiPost("/characters", {
+                    campaign_id: currentCampaignId,
+                    name,
+                    ac,
+                    base_initiative: init
+                });
+
+                newCharNameInput.value = "";
+                newCharACInput.value = "";
+                newCharInitInput.value = "";
+                showToast("Персонаж добавлен");
+                await loadCharacters();
+            } catch (e) {
+                console.error(e);
+                showToast("Ошибка добавления персонажа");
+            }
+        }
+
+        createCharBtn.onclick = createCharacter;
+
+        backToCampaignsBtn.onclick = () => {
+            screenCharacters.style.display = "none";
+            screenEncounterSetup.style.display = "none";
+            screenCampaigns.style.display = "block";
+            currentCampaignId = null;
+            currentCampaignName = "";
+        };
+
+        startSetupBtn.onclick = () => openEncounterSetup();
+
+        backToCharsBtn.onclick = () => {
+            screenEncounterSetup.style.display = "none";
+            screenCharacters.style.display = "block";
+        };
 
         async function openEncounterSetup() {
             if (!currentCampaignId) {
                 showToast("Сначала выберите кампанию");
                 return;
             }
-            // загрузим персонажей кампании заново
+
             try {
                 const chars = await apiGet(`/campaigns/${currentCampaignId}/characters`);
                 setupPlayers = chars.map(ch => ({
@@ -665,8 +781,8 @@ body{ padding: 14px 14px 96px; } /* место под нижнюю панель 
             renderSetupUnique();
             renderSetupGroups();
 
-
             screenCharacters.style.display = "none";
+            screenCampaigns.style.display = "none";
             screenEncounterSetup.style.display = "block";
 
             const title = document.getElementById("encSetupTitle");
@@ -675,91 +791,64 @@ body{ padding: 14px 14px 96px; } /* место под нижнюю панель 
             sub.innerText = `Кампания: ${currentCampaignName}`;
         }
 
-        const encPlayersList = document.getElementById("encPlayersList");
-
         function renderSetupPlayers() {
             encPlayersList.innerHTML = "";
+
             if (setupPlayers.length === 0) {
                 const empty = document.createElement("div");
-                empty.className = "hp-hint";
-                empty.innerText = "В этой кампании пока нет персонажей.";
+                empty.className = "item";
+                empty.innerHTML = `
+          <div>
+            <div class="item-title">Нет персонажей</div>
+            <div class="item-sub">Вернись и добавь хотя бы одного</div>
+          </div>
+          <div class="pill warn">Пусто</div>
+        `;
                 encPlayersList.appendChild(empty);
                 return;
             }
 
             setupPlayers.forEach((p, idx) => {
                 const row = document.createElement("div");
-                row.className = "row";
-                if (p.include) {
-                    row.classList.add("current"); // используем подсветку для отмеченных
-                }
+                row.className = "item pick" + (p.include ? " selected" : "");
 
                 const left = document.createElement("div");
-
                 const name = document.createElement("div");
-                name.className = "name";
+                name.className = "item-title";
                 name.innerText = p.name;
+
+                const sub = document.createElement("div");
+                sub.className = "item-sub";
+                sub.innerText = `КД: ${p.ac}, баз. ИНИЦ: ${p.base_initiative}`;
+
                 left.appendChild(name);
-
-                const meta = document.createElement("div");
-                meta.className = "meta";
-                meta.innerText = `КД: ${p.ac}, баз. ИНИЦ: ${p.base_initiative}`;
-                left.appendChild(meta);
-
-                const badges = document.createElement("div");
-                badges.className = "badges";
-                const badge = document.createElement("span");
-                badge.className = "badge pc";
-                badge.innerText = "Игрок";
-                badges.appendChild(badge);
-                left.appendChild(badges);
+                left.appendChild(sub);
 
                 const right = document.createElement("div");
                 right.style.display = "flex";
                 right.style.alignItems = "center";
-                right.style.gap = "6px";
+                right.style.gap = "10px";
 
-                // Индикатор участия (можно сделать иконку/квадратик вместо реального чекбокса)
-                const indicator = document.createElement("div");
-                indicator.style.width = "18px";
-                indicator.style.height = "18px";
-                indicator.style.borderRadius = "4px";
-                indicator.style.border = "1px solid #4b5563";
-                indicator.style.boxSizing = "border-box";
-                indicator.style.background = p.include ? "#22c55e" : "transparent";
+                const pill = document.createElement("div");
+                pill.className = "pill " + (p.include ? "ok" : "");
+                pill.innerText = p.include ? "В бою" : "Не в бою";
 
                 const initInput = document.createElement("input");
+                initInput.className = "input small";
                 initInput.type = "number";
                 initInput.value = p.initiative_total;
-                initInput.style.width = "70px";
-                initInput.style.padding = "4px 6px";
-                initInput.style.borderRadius = "6px";
-                initInput.style.border = "1px solid #4b5563";
-                initInput.style.background = "#020617";
-                initInput.style.color = "#e5e7eb";
-                initInput.style.fontSize = "12px";
-                initInput.placeholder = "ИНИЦ";
-
-                initInput.onchange = (e) => {
-                    e.stopPropagation(); // чтобы клик по инпуту не переключал выбор
+                initInput.onclick = (e) => e.stopPropagation();
+                initInput.onchange = () => {
                     const val = parseInt(initInput.value, 10);
-                    if (!isNaN(val)) {
-                        setupPlayers[idx].initiative_total = val;
-                    }
+                    if (!isNaN(val)) setupPlayers[idx].initiative_total = val;
                 };
 
-                const label = document.createElement("div");
-                label.className = "meta";
-                label.innerText = "В бою";
-
-                right.appendChild(label);
-                right.appendChild(indicator);
+                right.appendChild(pill);
                 right.appendChild(initInput);
 
                 row.appendChild(left);
                 row.appendChild(right);
 
-                // ВЕСЬ РЯД кликабельный: переключает "include"
                 row.onclick = () => {
                     setupPlayers[idx].include = !setupPlayers[idx].include;
                     renderSetupPlayers();
@@ -769,87 +858,102 @@ body{ padding: 14px 14px 96px; } /* место под нижнюю панель 
             });
         }
 
-
         function renderSetupUnique() {
             encUniqueMonstersEl.innerHTML = "";
+
             if (setupUniqueMonsters.length === 0) {
                 const empty = document.createElement("div");
-                empty.className = "hp-hint";
-                empty.innerText = "Пока нет уникальных мобов.";
+                empty.className = "item";
+                empty.innerHTML = `
+          <div>
+            <div class="item-title">Пока нет уникальных мобов</div>
+            <div class="item-sub">Добавь ниже (имя, ХП, КД, ИНИЦ+)</div>
+          </div>
+          <div class="pill warn">0</div>
+        `;
                 encUniqueMonstersEl.appendChild(empty);
                 return;
             }
 
             setupUniqueMonsters.forEach((m, idx) => {
                 const row = document.createElement("div");
-                row.className = "row";
+                row.className = "item";
 
                 const left = document.createElement("div");
                 const name = document.createElement("div");
-                name.className = "name";
+                name.className = "item-title";
                 name.innerText = m.name;
+
+                const sub = document.createElement("div");
+                sub.className = "item-sub";
+                sub.innerText = `ХП: ${m.max_hp}, КД: ${m.ac}, ИНИЦ+: ${m.initiative_mod}`;
+
                 left.appendChild(name);
+                left.appendChild(sub);
 
-                const meta = document.createElement("div");
-                meta.className = "meta";
-                meta.innerText = `ХП: ${m.max_hp}, КД: ${m.ac}, ИНИЦ мод: ${m.initiative_mod}`;
-                left.appendChild(meta);
-
-                const right = document.createElement("div");
                 const delBtn = document.createElement("button");
-                delBtn.className = "danger";
+                delBtn.className = "btn danger";
+                delBtn.style.height = "44px";
+                delBtn.style.borderRadius = "14px";
+                delBtn.style.padding = "0 14px";
                 delBtn.innerText = "✕";
                 delBtn.onclick = () => {
                     setupUniqueMonsters.splice(idx, 1);
                     renderSetupUnique();
                 };
-                right.appendChild(delBtn);
 
                 row.appendChild(left);
-                row.appendChild(right);
-
+                row.appendChild(delBtn);
                 encUniqueMonstersEl.appendChild(row);
             });
         }
 
         function renderSetupGroups() {
             encGroupMonstersEl.innerHTML = "";
+
             if (setupGroupMonsters.length === 0) {
                 const empty = document.createElement("div");
-                empty.className = "hp-hint";
-                empty.innerText = "Пока нет групповых мобов.";
+                empty.className = "item";
+                empty.innerHTML = `
+          <div>
+            <div class="item-title">Пока нет групп</div>
+            <div class="item-sub">Добавь ниже (имя, xN, ХП, КД, ИНИЦ+)</div>
+          </div>
+          <div class="pill warn">0</div>
+        `;
                 encGroupMonstersEl.appendChild(empty);
                 return;
             }
 
             setupGroupMonsters.forEach((g, idx) => {
                 const row = document.createElement("div");
-                row.className = "row";
+                row.className = "item";
 
                 const left = document.createElement("div");
                 const name = document.createElement("div");
-                name.className = "name";
+                name.className = "item-title";
                 name.innerText = `${g.name} (x${g.count})`;
+
+                const sub = document.createElement("div");
+                sub.className = "item-sub";
+                sub.innerText = `ХП: ${g.max_hp}, КД: ${g.ac}, ИНИЦ+: ${g.initiative_mod}`;
+
                 left.appendChild(name);
+                left.appendChild(sub);
 
-                const meta = document.createElement("div");
-                meta.className = "meta";
-                meta.innerText = `ХП: ${g.max_hp}, КД: ${g.ac}, ИНИЦ мод: ${g.initiative_mod}`;
-                left.appendChild(meta);
-
-                const right = document.createElement("div");
                 const delBtn = document.createElement("button");
-                delBtn.className = "danger";
+                delBtn.className = "btn danger";
+                delBtn.style.height = "44px";
+                delBtn.style.borderRadius = "14px";
+                delBtn.style.padding = "0 14px";
                 delBtn.innerText = "✕";
                 delBtn.onclick = () => {
                     setupGroupMonsters.splice(idx, 1);
                     renderSetupGroups();
                 };
-                right.appendChild(delBtn);
 
                 row.appendChild(left);
-                row.appendChild(right);
-
+                row.appendChild(delBtn);
                 encGroupMonstersEl.appendChild(row);
             });
         }
@@ -861,7 +965,7 @@ body{ padding: 14px 14px 96px; } /* место под нижнюю панель 
             const initMod = parseInt(uniqueInitModInput.value, 10);
 
             if (!name || isNaN(hp) || isNaN(ac) || isNaN(initMod)) {
-                showToast("Заполните имя, ХП, КД и мод ИНИЦ уникального моба");
+                showToast("Заполни имя, ХП, КД и ИНИЦ+");
                 return;
             }
 
@@ -889,7 +993,7 @@ body{ padding: 14px 14px 96px; } /* место под нижнюю панель 
             const initMod = parseInt(groupInitModInput.value, 10);
 
             if (!name || isNaN(count) || isNaN(hp) || isNaN(ac) || isNaN(initMod)) {
-                showToast("Заполните имя, кол-во, ХП, КД и мод ИНИЦ группы");
+                showToast("Заполни имя, xN, ХП, КД и ИНИЦ+");
                 return;
             }
 
@@ -911,121 +1015,6 @@ body{ padding: 14px 14px 96px; } /* место под нижнюю панель 
             renderSetupGroups();
         };
 
-
-        async function loadCharacters() {
-            if (!currentCampaignId) return;
-            try {
-                const chars = await apiGet(`/campaigns/${currentCampaignId}/characters`);
-                renderCharacters(chars);
-            } catch (e) {
-                console.error(e);
-                showToast("Не удалось загрузить персонажей");
-            }
-        }
-
-        function renderCharacters(chars) {
-            characterListEl.innerHTML = "";
-            if (chars.length === 0) {
-                const empty = document.createElement("div");
-                empty.className = "hp-hint";
-                empty.innerText = "Персонажей пока нет. Добавьте первого.";
-                characterListEl.appendChild(empty);
-                return;
-            }
-
-            chars.forEach(ch => {
-                const row = document.createElement("div");
-                row.className = "row";
-
-                const left = document.createElement("div");
-                const name = document.createElement("div");
-                name.className = "name";
-                name.innerText = ch.name;
-                left.appendChild(name);
-
-                const meta = document.createElement("div");
-                meta.className = "meta";
-                meta.innerText = `КД: ${ch.ac}, ИНИЦ: ${ch.base_initiative}`;
-                left.appendChild(meta);
-
-                const badges = document.createElement("div");
-                badges.className = "badges";
-                const badge = document.createElement("span");
-                badge.className = "badge pc";
-                badge.innerText = "Игрок";
-                badges.appendChild(badge);
-                left.appendChild(badges);
-
-                const right = document.createElement("div");
-                right.style.display = "flex";
-                right.style.gap = "4px";
-
-                const editBtn = document.createElement("button");
-                editBtn.className = "secondary";
-                editBtn.innerText = "✎";
-                editBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    editCharacterPrompt(ch);
-                };
-
-                const delBtn = document.createElement("button");
-                delBtn.className = "danger";
-                delBtn.innerText = "✕";
-                delBtn.onclick = async (e) => {
-                    e.stopPropagation();
-                    await deleteCharacter(ch.id);
-                };
-
-                right.appendChild(editBtn);
-                right.appendChild(delBtn);
-
-                row.appendChild(left);
-                row.appendChild(right);
-
-                characterListEl.appendChild(row);
-            });
-        }
-
-        async function createCharacter() {
-            if (!currentCampaignId) return;
-            const name = newCharNameInput.value.trim();
-            const ac = parseInt(newCharACInput.value, 10);
-            const init = parseInt(newCharInitInput.value, 10);
-
-            if (!name || isNaN(ac) || isNaN(init)) {
-                showToast("Имя, КД и ИНИЦ обязательны");
-                return;
-            }
-
-            try {
-                await apiPost("/characters", {
-                    campaign_id: currentCampaignId,
-                    name,
-                    ac,
-                    base_initiative: init
-                });
-                newCharNameInput.value = "";
-                newCharACInput.value = "";
-                newCharInitInput.value = "";
-                showToast("Персонаж добавлен");
-                await loadCharacters();
-            } catch (e) {
-                console.error(e);
-                showToast("Ошибка добавления персонажа");
-            }
-        }
-
-        createCharBtn.onclick = createCharacter;
-
-        backBtn.onclick = () => {
-            screenCharacters.style.display = "none";
-            screenCampaigns.style.display = "block";
-            currentCampaignId = null;
-            currentCampaignName = "";
-        };
-
-        const startEncounterBtn = document.getElementById("startEncounterBtn");
-
         startEncounterBtn.onclick = async () => {
             if (!currentCampaignId) {
                 showToast("Нет выбранной кампании");
@@ -1040,39 +1029,39 @@ body{ padding: 14px 14px 96px; } /* место под нижнюю панель 
                 }));
 
             if (playersForEncounter.length === 0) {
-                showToast("Выберите хотя бы одного игрока");
+                showToast("Выбери хотя бы одного игрока");
                 return;
             }
 
             try {
-                // 1) создаём Encounter
+                let encName = prompt("Название схватки:", "Засада у моста");
+                if (encName === null) return; // отмена
+                encName = encName.trim();
+                if (!encName) encName = "Схватка";
+
                 const enc = await apiPost("/encounters", {
                     campaign_id: currentCampaignId,
-                    name: "Схватка"
+                    name: encName
                 });
+
 
                 const encounterId = enc.id;
 
-                // 2) добавляем участников
                 await apiPost(`/encounters/${encounterId}/participants`, {
                     players: playersForEncounter,
                     unique_monsters: setupUniqueMonsters,
                     group_monsters: setupGroupMonsters
                 });
 
-                // 3) стартуем бой
                 await apiPost(`/encounters/${encounterId}/start`, {});
 
                 showToast("Схватка началась");
-
-                // 4) переходим на боевой экран (локально)
                 window.location.href = `/static/gm_encounter.html?encounter_id=${encounterId}`;
             } catch (e) {
                 console.error(e);
                 showToast("Ошибка при запуске схватки");
             }
         };
-
 
         async function editCharacterPrompt(ch) {
             const name = prompt("Имя персонажа:", ch.name);
@@ -1091,11 +1080,7 @@ body{ padding: 14px 14px 96px; } /* место под нижнюю панель 
             }
 
             try {
-                await apiPut(`/characters/${ch.id}`, {
-                    name,
-                    ac,
-                    base_initiative: init
-                });
+                await apiPut(`/characters/${ch.id}`, { name, ac, base_initiative: init });
                 showToast("Персонаж обновлён");
                 await loadCharacters();
             } catch (e) {
@@ -1116,12 +1101,35 @@ body{ padding: 14px 14px 96px; } /* место под нижнюю панель 
             }
         }
 
+        if (tg && tg.ready) tg.ready();
+        loadCampaigns();
+        loadMyEncounters();
 
-        if (tg && tg.ready) {
-            tg.ready();
+
+        function getTgDisplayName() {
+            const u = tg?.initDataUnsafe?.user;
+            if (!u) return "";
+
+            const first = (u.first_name || "").trim();
+            const last = (u.last_name || "").trim();
+            const uname = (u.username || "").trim();
+
+            const full = (first + " " + last).trim();
+            if (full) return full;
+            if (uname) return "@" + uname;
+            return "";
         }
 
-        loadCampaigns();
+        function updateTopSubtitle() {
+            const el = document.getElementById("topSubtitle");
+            if (!el) return;
+
+            const name = getTgDisplayName();
+            el.innerText = name ? `Ваши приключения (${name})` : "Ваши приключения";
+        }
+
+        updateTopSubtitle();
+
     </script>
 </body>
 
