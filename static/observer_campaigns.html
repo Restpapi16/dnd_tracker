@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <title>👁️ Мои кампании</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;
+            --bg: #000000;
+            --surface: #070707;
+            --surface2: #0b0b0b;
+            --stroke: #242424;
+            --stroke2: #303030;
+            --text: #f8fafc;
+            --muted: rgba(248, 250, 252, .66);
+            --accent: #fbbf24;
+            --accent2: #f59e0b;
+            --onAccent: #111827;
+            --success: #22c55e;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 14px;
+        }
+
+        .top-card {
+            background: linear-gradient(180deg, #060606, #000000);
+            border: 1px solid rgba(251, 191, 36, .55);
+            border-radius: 14px;
+            padding: 12px 14px;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 10px 30px rgba(0, 0, 0, .55);
+            margin-bottom: 16px;
+        }
+
+        .observer-badge {
+            display: inline-block;
+            background: rgba(100, 116, 139, 0.2);
+            border: 1px solid rgba(100, 116, 139, 0.4);
+            border-radius: 8px;
+            padding: 4px 10px;
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .top-title {
+            color: var(--accent);
+            font-weight: 900;
+            font-size: 18px;
+        }
+
+        .top-sub {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.10em;
+            opacity: 0.7;
+            margin: 16px 2px 8px;
+        }
+
+        .list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px;
+            border-radius: 14px;
+            background: linear-gradient(180deg, var(--surface), var(--surface2));
+            border: 1px solid var(--stroke);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .item:active {
+            transform: scale(0.99);
+        }
+
+        .item-title {
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .item-sub {
+            margin-top: 3px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .pill {
+            font-size: 12px;
+            padding: 9px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--stroke);
+            background: rgba(100, 116, 139, 0.2);
+            color: var(--text);
+            white-space: nowrap;
+        }
+
+        .pill.active {
+            background: rgba(34, 197, 94, .12);
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .hint {
+            font-size: 12px;
+            color: var(--muted);
+            margin: 8px 2px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--muted);
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--muted);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-card">
+        <div class="observer-badge">👁️ Observer Mode</div>
+        <div class="top-title">Мои кампании</div>
+        <div class="top-sub">Кампании, за которыми я наблюдаю</div>
+    </div>
+
+    <div class="section-title">🎯 Кампании</div>
+    <div id="campaignsList" class="list">
+        <div class="loading">Загрузка...</div>
+    </div>
+
+    <div class="hint">
+        👁️ Нажми на кампанию, чтобы увидеть активные схватки
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        const API_BASE = "";
+
+        function authHeaders() {
+            const initData = tg?.initData || "";
+            return initData ? { "Authorization": "tma " + initData } : {};
+        }
+
+        async function apiGet(path) {
+            const res = await fetch(API_BASE + path, { headers: { ...authHeaders() } });
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return await res.json();
+        }
+
+        async function loadCampaigns() {
+            try {
+                const campaigns = await apiGet('/campaigns/observer/my');
+                renderCampaigns(campaigns);
+            } catch (e) {
+                console.error(e);
+                document.getElementById('campaignsList').innerHTML = `
+                    <div class="empty">
+                        <div class="empty-icon">❌</div>
+                        <div>Ошибка загрузки кампаний</div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderCampaigns(campaigns) {
+            const listEl = document.getElementById('campaignsList');
+            
+            if (!campaigns || campaigns.length === 0) {
+                listEl.innerHTML = `
+                    <div class="empty">
+                        <div class="empty-icon">🔍</div>
+                        <div>У тебя пока нет кампаний для наблюдения</div>
+                        <div style="margin-top: 8px; font-size: 12px;">
+                            Попроси GM поделиться ссылкой-приглашением
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = '';
+            
+            campaigns.forEach(campaign => {
+                const item = document.createElement('div');
+                item.className = 'item';
+                item.onclick = () => openCampaign(campaign.id, campaign.name);
+
+                item.innerHTML = `
+                    <div>
+                        <div class="item-title">${campaign.name}</div>
+                        <div class="item-sub">ID: ${campaign.id}</div>
+                    </div>
+                    <div class="pill">👁️ Наблюдать</div>
+                `;
+
+                listEl.appendChild(item);
+            });
+        }
+
+        async function openCampaign(campaignId, campaignName) {
+            // Переход к списку активных схваток
+            window.location.href = `/static/observer_encounters.html?campaign_id=${campaignId}`;
+        }
+
+        if (tg && tg.ready) tg.ready();
+        loadCampaigns();
+    </script>
+</body>
+</html>
