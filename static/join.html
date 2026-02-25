@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <title>🔗 Присоединение</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;
+            --bg: #000000;
+            --surface: #070707;
+            --surface2: #0b0b0b;
+            --stroke: #242424;
+            --stroke2: #303030;
+            --text: #f8fafc;
+            --muted: rgba(248, 250, 252, .66);
+            --accent: #fbbf24;
+            --accent2: #f59e0b;
+            --onAccent: #111827;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --focus: rgba(251, 191, 36, .55);
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .top-card {
+            background: linear-gradient(180deg, #060606, #000000);
+            border: 1px solid rgba(251, 191, 36, .55);
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 10px 30px rgba(0, 0, 0, .55);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .title {
+            color: var(--accent);
+            font-weight: 900;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .status-box {
+            background: linear-gradient(180deg, var(--surface), var(--surface2));
+            border: 1px solid var(--stroke);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .status-box.success {
+            border-color: var(--success);
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .status-box.error {
+            border-color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .status-text {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            height: 54px;
+            width: 100%;
+            padding: 0 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, .55);
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: var(--onAccent);
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.7);
+            margin-bottom: 10px;
+        }
+
+        .btn:active {
+            transform: scale(0.99);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(135deg, #2a2a2a, #1d1d1d);
+            color: var(--text);
+            border: 1px solid var(--stroke2);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: var(--muted);
+        }
+
+        .spinner {
+            border: 3px solid var(--stroke);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="content">
+        <div class="loading">
+            <div class="spinner"></div>
+            <div>Проверка приглашения...</div>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        const API_BASE = "";
+
+        function authHeaders() {
+            const initData = tg?.initData || "";
+            return initData ? { "Authorization": "tma " + initData } : {};
+        }
+
+        async function apiPost(path, body) {
+            const res = await fetch(API_BASE + path, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", ...authHeaders() },
+                body: body ? JSON.stringify(body) : "{}",
+            });
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(errorText || `HTTP ${res.status}`);
+            }
+            return await res.json();
+        }
+
+        // Извлекаем токен из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const inviteToken = urlParams.get('token');
+
+        if (!inviteToken) {
+            showError('Ошибка: не указан токен приглашения');
+        } else {
+            joinCampaign(inviteToken);
+        }
+
+        async function joinCampaign(token) {
+            try {
+                const result = await apiPost('/campaigns/join', { invite_token: token });
+                
+                showSuccess(
+                    `Успех! 🎉`,
+                    `Ты присоединился к кампании "${result.campaign_name}"!`,
+                    result.campaign_id
+                );
+            } catch (e) {
+                console.error(e);
+                let errorMsg = 'Не удалось присоединиться';
+                
+                if (e.message.includes('400')) {
+                    errorMsg = 'Неверная или просроченная ссылка приглашения';
+                } else if (e.message.includes('403')) {
+                    errorMsg = 'Доступ запрещён';
+                }
+                
+                showError(errorMsg);
+            }
+        }
+
+        function showSuccess(title, message, campaignId) {
+            document.getElementById('content').innerHTML = `
+                <div class="top-card">
+                    <div class="icon">✅</div>
+                    <div class="title">${title}</div>
+                    <div class="subtitle">${message}</div>
+                </div>
+
+                <div class="status-box success">
+                    <div class="status-text">
+                        Теперь ты можешь наблюдать за активными схватками этой кампании в реальном времени.
+                    </div>
+                </div>
+
+                <button class="btn" onclick="window.location.href='/static/observer_campaigns.html'">
+                    👁️ Мои кампании
+                </button>
+                <button class="btn secondary" onclick="window.close()">
+                    Закрыть
+                </button>
+            `;
+        }
+
+        function showError(message) {
+            document.getElementById('content').innerHTML = `
+                <div class="top-card">
+                    <div class="icon">❌</div>
+                    <div class="title">Ошибка</div>
+                    <div class="subtitle">Не удалось присоединиться к кампании</div>
+                </div>
+
+                <div class="status-box error">
+                    <div class="status-text">${message}</div>
+                </div>
+
+                <button class="btn secondary" onclick="window.close()">
+                    Закрыть
+                </button>
+            `;
+        }
+
+        if (tg && tg.ready) tg.ready();
+    </script>
+</body>
+</html>
