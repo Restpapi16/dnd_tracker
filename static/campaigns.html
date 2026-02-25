@@ -265,6 +265,11 @@
             margin: 6px 2px 0;
         }
 
+        .hint.warning {
+            color: #fbbf24;
+            font-weight: 700;
+        }
+
         .chips {
             display: flex;
             gap: 8px;
@@ -319,6 +324,47 @@
             font-size: 11px;
             color: var(--muted);
             margin-top: 2px;
+        }
+
+        /* Разграничение блоков */
+        .setup-block {
+            margin-top: 20px;
+            padding: 14px;
+            background: rgba(15, 23, 42, 0.2);
+            border-radius: 16px;
+            border: 1px solid var(--stroke);
+        }
+
+        .setup-block.players {
+            border-color: rgba(37, 99, 235, .35);
+            background: rgba(37, 99, 235, 0.08);
+        }
+
+        .setup-block.unique {
+            border-color: rgba(220, 38, 38, .35);
+            background: rgba(220, 38, 38, 0.08);
+        }
+
+        .setup-block.groups {
+            border-color: rgba(245, 158, 11, .35);
+            background: rgba(245, 158, 11, 0.08);
+        }
+
+        /* Кнопка с атаками - визуальный индикатор */
+        .btn.has-attacks {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: var(--onAccent);
+            border: 2px solid var(--accent);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 18px rgba(251, 191, 36, 0.7);
+            }
         }
     </style>
 </head>
@@ -382,50 +428,78 @@
             <div class="top-sub" id="encSetupSubtitle">Выберите участников</div>
         </div>
 
-        <div class="section-title">Игроки кампании</div>
-        <div id="encPlayersList" class="list"></div>
-
-        <div class="section-title" style="margin-top:14px;">Уникальные мобы</div>
-        <div id="encUniqueMonsters" class="list"></div>
-
-        <div class="row-inline">
-            <input id="uniqueName" class="input" type="text" placeholder="Имя">
-            <input id="uniqueHP" class="input small" type="number" placeholder="ХП">
-            <input id="uniqueAC" class="input small" type="number" placeholder="КД">
-            <input id="uniqueInitMod" class="input small" type="number" placeholder="ИНИЦ+">
-            <button id="addUniqueBtn" class="btn secondary">+ Моб</button>
+        <!-- БЛОК: Игроки -->
+        <div class="setup-block players">
+            <div class="section-title" style="margin-top:0;">🛡️ Игроки кампании</div>
+            <div id="encPlayersList" class="list"></div>
         </div>
 
-        <!-- Блок для атак уникального моба -->
-        <div id="uniqueAttacksSection" class="attacks-section" style="display:none;">
-            <div class="section-title" style="margin: 0 0 8px 0;">⚔️ Атаки моба</div>
+        <!-- БЛОК: Уникальные мобы -->
+        <div class="setup-block unique">
+            <div class="section-title" style="margin-top:0;">👹 Уникальные мобы</div>
+            <div id="encUniqueMonsters" class="list"></div>
+
             <div class="row-inline">
-                <input id="attackName" class="input" type="text" placeholder="Название атаки">
-                <input id="attackHitBonus" class="input small" type="number" placeholder="+Попад">
-                <input id="attackDmgBonus" class="input small" type="number" placeholder="+Урон">
+                <input id="uniqueName" class="input" type="text" placeholder="Имя">
+                <input id="uniqueHP" class="input small" type="number" placeholder="ХП">
+                <input id="uniqueAC" class="input small" type="number" placeholder="КД">
+                <input id="uniqueInitMod" class="input small" type="number" placeholder="ИНИЦ+">
+                <button id="addUniqueBtn" class="btn secondary">+ Моб</button>
             </div>
-            <div class="row-inline" style="margin-top: 6px;">
-                <input id="attackDmgType" class="input" type="text" placeholder="Тип урона">
-                <input id="attackRange" class="input" type="text" placeholder="Дальность">
-                <button id="addAttackBtn" class="btn secondary">+ Атака</button>
+
+            <!-- Блок для атак уникального моба -->
+            <div id="uniqueAttacksSection" class="attacks-section" style="display:none;">
+                <div class="section-title" style="margin: 0 0 8px 0;">⚔️ Атаки моба</div>
+                <div class="row-inline">
+                    <input id="uniqueAttackName" class="input" type="text" placeholder="Название атаки">
+                    <input id="uniqueAttackHitBonus" class="input small" type="number" placeholder="+Попад">
+                    <input id="uniqueAttackDmgBonus" class="input small" type="number" placeholder="+Урон">
+                </div>
+                <div class="row-inline" style="margin-top: 6px;">
+                    <input id="uniqueAttackDmgType" class="input" type="text" placeholder="Тип урона">
+                    <input id="uniqueAttackRange" class="input" type="text" placeholder="Дальность">
+                    <button id="addUniqueAttackBtn" class="btn secondary">+ Атака</button>
+                </div>
+                <div id="uniqueAttacksList"></div>
             </div>
-            <div id="attacksList"></div>
-        </div>
-        <button id="toggleAttacksBtn" class="btn secondary" style="width: 100%; margin-top: 8px;">⚔️ Атаки (0)</button>
-
-        <div class="section-title" style="margin-top:14px;">Группы мобов</div>
-        <div id="encGroupMonsters" class="list"></div>
-
-        <div class="row-inline">
-            <input id="groupName" class="input" type="text" placeholder="Имя группы">
-            <input id="groupCount" class="input small" type="number" placeholder="xN">
-            <input id="groupHP" class="input small" type="number" placeholder="ХП">
-            <input id="groupAC" class="input small" type="number" placeholder="КД">
-            <input id="groupInitMod" class="input small" type="number" placeholder="ИНИЦ+">
-            <button id="addGroupBtn" class="btn secondary">+ Группа</button>
+            <button id="toggleUniqueAttacksBtn" class="btn secondary" style="width: 100%; margin-top: 8px;">⚔️ Атаки (0)</button>
+            <div id="uniqueAttacksHint" class="hint" style="display:none;"></div>
         </div>
 
-        <div class="chips" style="margin-top:14px;">
+        <!-- БЛОК: Группы мобов -->
+        <div class="setup-block groups">
+            <div class="section-title" style="margin-top:0;">👥 Группы мобов</div>
+            <div id="encGroupMonsters" class="list"></div>
+
+            <div class="row-inline">
+                <input id="groupName" class="input" type="text" placeholder="Имя группы">
+                <input id="groupCount" class="input small" type="number" placeholder="xN">
+                <input id="groupHP" class="input small" type="number" placeholder="ХП">
+                <input id="groupAC" class="input small" type="number" placeholder="КД">
+                <input id="groupInitMod" class="input small" type="number" placeholder="ИНИЦ+">
+                <button id="addGroupBtn" class="btn secondary">+ Группа</button>
+            </div>
+
+            <!-- Блок для атак группы -->
+            <div id="groupAttacksSection" class="attacks-section" style="display:none;">
+                <div class="section-title" style="margin: 0 0 8px 0;">⚔️ Атаки группы</div>
+                <div class="row-inline">
+                    <input id="groupAttackName" class="input" type="text" placeholder="Название атаки">
+                    <input id="groupAttackHitBonus" class="input small" type="number" placeholder="+Попад">
+                    <input id="groupAttackDmgBonus" class="input small" type="number" placeholder="+Урон">
+                </div>
+                <div class="row-inline" style="margin-top: 6px;">
+                    <input id="groupAttackDmgType" class="input" type="text" placeholder="Тип урона">
+                    <input id="groupAttackRange" class="input" type="text" placeholder="Дальность">
+                    <button id="addGroupAttackBtn" class="btn secondary">+ Атака</button>
+                </div>
+                <div id="groupAttacksList"></div>
+            </div>
+            <button id="toggleGroupAttacksBtn" class="btn secondary" style="width: 100%; margin-top: 8px;">⚔️ Атаки (0)</button>
+            <div id="groupAttacksHint" class="hint" style="display:none;"></div>
+        </div>
+
+        <div class="chips" style="margin-top:20px;">
             <button id="startEncounterBtn" class="btn">Начать</button>
             <button class="btn secondary" id="backToCharsBtn">← Персонажи</button>
         </div>
@@ -527,31 +601,43 @@
 
         const startEncounterBtn = document.getElementById("startEncounterBtn");
 
-        // === ATTACKS MANAGEMENT ===
-        let currentMonsterAttacks = [];
+        // === ATTACKS MANAGEMENT - UNIQUE ===
+        let uniqueMonsterAttacks = [];
 
-        const toggleAttacksBtn = document.getElementById("toggleAttacksBtn");
+        const toggleUniqueAttacksBtn = document.getElementById("toggleUniqueAttacksBtn");
         const uniqueAttacksSection = document.getElementById("uniqueAttacksSection");
-        const addAttackBtn = document.getElementById("addAttackBtn");
-        const attacksList = document.getElementById("attacksList");
+        const addUniqueAttackBtn = document.getElementById("addUniqueAttackBtn");
+        const uniqueAttacksList = document.getElementById("uniqueAttacksList");
+        const uniqueAttacksHint = document.getElementById("uniqueAttacksHint");
 
-        toggleAttacksBtn.onclick = () => {
+        toggleUniqueAttacksBtn.onclick = () => {
             const isVisible = uniqueAttacksSection.style.display !== 'none';
             uniqueAttacksSection.style.display = isVisible ? 'none' : 'block';
         };
 
-        function updateAttacksButton() {
-            toggleAttacksBtn.innerText = `⚔️ Атаки (${currentMonsterAttacks.length})`;
+        function updateUniqueAttacksButton() {
+            const count = uniqueMonsterAttacks.length;
+            toggleUniqueAttacksBtn.innerText = `⚔️ Атаки (${count})`;
+            
+            if (count > 0) {
+                toggleUniqueAttacksBtn.classList.add('has-attacks');
+                uniqueAttacksHint.style.display = 'block';
+                uniqueAttacksHint.className = 'hint warning';
+                uniqueAttacksHint.innerText = `⚠️ ${count} атак будут добавлены следующему мобу`;
+            } else {
+                toggleUniqueAttacksBtn.classList.remove('has-attacks');
+                uniqueAttacksHint.style.display = 'none';
+            }
         }
 
-        function renderAttacksList() {
-            attacksList.innerHTML = '';
-            if (currentMonsterAttacks.length === 0) {
-                attacksList.innerHTML = '<div class="hint">Атак пока нет</div>';
+        function renderUniqueAttacksList() {
+            uniqueAttacksList.innerHTML = '';
+            if (uniqueMonsterAttacks.length === 0) {
+                uniqueAttacksList.innerHTML = '<div class="hint">Атак пока нет</div>';
                 return;
             }
 
-            currentMonsterAttacks.forEach((attack, idx) => {
+            uniqueMonsterAttacks.forEach((attack, idx) => {
                 const attackDiv = document.createElement('div');
                 attackDiv.className = 'attack-item';
 
@@ -576,30 +662,30 @@
                 delBtn.style.fontSize = '12px';
                 delBtn.innerText = '✕';
                 delBtn.onclick = () => {
-                    currentMonsterAttacks.splice(idx, 1);
-                    renderAttacksList();
-                    updateAttacksButton();
+                    uniqueMonsterAttacks.splice(idx, 1);
+                    renderUniqueAttacksList();
+                    updateUniqueAttacksButton();
                 };
 
                 attackDiv.appendChild(infoDiv);
                 attackDiv.appendChild(delBtn);
-                attacksList.appendChild(attackDiv);
+                uniqueAttacksList.appendChild(attackDiv);
             });
         }
 
-        addAttackBtn.onclick = () => {
-            const name = document.getElementById('attackName').value.trim();
-            const hitBonus = parseInt(document.getElementById('attackHitBonus').value) || 0;
-            const dmgBonus = parseInt(document.getElementById('attackDmgBonus').value) || 0;
-            const dmgType = document.getElementById('attackDmgType').value.trim() || 'физический';
-            const range = document.getElementById('attackRange').value.trim() || 'ближний бой';
+        addUniqueAttackBtn.onclick = () => {
+            const name = document.getElementById('uniqueAttackName').value.trim();
+            const hitBonus = parseInt(document.getElementById('uniqueAttackHitBonus').value) || 0;
+            const dmgBonus = parseInt(document.getElementById('uniqueAttackDmgBonus').value) || 0;
+            const dmgType = document.getElementById('uniqueAttackDmgType').value.trim() || 'физический';
+            const range = document.getElementById('uniqueAttackRange').value.trim() || 'ближний бой';
 
             if (!name) {
                 showToast('Введите название атаки');
                 return;
             }
 
-            currentMonsterAttacks.push({
+            uniqueMonsterAttacks.push({
                 name,
                 hit_bonus: hitBonus,
                 damage_bonus: dmgBonus,
@@ -607,26 +693,139 @@
                 range
             });
 
-            document.getElementById('attackName').value = '';
-            document.getElementById('attackHitBonus').value = '';
-            document.getElementById('attackDmgBonus').value = '';
-            document.getElementById('attackDmgType').value = '';
-            document.getElementById('attackRange').value = '';
+            document.getElementById('uniqueAttackName').value = '';
+            document.getElementById('uniqueAttackHitBonus').value = '';
+            document.getElementById('uniqueAttackDmgBonus').value = '';
+            document.getElementById('uniqueAttackDmgType').value = '';
+            document.getElementById('uniqueAttackRange').value = '';
 
-            renderAttacksList();
-            updateAttacksButton();
+            renderUniqueAttacksList();
+            updateUniqueAttacksButton();
         };
 
-        function clearAttacks() {
-            currentMonsterAttacks = [];
-            renderAttacksList();
-            updateAttacksButton();
+        function clearUniqueAttacks() {
+            uniqueMonsterAttacks = [];
+            renderUniqueAttacksList();
+            updateUniqueAttacksButton();
         }
 
-        function getAttacksForMonster() {
-            return currentMonsterAttacks.length > 0 ? [...currentMonsterAttacks] : null;
+        function getUniqueAttacks() {
+            return uniqueMonsterAttacks.length > 0 ? [...uniqueMonsterAttacks] : null;
         }
-        // === END ATTACKS ===
+        // === END UNIQUE ATTACKS ===
+
+        // === ATTACKS MANAGEMENT - GROUPS ===
+        let groupMonsterAttacks = [];
+
+        const toggleGroupAttacksBtn = document.getElementById("toggleGroupAttacksBtn");
+        const groupAttacksSection = document.getElementById("groupAttacksSection");
+        const addGroupAttackBtn = document.getElementById("addGroupAttackBtn");
+        const groupAttacksList = document.getElementById("groupAttacksList");
+        const groupAttacksHint = document.getElementById("groupAttacksHint");
+
+        toggleGroupAttacksBtn.onclick = () => {
+            const isVisible = groupAttacksSection.style.display !== 'none';
+            groupAttacksSection.style.display = isVisible ? 'none' : 'block';
+        };
+
+        function updateGroupAttacksButton() {
+            const count = groupMonsterAttacks.length;
+            toggleGroupAttacksBtn.innerText = `⚔️ Атаки (${count})`;
+            
+            if (count > 0) {
+                toggleGroupAttacksBtn.classList.add('has-attacks');
+                groupAttacksHint.style.display = 'block';
+                groupAttacksHint.className = 'hint warning';
+                groupAttacksHint.innerText = `⚠️ ${count} атак будут добавлены следующей группе`;
+            } else {
+                toggleGroupAttacksBtn.classList.remove('has-attacks');
+                groupAttacksHint.style.display = 'none';
+            }
+        }
+
+        function renderGroupAttacksList() {
+            groupAttacksList.innerHTML = '';
+            if (groupMonsterAttacks.length === 0) {
+                groupAttacksList.innerHTML = '<div class="hint">Атак пока нет</div>';
+                return;
+            }
+
+            groupMonsterAttacks.forEach((attack, idx) => {
+                const attackDiv = document.createElement('div');
+                attackDiv.className = 'attack-item';
+
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'attack-info';
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'attack-name';
+                nameDiv.innerText = attack.name;
+
+                const statsDiv = document.createElement('div');
+                statsDiv.className = 'attack-stats';
+                statsDiv.innerText = `+${attack.hit_bonus} попадание, +${attack.damage_bonus} урон (${attack.damage_type}), ${attack.range}`;
+
+                infoDiv.appendChild(nameDiv);
+                infoDiv.appendChild(statsDiv);
+
+                const delBtn = document.createElement('button');
+                delBtn.className = 'btn danger';
+                delBtn.style.height = '36px';
+                delBtn.style.padding = '0 12px';
+                delBtn.style.fontSize = '12px';
+                delBtn.innerText = '✕';
+                delBtn.onclick = () => {
+                    groupMonsterAttacks.splice(idx, 1);
+                    renderGroupAttacksList();
+                    updateGroupAttacksButton();
+                };
+
+                attackDiv.appendChild(infoDiv);
+                attackDiv.appendChild(delBtn);
+                groupAttacksList.appendChild(attackDiv);
+            });
+        }
+
+        addGroupAttackBtn.onclick = () => {
+            const name = document.getElementById('groupAttackName').value.trim();
+            const hitBonus = parseInt(document.getElementById('groupAttackHitBonus').value) || 0;
+            const dmgBonus = parseInt(document.getElementById('groupAttackDmgBonus').value) || 0;
+            const dmgType = document.getElementById('groupAttackDmgType').value.trim() || 'физический';
+            const range = document.getElementById('groupAttackRange').value.trim() || 'ближний бой';
+
+            if (!name) {
+                showToast('Введите название атаки');
+                return;
+            }
+
+            groupMonsterAttacks.push({
+                name,
+                hit_bonus: hitBonus,
+                damage_bonus: dmgBonus,
+                damage_type: dmgType,
+                range
+            });
+
+            document.getElementById('groupAttackName').value = '';
+            document.getElementById('groupAttackHitBonus').value = '';
+            document.getElementById('groupAttackDmgBonus').value = '';
+            document.getElementById('groupAttackDmgType').value = '';
+            document.getElementById('groupAttackRange').value = '';
+
+            renderGroupAttacksList();
+            updateGroupAttacksButton();
+        };
+
+        function clearGroupAttacks() {
+            groupMonsterAttacks = [];
+            renderGroupAttacksList();
+            updateGroupAttacksButton();
+        }
+
+        function getGroupAttacks() {
+            return groupMonsterAttacks.length > 0 ? [...groupMonsterAttacks] : null;
+        }
+        // === END GROUP ATTACKS ===
 
         let setupPlayers = [];
         let setupUniqueMonsters = [];
@@ -928,7 +1127,8 @@
 
             setupUniqueMonsters = [];
             setupGroupMonsters = [];
-            clearAttacks(); // очистить атаки при новой схватке
+            clearUniqueAttacks();
+            clearGroupAttacks();
 
             renderSetupPlayers();
             renderSetupUnique();
@@ -1128,7 +1328,8 @@
                 return;
             }
 
-            const attacks = getAttacksForMonster();
+            const attacks = getUniqueAttacks();
+            const attacksCount = attacks ? attacks.length : 0;
 
             setupUniqueMonsters.push({
                 name,
@@ -1144,8 +1345,14 @@
             uniqueACInput.value = "";
             uniqueInitModInput.value = "";
             
-            clearAttacks();
+            clearUniqueAttacks();
             renderSetupUnique();
+            
+            if (attacksCount > 0) {
+                showToast(`Моб '${name}' добавлен с ${attacksCount} атаками ⚔️`);
+            } else {
+                showToast(`Моб '${name}' добавлен`);
+            }
         };
 
         addGroupBtn.onclick = () => {
@@ -1160,7 +1367,8 @@
                 return;
             }
 
-            const attacks = getAttacksForMonster();
+            const attacks = getGroupAttacks();
+            const attacksCount = attacks ? attacks.length : 0;
 
             setupGroupMonsters.push({
                 name,
@@ -1178,8 +1386,14 @@
             groupACInput.value = "";
             groupInitModInput.value = "";
 
-            clearAttacks();
+            clearGroupAttacks();
             renderSetupGroups();
+            
+            if (attacksCount > 0) {
+                showToast(`Группа '${name}' (x${count}) добавлена с ${attacksCount} атаками ⚔️`);
+            } else {
+                showToast(`Группа '${name}' (x${count}) добавлена`);
+            }
         };
 
         startEncounterBtn.onclick = async () => {
