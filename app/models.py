@@ -1,10 +1,11 @@
 # app/models.py
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Enum
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Enum, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy import Text
 from .database import Base
 import enum
 import json
+from datetime import datetime
 
 
 class EncounterStatus(str, enum.Enum):
@@ -19,6 +20,11 @@ class ParticipantType(str, enum.Enum):
     npc_group = "npc_group"
 
 
+class MemberRole(str, enum.Enum):
+    gm = "gm"
+    observer = "observer"
+
+
 class Campaign(Base):
     __tablename__ = "campaigns"
 
@@ -28,6 +34,35 @@ class Campaign(Base):
 
     characters = relationship("Character", back_populates="campaign")
     encounters = relationship("Encounter", back_populates="campaign")
+    members = relationship("CampaignMember", back_populates="campaign", cascade="all, delete-orphan")
+    invites = relationship("CampaignInvite", back_populates="campaign", cascade="all, delete-orphan")
+
+
+class CampaignMember(Base):
+    __tablename__ = "campaign_members"
+
+    id = Column(Integer, primary_key=True, index=True)
+    campaign_id = Column(Integer, ForeignKey("campaigns.id"), nullable=False, index=True)
+    user_id = Column(Integer, nullable=False, index=True)
+    role = Column(Enum(MemberRole), nullable=False)
+    joined_at = Column(DateTime, default=datetime.utcnow)
+
+    campaign = relationship("Campaign", back_populates="members")
+
+
+class CampaignInvite(Base):
+    __tablename__ = "campaign_invites"
+
+    id = Column(Integer, primary_key=True, index=True)
+    campaign_id = Column(Integer, ForeignKey("campaigns.id"), nullable=False, index=True)
+    invite_token = Column(String, nullable=False, unique=True, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    expires_at = Column(DateTime, nullable=True)
+    is_active = Column(Boolean, default=True)
+    max_uses = Column(Integer, nullable=True)
+    current_uses = Column(Integer, default=0)
+
+    campaign = relationship("Campaign", back_populates="invites")
 
 
 class Character(Base):
