@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from typing import Optional
 from . import models, schemas
 from sqlalchemy.orm import joinedload
+import json
 
 # ----- CAMPAIGNS -----
 
@@ -147,12 +148,19 @@ def add_participants_to_encounter(
             ac=None,
             initiative_total=p.initiative_total,
             is_enemy=False,
+            attacks=None,
         )
         db.add(db_part)
 
     # 2) Уникальные мобы
     for m in participants_data.unique_monsters:
         roll = random.randint(1, 20) + m.initiative_mod
+        
+        # Сериализуем атаки в JSON, если они есть
+        attacks_json = None
+        if m.attacks:
+            attacks_json = json.dumps([a.dict() for a in m.attacks])
+        
         db_part = models.Participant(
             encounter_id=encounter_id,
             type=models.ParticipantType.npc_unique,
@@ -163,6 +171,7 @@ def add_participants_to_encounter(
             ac=m.ac,
             initiative_total=roll,
             is_enemy=m.is_enemy,
+            attacks=attacks_json,
         )
         db.add(db_part)
 
@@ -171,6 +180,12 @@ def add_participants_to_encounter(
     for g in participants_data.group_monsters:
         group_id = group_id_counter
         group_id_counter += 1
+        
+        # Сериализуем атаки
+        attacks_json = None
+        if g.attacks:
+            attacks_json = json.dumps([a.dict() for a in g.attacks])
+        
         for i in range(g.count):
             roll = random.randint(1, 20) + g.initiative_mod
             db_part = models.Participant(
@@ -184,6 +199,7 @@ def add_participants_to_encounter(
                 initiative_total=roll,
                 is_enemy=g.is_enemy,
                 group_id=group_id,
+                attacks=attacks_json,
             )
             db.add(db_part)
 
@@ -274,6 +290,13 @@ def get_encounter_state_for_gm(db: Session, encounter_id: int) -> Optional[schem
     for p in participants:
         is_alive = p.current_hp is None or (
             p.current_hp is not None and p.current_hp > 0)
+        
+        # Десериализуем атаки из JSON
+        attacks = None
+        if p.attacks:
+            attacks_data = json.loads(p.attacks)
+            attacks = [schemas.Attack(**a) for a in attacks_data]
+        
         items.append(
             schemas.EncounterParticipantGM(
                 id=p.id,
@@ -285,6 +308,7 @@ def get_encounter_state_for_gm(db: Session, encounter_id: int) -> Optional[schem
                 ac=p.ac,
                 initiative_total=p.initiative_total,
                 is_alive=is_alive,
+                attacks=attacks,
             )
         )
 
@@ -331,6 +355,12 @@ def get_encounter_state_for_player(db: Session, encounter_id: int) -> Optional[s
         else:
             max_hp = p.max_hp
             current_hp = p.current_hp
+        
+        # Десериализуем атаки из JSON
+        attacks = None
+        if p.attacks:
+            attacks_data = json.loads(p.attacks)
+            attacks = [schemas.Attack(**a) for a in attacks_data]
 
         items.append(
             schemas.EncounterParticipantPlayer(
@@ -343,6 +373,7 @@ def get_encounter_state_for_player(db: Session, encounter_id: int) -> Optional[s
                 ac=p.ac,
                 initiative_total=p.initiative_total,
                 is_alive=is_alive,
+                attacks=attacks,
             )
         )
 
