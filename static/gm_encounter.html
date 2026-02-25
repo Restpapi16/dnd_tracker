@@ -49,6 +49,25 @@
       box-shadow: 0 0 0 1px rgba(0, 0, 0, .55);
       white-space: nowrap;
     }
+    .observer-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--stroke2);
+      background: rgba(100, 116, 139, 0.1);
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.2s ease;
+    }
+    .observer-toggle:active { transform: scale(0.98); }
+    .observer-toggle.active {
+      background: rgba(251, 191, 36, 0.15);
+      border-color: var(--accent);
+    }
+    .observer-toggle-icon { font-size: 16px; }
+    .observer-toggle-text { font-size: 12px; font-weight: 700; }
     .status-line { font-size: 12px; margin-top: 8px; min-height: 16px; opacity: 0.9; }
     .section-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.10em; opacity: 0.7; margin: 10px 2px 8px; }
     .list { display: flex; flex-direction: column; gap: 10px; }
@@ -62,9 +81,11 @@
       border: 1px solid var(--stroke);
       min-height: 62px;
       user-select: none;
+      position: relative;
+      overflow: hidden;
     }
     .card:active { transform: scale(0.99); }
-    .card-main { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .card-main { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; position: relative; z-index: 1; }
     .card.current {
       border-color: var(--accent);
       box-shadow: 0 0 16px rgba(251, 191, 36, 0.25);
@@ -72,9 +93,66 @@
     }
     .card.selected { outline: 2px solid rgba(96, 165, 250, 0.85); outline-offset: 0px; }
     .card.dead { opacity: 0.55; }
+    
+    /* Эффекты трещин для режима наблюдателя */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border-radius: 16px;
+    }
+    
+    /* 50% HP и ниже - маленькие трещины */
+    .card.wounded-50::before {
+      opacity: 0.3;
+      background-image:
+        linear-gradient(135deg, transparent 0%, transparent 45%, rgba(220, 38, 38, 0.4) 45%, rgba(220, 38, 38, 0.4) 46%, transparent 46%),
+        linear-gradient(225deg, transparent 0%, transparent 45%, rgba(220, 38, 38, 0.4) 45%, rgba(220, 38, 38, 0.4) 46%, transparent 46%);
+      background-size: 20px 20px;
+      background-position: top left, top right;
+      background-repeat: no-repeat, no-repeat;
+    }
+    
+    /* 25% HP и ниже - больше трещин */
+    .card.wounded-25::before {
+      opacity: 0.5;
+      background-image:
+        linear-gradient(135deg, transparent 0%, transparent 40%, rgba(220, 38, 38, 0.6) 40%, rgba(220, 38, 38, 0.6) 42%, transparent 42%),
+        linear-gradient(225deg, transparent 0%, transparent 40%, rgba(220, 38, 38, 0.6) 40%, rgba(220, 38, 38, 0.6) 42%, transparent 42%),
+        linear-gradient(135deg, transparent 0%, transparent 43%, rgba(220, 38, 38, 0.5) 43%, rgba(220, 38, 38, 0.5) 44%, transparent 44%),
+        linear-gradient(90deg, transparent 0%, transparent 48%, rgba(220, 38, 38, 0.4) 48%, rgba(220, 38, 38, 0.4) 49%, transparent 49%);
+      background-size: 30px 30px, 30px 30px, 25px 25px, 100% 100%;
+      background-position: top left, top right, bottom left, center;
+      background-repeat: no-repeat;
+    }
+    
+    /* 10% HP и ниже - много трещин + пульсация */
+    .card.wounded-10::before {
+      opacity: 0.7;
+      background-image:
+        linear-gradient(135deg, transparent 0%, transparent 35%, rgba(220, 38, 38, 0.8) 35%, rgba(220, 38, 38, 0.8) 38%, transparent 38%),
+        linear-gradient(225deg, transparent 0%, transparent 35%, rgba(220, 38, 38, 0.8) 35%, rgba(220, 38, 38, 0.8) 38%, transparent 38%),
+        linear-gradient(135deg, transparent 0%, transparent 40%, rgba(220, 38, 38, 0.7) 40%, rgba(220, 38, 38, 0.7) 42%, transparent 42%),
+        linear-gradient(225deg, transparent 0%, transparent 42%, rgba(220, 38, 38, 0.6) 42%, rgba(220, 38, 38, 0.6) 43%, transparent 43%),
+        linear-gradient(90deg, transparent 0%, transparent 45%, rgba(220, 38, 38, 0.5) 45%, rgba(220, 38, 38, 0.5) 46%, transparent 46%),
+        linear-gradient(180deg, transparent 0%, transparent 47%, rgba(220, 38, 38, 0.4) 47%, rgba(220, 38, 38, 0.4) 48%, transparent 48%);
+      background-size: 40px 40px, 40px 40px, 35px 35px, 30px 30px, 100% 100%, 100% 100%;
+      background-position: top left, top right, bottom left, bottom right, center, center;
+      background-repeat: no-repeat;
+      animation: crack-pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes crack-pulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 0.9; }
+    }
+    
     .title { font-size: 16px; font-weight: 900; line-height: 1.15; }
     .sub { margin-top: 4px; font-size: 12px; color: var(--muted); }
-    .badges { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+    .badges { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; position: relative; z-index: 1; }
     .badge {
       display: inline-block;
       padding: 6px 10px;
@@ -88,15 +166,18 @@
     .badge.enemy { background: rgba(220, 38, 38, .12); border-color: rgba(220, 38, 38, .35); }
     .badge.pc { background: rgba(37, 99, 235, .12); border-color: rgba(37, 99, 235, .35); }
     .badge.zero { background: rgba(245, 158, 11, .12); border-color: rgba(245, 158, 11, .35); }
-    .right { text-align: right; min-width: 96px; }
+    .right { text-align: right; min-width: 96px; position: relative; z-index: 1; }
     .hp { font-size: 14px; font-weight: 900; margin-top: 2px; }
     .hp.muted { color: var(--muted); font-weight: 700; }
+    .hp-status { font-size: 13px; font-weight: 700; margin-top: 2px; }
     .attacks-block {
       margin-top: 10px;
       padding: 10px;
       background: rgba(127, 29, 29, 0.15);
       border-radius: 10px;
       border: 1px solid rgba(127, 29, 29, 0.35);
+      position: relative;
+      z-index: 1;
     }
     .attacks-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 6px; }
     .attack-item { margin-top: 6px; padding: 6px 8px; background: rgba(0, 0, 0, 0.3); border-radius: 8px; border: 1px solid rgba(127, 29, 29, 0.25); }
@@ -163,6 +244,10 @@
       <div class="pill" id="roundInfo">Раунд ?</div>
       <div class="pill" id="turnInfo">Ход ?</div>
     </div>
+    <div class="observer-toggle" id="observerToggle">
+      <span class="observer-toggle-icon">👁️</span>
+      <span class="observer-toggle-text">Режим наблюдателя</span>
+    </div>
     <div class="status-line" id="statusLine"></div>
   </div>
   <div class="section-title">Порядок ходов</div>
@@ -202,6 +287,38 @@
       encounterId = tg.initDataUnsafe.start_param;
     }
     if (!encounterId) document.getElementById("statusLine").innerText = "Нет encounter_id";
+    
+    // Observer mode state
+    let observerMode = localStorage.getItem('gm_observer_mode') === 'true';
+    const observerToggle = document.getElementById('observerToggle');
+    
+    // Toggle observer mode
+    observerToggle.onclick = () => {
+      observerMode = !observerMode;
+      localStorage.setItem('gm_observer_mode', observerMode);
+      updateObserverToggle();
+      renderState();
+    };
+    
+    function updateObserverToggle() {
+      if (observerMode) {
+        observerToggle.classList.add('active');
+      } else {
+        observerToggle.classList.remove('active');
+      }
+    }
+    
+    function getHpStatusText(currentHp, maxHp) {
+      if (!currentHp || !maxHp) return '—';
+      const percent = (currentHp / maxHp) * 100;
+      if (percent >= 90) return '😊 Целый';
+      if (percent >= 75) return '🩹 Царапины';
+      if (percent >= 50) return '😣 Ранен';
+      if (percent >= 25) return '🩸 Сильно ранен';
+      if (percent >= 10) return '💀 При смерти';
+      return '☠️ Критическое';
+    }
+    
     let currentState = null;
     let selectedParticipantId = null;
     async function apiGet(path) {
@@ -250,11 +367,31 @@
       document.getElementById("roundInfo").innerText = `Раунд ${currentState.round}`;
       const total = currentState.participants.length;
       document.getElementById("turnInfo").innerText = `Ход ${currentState.current_index + 1} из ${total}`;
+      
+      updateObserverToggle();
+      
       const container = document.getElementById("participants");
       container.innerHTML = "";
       currentState.participants.forEach((p, index) => {
         const card = document.createElement("div");
-        card.className = "card" + (index === currentState.current_index ? " current" : "") + (!p.is_alive ? " dead" : "") + (selectedParticipantId === p.id ? " selected" : "");
+        let cardClasses = "card";
+        if (index === currentState.current_index) cardClasses += " current";
+        if (!p.is_alive) cardClasses += " dead";
+        if (selectedParticipantId === p.id) cardClasses += " selected";
+        
+        // Add wound classes in observer mode for enemies
+        if (observerMode && p.is_enemy && p.is_alive && p.current_hp !== undefined && p.max_hp !== undefined) {
+          const hpPercent = (p.current_hp / p.max_hp) * 100;
+          if (hpPercent <= 10) {
+            cardClasses += ' wounded-10';
+          } else if (hpPercent <= 25) {
+            cardClasses += ' wounded-25';
+          } else if (hpPercent <= 50) {
+            cardClasses += ' wounded-50';
+          }
+        }
+        
+        card.className = cardClasses;
         card.onclick = () => {
           selectedParticipantId = (selectedParticipantId === p.id) ? null : p.id;
           renderState();
@@ -286,18 +423,32 @@
         left.appendChild(badges);
         const right = document.createElement("div");
         right.className = "right";
-        const hp = document.createElement("div");
-        hp.className = "hp" + ((p.max_hp == null || p.current_hp == null) ? " muted" : "");
-        if (p.max_hp != null && p.current_hp != null) {
-          hp.innerText = `${p.current_hp}/${p.max_hp}`;
+        
+        // HP display logic based on observer mode
+        if (observerMode && p.is_enemy) {
+          // Observer mode: show status text for enemies
+          const hpStatus = document.createElement("div");
+          hpStatus.className = "hp-status";
+          hpStatus.innerText = getHpStatusText(p.current_hp, p.max_hp);
+          right.appendChild(hpStatus);
         } else {
-          hp.innerText = "—";
+          // Normal mode: show exact HP
+          const hp = document.createElement("div");
+          hp.className = "hp" + ((p.max_hp == null || p.current_hp == null) ? " muted" : "");
+          if (p.max_hp != null && p.current_hp != null) {
+            hp.innerText = `${p.current_hp}/${p.max_hp}`;
+          } else {
+            hp.innerText = "—";
+          }
+          right.appendChild(hp);
         }
-        right.appendChild(hp);
+        
         mainRow.appendChild(left);
         mainRow.appendChild(right);
         card.appendChild(mainRow);
-        if (p.attacks && p.attacks.length > 0) {
+        
+        // Hide attacks in observer mode
+        if (!observerMode && p.attacks && p.attacks.length > 0) {
           const attacksBlock = document.createElement("div");
           attacksBlock.className = "attacks-block";
           const attacksTitle = document.createElement("div");
