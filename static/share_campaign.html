@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <title>Поделиться кампанией</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;
+            --bg: #000000;
+            --surface: #070707;
+            --surface2: #0b0b0b;
+            --stroke: #242424;
+            --stroke2: #303030;
+            --text: #f8fafc;
+            --muted: rgba(248, 250, 252, .66);
+            --accent: #fbbf24;
+            --accent2: #f59e0b;
+            --onAccent: #111827;
+            --danger: #ef4444;
+            --danger2: #991b1b;
+            --onDanger: #ffffff;
+            --focus: rgba(251, 191, 36, .55);
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 14px;
+        }
+
+        .top-card {
+            background: linear-gradient(180deg, #060606, #000000);
+            border: 1px solid rgba(251, 191, 36, .55);
+            border-radius: 14px;
+            padding: 12px 14px;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 10px 30px rgba(0, 0, 0, .55);
+            margin-bottom: 20px;
+        }
+
+        .top-title {
+            color: var(--accent);
+            font-weight: 900;
+            font-size: 18px;
+        }
+
+        .top-sub {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.10em;
+            opacity: 0.7;
+            margin: 20px 2px 10px;
+        }
+
+        .invite-box {
+            background: linear-gradient(180deg, var(--surface), var(--surface2));
+            border: 1px solid var(--stroke);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .invite-link {
+            background: #000;
+            border: 1px solid var(--stroke2);
+            border-radius: 10px;
+            padding: 12px;
+            color: var(--accent);
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            height: 54px;
+            width: 100%;
+            padding: 0 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, .55);
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: var(--onAccent);
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.7);
+            margin-bottom: 10px;
+        }
+
+        .btn:active {
+            transform: scale(0.99);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(135deg, #2a2a2a, #1d1d1d);
+            color: var(--text);
+            border: 1px solid var(--stroke2);
+        }
+
+        .hint {
+            font-size: 12px;
+            color: var(--muted);
+            margin: 6px 2px;
+            line-height: 1.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--muted);
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 18px;
+            transform: translateX(-50%) translateY(20px);
+            min-width: 220px;
+            max-width: 90vw;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid #78350f;
+            color: #f9fafb;
+            font-size: 12px;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+            z-index: 2000;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div id="toast" class="toast"></div>
+
+    <div id="content">
+        <div class="top-card">
+            <div class="top-title" id="campaignName">Кампания</div>
+            <div class="top-sub">Поделиться с наблюдателями</div>
+        </div>
+
+        <div class="section-title">📤 Инвайт-ссылка</div>
+        <div class="hint">
+            Отправь эту ссылку друзьям, чтобы они могли наблюдать за твоими схватками в реальном времени.
+        </div>
+
+        <div id="inviteSection" style="display:none;">
+            <div class="invite-box">
+                <div class="invite-link" id="inviteLink">Генерация...</div>
+                <button class="btn" id="copyBtn">📋 Копировать ссылку</button>
+                <button class="btn secondary" id="shareBtn">📨 Поделиться в Telegram</button>
+            </div>
+        </div>
+
+        <div id="loadingSection" class="loading">
+            Генерация инвайт-ссылки...
+        </div>
+
+        <button class="btn secondary" id="backBtn">← Назад к кампаниям</button>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        const API_BASE = "";
+
+        function authHeaders() {
+            const initData = tg?.initData || "";
+            return initData ? { "Authorization": "tma " + initData } : {};
+        }
+
+        let toastTimeout = null;
+        function showToast(text) {
+            const el = document.getElementById("toast");
+            if (!el) return;
+            el.innerText = text;
+            el.classList.add("show");
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => el.classList.remove("show"), 2200);
+        }
+
+        async function apiPost(path, body) {
+            const res = await fetch(API_BASE + path, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", ...authHeaders() },
+                body: body ? JSON.stringify(body) : "{}",
+            });
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return await res.json();
+        }
+
+        async function apiGet(path) {
+            const res = await fetch(API_BASE + path, { headers: { ...authHeaders() } });
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return await res.json();
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const campaignId = urlParams.get('campaign_id');
+
+        if (!campaignId) {
+            document.getElementById('content').innerHTML = '<div class="loading">Ошибка: не указан ID кампании</div>';
+        } else {
+            init();
+        }
+
+        async function init() {
+            try {
+                // Загружаем информацию о кампании
+                const campaign = await apiGet(`/campaigns/${campaignId}`);
+                document.getElementById('campaignName').innerText = campaign.name;
+
+                // Генерируем инвайт
+                const inviteData = await apiPost(`/campaigns/${campaignId}/invite`);
+                
+                document.getElementById('inviteLink').innerText = inviteData.invite_url;
+                document.getElementById('loadingSection').style.display = 'none';
+                document.getElementById('inviteSection').style.display = 'block';
+
+                // Кнопка копирования
+                document.getElementById('copyBtn').onclick = () => {
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(inviteData.invite_url);
+                        showToast('Ссылка скопирована!');
+                    } else {
+                        showToast('Копирование недоступно');
+                    }
+                };
+
+                // Кнопка отправки в Telegram
+                document.getElementById('shareBtn').onclick = () => {
+                    const text = `🎲 Присоединяйся к моей D&D кампании "${campaign.name}"!\n\n${inviteData.invite_url}`;
+                    const url = `https://t.me/share/url?url=${encodeURIComponent(inviteData.invite_url)}&text=${encodeURIComponent(text)}`;
+                    window.open(url, '_blank');
+                };
+
+            } catch (e) {
+                console.error(e);
+                document.getElementById('loadingSection').innerHTML = 'Ошибка генерации ссылки';
+                showToast('Ошибка: ' + e.message);
+            }
+        }
+
+        document.getElementById('backBtn').onclick = () => {
+            window.location.href = '/static/campaigns.html';
+        };
+
+        if (tg && tg.ready) tg.ready();
+    </script>
+</body>
+</html>
