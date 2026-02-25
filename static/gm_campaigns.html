@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Кампании</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        :root {
+            /* Base */
+            --font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            --bg: #000000;
+            --surface: #070707;
+            /* карточки */
+            --surface2: #0b0b0b;
+            /* приподнятые */
+            --stroke: #242424;
+            /* границы/разделители */
+            --stroke2: #303030;
+            /* активные границы */
+
+            /* Text */
+            --text: #f8fafc;
+            --muted: rgba(248, 250, 252, .66);
+
+            /* Accent (yellow) */
+            --accent: #fbbf24;
+            /* amber-400 */
+            --accent2: #f59e0b;
+            /* amber-500 */
+            --onAccent: #111827;
+            /* текст на жёлтом */
+
+            /* States */
+            --danger: #ef4444;
+            --danger2: #991b1b;
+            --onDanger: #ffffff;
+
+            --focus: rgba(251, 191, 36, .55);
+        }
+
+
+
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 14px 14px 108px;
+            /* в gm_encounter оставь своё значение под bottom-bar */
+        }
+
+
+        /* "Пергамент" для верхней карточки */
+        .top-card {
+            background: linear-gradient(180deg, #060606, #000000);
+            border: 1px solid rgba(251, 191, 36, .55);
+            border-radius: 14px;
+            padding: 12px 14px;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 10px 30px rgba(0, 0, 0, .55);
+        }
+
+        .top-title {
+            color: var(--accent);
+        }
+
+        .top-sub {
+            color: var(--muted);
+        }
+
+
+        .section-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.10em;
+            opacity: 0.7;
+            margin: 10px 2px 8px;
+        }
+
+        .list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 14px;
+            border-radius: 16px;
+            background: linear-gradient(180deg, var(--surface), var(--surface2));
+            border: 1px solid var(--stroke);
+            border-color: #27272a;
+            min-height: 58px;
+            user-select: none;
+        }
+
+        .item:active {
+            transform: scale(0.99);
+        }
+
+        .item-title {
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .item-sub {
+            margin-top: 3px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .pill {
+            font-size: 12px;
+            padding: 9px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--stroke);
+            background: rgba(37, 99, 235, .12);
+            color: var(--text);
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .pill.ok {
+            background: rgba(34, 197, 94, .12);
+        }
+
+        .pill.warn {
+            background: rgba(245, 158, 11, .12);
+        }
+
+        .row-inline {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn {
+            height: 54px;
+            padding: 0 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, .55);
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: var(--onAccent);
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.7);
+        }
+
+        .top-title {
+            font-weight: 900;
+        }
+
+        .item-title,
+        .title {
+            font-weight: 800;
+        }
+
+
+        .btn:active {
+            transform: scale(0.99);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(135deg, #2a2a2a, #1d1d1d);
+            color: var(--text);
+            border: 1px solid var(--stroke2);
+        }
+
+        .btn.danger {
+            background: linear-gradient(135deg, var(--danger), var(--danger2));
+            color: var(--onDanger);
+            border: 1px solid rgba(0, 0, 0, .35);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: default;
+            box-shadow: none;
+        }
+
+        .input {
+            height: 54px;
+            padding: 0 14px;
+            border-radius: 16px;
+            border: 1px solid var(--stroke2);
+            background: #000;
+            color: var(--text);
+            font-size: 16px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .input.small {
+            width: 92px;
+        }
+
+        .input.tiny {
+            width: 56px;
+        }
+
+        .input:focus {
+            outline: 2px solid var(--focus);
+            outline-offset: 1px;
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 18px;
+            transform: translateX(-50%) translateY(20px);
+            min-width: 220px;
+            max-width: 90vw;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid #78350f;
+            color: #f9fafb;
+            font-size: 12px;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+            z-index: 2000;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Нижняя панель */
+        .bottom-bar {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+            background: rgba(2, 6, 23, .92);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--stroke);
+            z-index: 1500;
+        }
+
+        .bottom-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .bottom-row .input {
+            flex: 1;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: var(--muted);
+            margin: 6px 2px 0;
+        }
+
+        .hint.warning {
+            color: #fbbf24;
+            font-weight: 700;
+        }
+
+        .chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        /* Подсветка выбранного игрока в подготовке схватки */
+        .item.pick {
+            transition: transform .05s, box-shadow .12s, border-color .12s, background .12s;
+        }
+
+        .item.pick.selected {
+            border-color: var(--brand);
+            box-shadow: 0 0 18px rgba(251, 191, 36, 0.30);
+            background:
+                radial-gradient(circle at top left, rgba(251, 191, 36, 0.16) 0, transparent 45%),
+                linear-gradient(145deg, #0b0f18, #020617);
+        }
+
+        /* Стили для блока атак */
+        .attacks-section {
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 12px;
+            border: 1px solid var(--stroke);
+        }
+
+        .attack-item {
+            padding: 8px;
+            margin-top: 6px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            border: 1px solid var(--stroke);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .attack-info {
+            flex: 1;
+        }
+
+        .attack-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .attack-stats {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        /* Разграничение блоков */
+        .setup-block {
+            margin-top: 20px;
+            padding: 14px;
+            background: rgba(15, 23, 42, 0.2);
+            border-radius: 16px;
+            border: 1px solid var(--stroke);
+        }
+
+        .setup-block.players {
+            border-color: rgba(37, 99, 235, .35);
+            background: rgba(37, 99, 235, 0.08);
+        }
+
+        .setup-block.unique {
+            border-color: rgba(220, 38, 38, .35);
+            background: rgba(220, 38, 38, 0.08);
+        }
+
+        .setup-block.groups {
+            border-color: rgba(245, 158, 11, .35);
+            background: rgba(245, 158, 11, 0.08);
+        }
+
+        /* Кнопка с атаками - визуальный индикатор */
+        .btn.has-attacks {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: var(--onAccent);
+            border: 2px solid var(--accent);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 18px rgba(251, 191, 36, 0.7);
+            }
+        }
+
+        /* Стиль для dice group */
+        .dice-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dice-separator {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--accent);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="toast" class="toast"></div>
+
+    <!-- Экран A: кампании -->
+    <div id="screenCampaigns">
+        <div class="top-card">
+            <div class="top-title">Кампейны</div>
+            <div class="top-sub" id="topSubtitle">Ваши приключения</div>
+        </div>
+
+        <div class="section-title">Список кампаний</div>
+        <div id="campaignList" class="list"></div>
+        <div class="section-title">Мои схватки</div>
+        <div id="myEncountersList" class="list"></div>
+
+        <div class="hint">Создание — снизу. Тап по кампании открывает персонажей.</div>
+
+        <button class="btn secondary" style="width: 100%; margin-top: 14px;" onclick="goHome()">🏠 Главное меню</button>
+
+        <!-- Нижняя панель: создать кампанию -->
+        <div class="bottom-bar">
+            <div class="bottom-row">
+                <input id="newCampaignName" class="input" type="text" placeholder="Название кампании">
+                <button id="createCampaignBtn" class="btn">Создать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ... rest of file unchanged ... -->
+    <script src="/static/gm_campaigns.js"></script>
+</body>
+
+</html>

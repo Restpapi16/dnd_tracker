@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8" />
-    <title>👁️ Мои кампании</title>
+    <title>Наблюдатель</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -15,10 +15,9 @@
             --stroke2: #303030;
             --text: #f8fafc;
             --muted: rgba(248, 250, 252, .66);
-            --accent: #fbbf24;
-            --accent2: #f59e0b;
+            --accent: #94a3b8;
+            --accent2: #64748b;
             --onAccent: #111827;
-            --success: #22c55e;
         }
 
         body {
@@ -31,33 +30,22 @@
 
         .top-card {
             background: linear-gradient(180deg, #060606, #000000);
-            border: 1px solid rgba(251, 191, 36, .55);
+            border: 1px solid rgba(148, 163, 184, .55);
             border-radius: 14px;
             padding: 12px 14px;
             box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 10px 30px rgba(0, 0, 0, .55);
-            margin-bottom: 16px;
-        }
-
-        .observer-badge {
-            display: inline-block;
-            background: rgba(100, 116, 139, 0.2);
-            border: 1px solid rgba(100, 116, 139, 0.4);
-            border-radius: 8px;
-            padding: 4px 10px;
-            font-size: 11px;
-            color: var(--muted);
-            margin-bottom: 8px;
+            margin-bottom: 20px;
         }
 
         .top-title {
             color: var(--accent);
             font-weight: 900;
-            font-size: 18px;
+            font-size: 20px;
         }
 
         .top-sub {
             color: var(--muted);
-            font-size: 13px;
+            font-size: 14px;
             margin-top: 4px;
         }
 
@@ -66,7 +54,7 @@
             text-transform: uppercase;
             letter-spacing: 0.10em;
             opacity: 0.7;
-            margin: 16px 2px 8px;
+            margin: 10px 2px 8px;
         }
 
         .list {
@@ -81,11 +69,11 @@
             justify-content: space-between;
             gap: 12px;
             padding: 14px;
-            border-radius: 14px;
+            border-radius: 16px;
             background: linear-gradient(180deg, var(--surface), var(--surface2));
             border: 1px solid var(--stroke);
+            min-height: 58px;
             cursor: pointer;
-            user-select: none;
         }
 
         .item:active {
@@ -95,7 +83,6 @@
         .item-title {
             font-size: 16px;
             font-weight: 800;
-            line-height: 1.2;
         }
 
         .item-sub {
@@ -109,23 +96,38 @@
             padding: 9px 12px;
             border-radius: 999px;
             border: 1px solid var(--stroke);
-            background: rgba(100, 116, 139, 0.2);
+            background: rgba(148, 163, 184, .12);
             color: var(--text);
             white-space: nowrap;
         }
 
         .pill.active {
             background: rgba(34, 197, 94, .12);
-            border-color: var(--success);
-            color: var(--success);
+        }
+
+        .btn {
+            height: 54px;
+            padding: 0 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, .55);
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: var(--onAccent);
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 14px;
+        }
+
+        .btn:active {
+            transform: scale(0.99);
         }
 
         .hint {
             font-size: 12px;
             color: var(--muted);
-            margin: 8px 2px;
-            text-align: center;
-            line-height: 1.5;
+            margin: 6px 2px;
         }
 
         .loading {
@@ -133,34 +135,22 @@
             padding: 40px;
             color: var(--muted);
         }
-
-        .empty {
-            text-align: center;
-            padding: 30px 20px;
-            color: var(--muted);
-        }
-
-        .empty-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
     </style>
 </head>
 <body>
     <div class="top-card">
-        <div class="observer-badge">👁️ Observer Mode</div>
-        <div class="top-title">Мои кампании</div>
-        <div class="top-sub">Кампании, за которыми я наблюдаю</div>
+        <div class="top-title">👁️ Наблюдатель</div>
+        <div class="top-sub">Кампании, за которыми ты следишь</div>
     </div>
 
-    <div class="section-title">🎯 Кампании</div>
-    <div id="campaignsList" class="list">
+    <div class="section-title">Мои observer-кампании</div>
+    <div id="campaignList" class="list">
         <div class="loading">Загрузка...</div>
     </div>
 
-    <div class="hint">
-        👁️ Нажми на кампанию, чтобы увидеть активные схватки
-    </div>
+    <div class="hint">Нажми на кампанию, чтобы увидеть активные схватки</div>
+
+    <button class="btn" onclick="goHome()">🏠 Главное меню</button>
 
     <script>
         const tg = window.Telegram.WebApp;
@@ -179,57 +169,86 @@
 
         async function loadCampaigns() {
             try {
-                const campaigns = await apiGet('/campaigns/observer/my');
+                const campaigns = await apiGet("/campaigns/observer/my");
                 renderCampaigns(campaigns);
             } catch (e) {
                 console.error(e);
-                document.getElementById('campaignsList').innerHTML = `
-                    <div class="empty">
-                        <div class="empty-icon">❌</div>
-                        <div>Ошибка загрузки кампаний</div>
-                    </div>
-                `;
+                document.getElementById('campaignList').innerHTML = '<div class="item"><div class="item-title">Ошибка загрузки</div></div>';
             }
         }
 
         function renderCampaigns(campaigns) {
-            const listEl = document.getElementById('campaignsList');
-            
+            const list = document.getElementById('campaignList');
+            list.innerHTML = '';
+
             if (!campaigns || campaigns.length === 0) {
-                listEl.innerHTML = `
-                    <div class="empty">
-                        <div class="empty-icon">🔍</div>
-                        <div>У тебя пока нет кампаний для наблюдения</div>
-                        <div style="margin-top: 8px; font-size: 12px;">
-                            Попроси GM поделиться ссылкой-приглашением
+                list.innerHTML = `
+                    <div class="item">
+                        <div>
+                            <div class="item-title">Пусто</div>
+                            <div class="item-sub">Ты пока не принял ни одного приглашения</div>
                         </div>
+                        <div class="pill">Нет кампаний</div>
                     </div>
                 `;
                 return;
             }
 
-            listEl.innerHTML = '';
-            
-            campaigns.forEach(campaign => {
-                const item = document.createElement('div');
-                item.className = 'item';
-                item.onclick = () => openCampaign(campaign.id, campaign.name);
+            campaigns.forEach(c => {
+                const row = document.createElement('div');
+                row.className = 'item';
+                row.onclick = () => openCampaign(c.id, c.name);
 
-                item.innerHTML = `
-                    <div>
-                        <div class="item-title">${campaign.name}</div>
-                        <div class="item-sub">ID: ${campaign.id}</div>
-                    </div>
-                    <div class="pill">👁️ Наблюдать</div>
-                `;
+                const left = document.createElement('div');
+                const title = document.createElement('div');
+                title.className = 'item-title';
+                title.innerText = c.name;
 
-                listEl.appendChild(item);
+                const sub = document.createElement('div');
+                sub.className = 'item-sub';
+                sub.innerText = `ID: ${c.id}`;
+
+                left.appendChild(title);
+                left.appendChild(sub);
+
+                const pill = document.createElement('div');
+                pill.className = 'pill';
+                pill.innerText = 'Смотреть';
+
+                row.appendChild(left);
+                row.appendChild(pill);
+                list.appendChild(row);
             });
         }
 
-        async function openCampaign(campaignId, campaignName) {
-            // Переход к списку активных схваток
-            window.location.href = `/static/observer_encounters.html?campaign_id=${campaignId}`;
+        async function openCampaign(id, name) {
+            // Показать активные схватки кампании
+            try {
+                const encounters = await apiGet(`/campaigns/${id}/encounters/active`);
+                if (encounters.length === 0) {
+                    alert(`В кампании "${name}" нет активных схваток`);
+                    return;
+                }
+                // Если одна схватка - открываем сразу
+                if (encounters.length === 1) {
+                    window.location.href = `/static/observer_encounter.html?encounter_id=${encounters[0].id}`;
+                    return;
+                }
+                // Если несколько - показываем список
+                let msg = `Активные схватки "${name}":\n\n`;
+                encounters.forEach((e, i) => {
+                    msg += `${i+1}. ${e.name || `Схватка #${e.id}`}\n`;
+                });
+                msg += `\nПерейди по прямой ссылке от GM`;
+                alert(msg);
+            } catch (e) {
+                console.error(e);
+                alert('Ошибка загрузки схваток');
+            }
+        }
+
+        function goHome() {
+            window.location.href = '/static/index.html';
         }
 
         if (tg && tg.ready) tg.ready();
