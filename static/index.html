@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <title>D&D Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;
+            --bg: #000000;
+            --surface: #070707;
+            --surface2: #0b0b0b;
+            --stroke: #242424;
+            --stroke2: #303030;
+            --text: #f8fafc;
+            --muted: rgba(248, 250, 252, .66);
+            --accent: #fbbf24;
+            --accent2: #f59e0b;
+            --onAccent: #111827;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 14px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-card {
+            background: linear-gradient(180deg, #060606, #000000);
+            border: 1px solid rgba(251, 191, 36, .55);
+            border-radius: 14px;
+            padding: 12px 14px;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 10px 30px rgba(0, 0, 0, .55);
+            margin-bottom: 20px;
+        }
+
+        .top-title {
+            color: var(--accent);
+            font-weight: 900;
+            font-size: 24px;
+        }
+
+        .top-sub {
+            color: var(--muted);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .greeting {
+            background: rgba(15, 23, 42, 0.3);
+            border: 1px solid var(--stroke);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+        }
+
+        .greeting-text {
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .role-card {
+            background: linear-gradient(180deg, var(--surface), var(--surface2));
+            border: 1px solid var(--stroke);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .role-card:active {
+            transform: scale(0.98);
+        }
+
+        .role-card.gm {
+            border-color: rgba(251, 191, 36, .4);
+            background: linear-gradient(180deg, rgba(251, 191, 36, 0.08), rgba(245, 158, 11, 0.05));
+        }
+
+        .role-card.observer {
+            border-color: rgba(100, 116, 139, 0.4);
+            background: linear-gradient(180deg, rgba(100, 116, 139, 0.08), rgba(71, 85, 105, 0.05));
+        }
+
+        .role-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .role-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .role-desc {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .role-count {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .role-count.observer-text {
+            color: #94a3b8;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--muted);
+        }
+    </style>
+</head>
+<body>
+    <div id="content">
+        <div class="loading">Загрузка...</div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        const API_BASE = "";
+
+        function authHeaders() {
+            const initData = tg?.initData || "";
+            return initData ? { "Authorization": "tma " + initData } : {};
+        }
+
+        async function apiGet(path) {
+            const res = await fetch(API_BASE + path, { headers: { ...authHeaders() } });
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return await res.json();
+        }
+
+        function getTgDisplayName() {
+            const u = tg?.initDataUnsafe?.user;
+            if (!u) return "Пользователь";
+
+            const first = (u.first_name || "").trim();
+            const last = (u.last_name || "").trim();
+            const uname = (u.username || "").trim();
+
+            const full = (first + " " + last).trim();
+            if (full) return full;
+            if (uname) return "@" + uname;
+            return "Пользователь";
+        }
+
+        async function init() {
+            try {
+                const stats = await apiGet("/me/stats");
+                renderMenu(stats);
+            } catch (e) {
+                console.error(e);
+                document.getElementById('content').innerHTML = '<div class="loading">Ошибка загрузки</div>';
+            }
+        }
+
+        function renderMenu(stats) {
+            const userName = getTgDisplayName();
+            const gmCount = stats.gm_campaigns_count || 0;
+            const observerCount = stats.observer_campaigns_count || 0;
+
+            const html = `
+                <div class="top-card">
+                    <div class="top-title">🎲 D&D Tracker</div>
+                    <div class="top-sub">Выбери роль</div>
+                </div>
+
+                <div class="greeting">
+                    <div class="greeting-text">👋 Привет, ${userName}!</div>
+                </div>
+
+                <div class="role-card gm" onclick="openGM()">
+                    <div class="role-icon">🎭</div>
+                    <div class="role-title">Мастер (GM)</div>
+                    <div class="role-desc">Управляй своими кампаниями</div>
+                    <div class="role-count">→ ${gmCount} кампани${gmCount === 1 ? 'я' : 'й'}</div>
+                </div>
+
+                <div class="role-card observer" onclick="openObserver()">
+                    <div class="role-icon">👁️</div>
+                    <div class="role-title">Наблюдатель</div>
+                    <div class="role-desc">Следи за играми друзей</div>
+                    <div class="role-count observer-text">→ ${observerCount} кампани${observerCount === 1 ? 'я' : 'й'}</div>
+                </div>
+            `;
+
+            document.getElementById('content').innerHTML = html;
+        }
+
+        function openGM() {
+            window.location.href = '/static/gm_campaigns.html';
+        }
+
+        function openObserver() {
+            window.location.href = '/static/observer_campaigns.html';
+        }
+
+        if (tg && tg.ready) tg.ready();
+        init();
+    </script>
+</body>
+</html>
