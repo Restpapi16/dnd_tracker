@@ -5,6 +5,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from .database import engine, Base, get_db
 from . import models, schemas, crud
+from . import crud_multiplayer
 from typing import Optional
 from typing import List
 from .deps import get_current_tg_user_id
@@ -54,6 +55,103 @@ def read_campaign(
     if db_campaign is None:
         raise HTTPException(status_code=404, detail="Кампании не найдены")
     return db_campaign
+
+
+# ----- MULTIPLAYER: CAMPAIGNS API -----
+
+@app.get("/campaigns/observer/my", response_model=List[schemas.Campaign])
+def list_observer_campaigns(
+    db: Session = Depends(get_db),
+    tg_user_id: int = Depends(get_current_tg_user_id),
+):
+    """Получить список кампаний, где я observer"""
+    campaigns = crud_multiplayer.get_campaigns_for_observer(db, tg_user_id)
+    return campaigns
+
+
+@app.post("/campaigns/{campaign_id}/invite")
+def generate_campaign_invite(
+    campaign_id: int,
+    db: Session = Depends(get_db),
+    tg_user_id: int = Depends(get_current_tg_user_id),
+):
+    """Сгенерировать инвайт-ссылку для кампании (GM only)"""
+    # Проверка: является ли пользователь GM
+    if not crud_multiplayer.is_campaign_gm(db, campaign_id, tg_user_id):
+        raise HTTPException(status_code=403, detail="Только GM может создавать приглашения")
+    
+    # Создаём инвайт (бессрочный, без лимита)
+    invite = crud_multiplayer.create_campaign_invite(db, campaign_id)
+    
+    # TODO: заменить на реальное имя бота
+    bot_username = "YOUR_BOT_USERNAME"
+    invite_url = f"https://t.me/{bot_username}?start=invite_{invite.invite_token}"
+    
+    return schemas.InviteGenerateResponse(
+        invite_token=invite.invite_token,
+        invite_url=invite_url,
+        expires_at=invite.expires_at
+    )
+
+
+@app.post("/campaigns/join")
+def join_campaign(
+    request: schemas.InviteJoinRequest,
+    db: Session = Depends(get_db),
+    tg_user_id: int = Depends(get_current_tg_user_id),
+):
+    """Присоединиться к кампании по инвайт-токену"""
+    campaign, error = crud_multiplayer.join_campaign_by_invite(
+        db, request.invite_token, tg_user_id
+    )
+    
+    if error:
+        raise HTTPException(status_code=400, detail=error)
+    
+    return {
+        "status": "success",
+        "campaign_id": campaign.id,
+        "campaign_name": campaign.name
+    }
+
+
+@app.get("/campaigns/{campaign_id}/members", response_model=List[schemas.CampaignMemberInfo])
+def get_campaign_members_list(
+    campaign_id: int,
+    db: Session = Depends(get_db),
+    tg_user_id: int = Depends(get_current_tg_user_id),
+):
+    """Получить список участников кампании (GM only)"""
+    if not crud_multiplayer.is_campaign_gm(db, campaign_id, tg_user_id):
+        raise HTTPException(status_code=403, detail="Только GM может просматривать список участников")
+    
+    members = crud_multiplayer.get_campaign_members(db, campaign_id)
+    return [
+        schemas.CampaignMemberInfo(
+            user_id=m.user_id,
+            role=m.role,
+            joined_at=m.joined_at
+        )
+        for m in members
+    ]
+
+
+@app.delete("/campaigns/{campaign_id}/members/{user_id}")
+def remove_member(
+    campaign_id: int,
+    user_id: int,
+    db: Session = Depends(get_db),
+    tg_user_id: int = Depends(get_current_tg_user_id),
+):
+    """Удалить участника из кампании (GM only)"""
+    if not crud_multiplayer.is_campaign_gm(db, campaign_id, tg_user_id):
+        raise HTTPException(status_code=403, detail="Только GM может удалять участников")
+    
+    success = crud_multiplayer.remove_campaign_member(db, campaign_id, user_id)
+    if not success:
+        raise HTTPException(status_code=400, detail="Не удалось удалить участника")
+    
+    return {"status": "deleted"}
 
 
 # ----- CHARACTERS API -----
@@ -163,16 +261,17 @@ def start_encounter(
 @app.get("/encounters/{encounter_id}/state")
 def get_encounter_state(
     encounter_id: int,
-    role: str = Query("gm", regex="^(gm|player)$"),
+    role: str = Query("gm", regex="^(gm|player|observer)$"),
     db: Session = Depends(get_db),
     tg_user_id: int = Depends(get_current_tg_user_id),
 ):
+    """Получить состояние схватки с учётом роли пользователя"""
     if role == "gm":
-        state: Optional[schemas.EncounterStateGM] = crud.get_encounter_state_for_gm(
-            db, encounter_id)
+        state = crud.get_encounter_state_for_gm(db, encounter_id)
+    elif role == "observer":
+        state = crud_multiplayer.get_encounter_state_for_observer(db, encounter_id)
     else:
-        state: Optional[schemas.EncounterStatePlayer] = crud.get_encounter_state_for_player(
-            db, encounter_id)
+        state = crud.get_encounter_state_for_player(db, encounter_id)
 
     if state is None:
         raise HTTPException(
@@ -211,6 +310,29 @@ def my_encounters(db: Session = Depends(get_db),
         "campaign_id": e.campaign_id,
         "campaign_name": e.campaign.name
     } for e in encs]
+
+
+# ----- MULTIPLAYER: OBSERVER ENCOUNTERS -----
+
+@app.get("/campaigns/{campaign_id}/encounters/active")
+def get_active_encounters(
+    campaign_id: int,
+    db: Session = Depends(get_db),
+    tg_user_id: int = Depends(get_current_tg_user_id),
+):
+    """Получить активные схватки кампании (observers могут смотреть)"""
+    # Проверяем доступ
+    if not crud_multiplayer.has_campaign_access(db, campaign_id, tg_user_id):
+        raise HTTPException(status_code=403, detail="Нет доступа")
+    
+    encounters = crud_multiplayer.get_active_encounters_for_campaign(db, campaign_id)
+    
+    return [{
+        "id": e.id,
+        "name": e.name,
+        "status": e.status.value,
+        "campaign_id": e.campaign_id
+    } for e in encounters]
 
 
 # ----- HP CHANGE / FINISH / DELETE API -----
