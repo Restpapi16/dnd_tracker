@@ -23,158 +23,44 @@
             --onDanger: #ffffff;
             --focus: rgba(251, 191, 36, .55);
         }
-        body {
-            font-family: var(--font);
-            background: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 14px 14px 108px;
-        }
-        .top-card {
-            background: linear-gradient(180deg, #060606, #000000);
-            border: 1px solid rgba(251, 191, 36, .55);
-            border-radius: 14px;
-            padding: 12px 14px;
-            box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 10px 30px rgba(0, 0, 0, .55);
-        }
-        .top-title {
-            color: var(--accent);
-            font-weight: 900;
-            font-size: 20px;
-        }
-        .top-sub {
-            color: var(--muted);
-            font-size: 14px;
-            margin-top: 4px;
-        }
-        .section-title {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.10em;
-            opacity: 0.7;
-            margin: 10px 2px 8px;
-        }
-        .list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 14px;
-            border-radius: 16px;
-            background: linear-gradient(180deg, var(--surface), var(--surface2));
-            border: 1px solid #27272a;
-            min-height: 58px;
-            user-select: none;
-        }
+        body { font-family: var(--font); background: var(--bg); color: var(--text); margin: 0; padding: 14px 14px 108px; }
+        .top-card { background: linear-gradient(180deg, #060606, #000000); border: 1px solid rgba(251, 191, 36, .55); border-radius: 14px; padding: 12px 14px; box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 10px 30px rgba(0, 0, 0, .55); }
+        .top-title { color: var(--accent); font-weight: 900; font-size: 20px; }
+        .top-sub { color: var(--muted); font-size: 14px; margin-top: 4px; }
+        .section-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.10em; opacity: 0.7; margin: 10px 2px 8px; }
+        .list { display: flex; flex-direction: column; gap: 10px; }
+        .item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px; border-radius: 16px; background: linear-gradient(180deg, var(--surface), var(--surface2)); border: 1px solid #27272a; min-height: 58px; user-select: none; }
         .item:active { transform: scale(0.99); }
-        .item-title {
-            font-size: 16px;
-            font-weight: 800;
-            line-height: 1.2;
-        }
-        .item-sub {
-            margin-top: 3px;
-            font-size: 12px;
-            color: var(--muted);
-        }
-        .pill {
-            font-size: 12px;
-            padding: 9px 12px;
-            border-radius: 999px;
-            border: 1px solid var(--stroke);
-            background: rgba(37, 99, 235, .12);
-            color: var(--text);
-            white-space: nowrap;
-            cursor: pointer;
-        }
+        .item-title { font-size: 16px; font-weight: 800; line-height: 1.2; }
+        .item-sub { margin-top: 3px; font-size: 12px; color: var(--muted); }
+        .pill { font-size: 12px; padding: 9px 12px; border-radius: 999px; border: 1px solid var(--stroke); background: rgba(37, 99, 235, .12); color: var(--text); white-space: nowrap; cursor: pointer; }
         .pill.ok { background: rgba(34, 197, 94, .12); }
         .pill.warn { background: rgba(245, 158, 11, .12); }
-        .row-inline {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-        .btn {
-            height: 54px;
-            padding: 0 16px;
-            border-radius: 16px;
-            border: 1px solid rgba(0, 0, 0, .55);
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: var(--onAccent);
-            font-size: 14px;
-            font-weight: 900;
-            letter-spacing: .06em;
-            text-transform: uppercase;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.7);
-        }
+        .row-inline { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+        .btn { height: 54px; padding: 0 16px; border-radius: 16px; border: 1px solid rgba(0, 0, 0, .55); background: linear-gradient(135deg, var(--accent), var(--accent2)); color: var(--onAccent); font-size: 14px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.7); }
         .btn:active { transform: scale(0.99); }
-        .btn.secondary {
-            background: linear-gradient(135deg, #2a2a2a, #1d1d1d);
-            color: var(--text);
-            border: 1px solid var(--stroke2);
-        }
-        .btn.danger {
-            background: linear-gradient(135deg, var(--danger), var(--danger2));
-            color: var(--onDanger);
-        }
-        .input {
-            height: 54px;
-            padding: 0 14px;
-            border-radius: 16px;
-            border: 1px solid var(--stroke2);
-            background: #000;
-            color: var(--text);
-            font-size: 16px;
-            outline: none;
-        }
+        .btn.secondary { background: linear-gradient(135deg, #2a2a2a, #1d1d1d); color: var(--text); border: 1px solid var(--stroke2); }
+        .btn.danger { background: linear-gradient(135deg, var(--danger), var(--danger2)); color: var(--onDanger); }
+        .input { height: 54px; padding: 0 14px; border-radius: 16px; border: 1px solid var(--stroke2); background: #000; color: var(--text); font-size: 16px; outline: none; }
         .input.small { width: 92px; }
         .input.tiny { width: 56px; }
-        .bottom-bar {
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
-            background: rgba(2, 6, 23, .92);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid var(--stroke);
-            z-index: 1500;
-        }
+        .bottom-bar { position: fixed; left: 0; right: 0; bottom: 0; padding: 12px 14px calc(12px + env(safe-area-inset-bottom)); background: rgba(2, 6, 23, .92); backdrop-filter: blur(10px); border-top: 1px solid var(--stroke); z-index: 1500; }
         .bottom-row { display: flex; gap: 10px; }
         .bottom-row .input { flex: 1; }
         .hint { font-size: 12px; color: var(--muted); margin: 6px 2px 0; }
-        .toast {
-            position: fixed;
-            left: 50%; bottom: 18px;
-            transform: translateX(-50%) translateY(20px);
-            min-width: 220px;
-            padding: 10px 14px;
-            border-radius: 999px;
-            background: rgba(15, 23, 42, 0.95);
-            border: 1px solid #78350f;
-            color: #f9fafb;
-            font-size: 12px;
-            text-align: center;
-            opacity: 0;
-            transition: opacity 0.25s, transform 0.25s;
-            z-index: 2000;
-        }
+        .toast { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%) translateY(20px); min-width: 220px; padding: 10px 14px; border-radius: 999px; background: rgba(15, 23, 42, 0.95); border: 1px solid #78350f; color: #f9fafb; font-size: 12px; text-align: center; opacity: 0; transition: opacity 0.25s, transform 0.25s; z-index: 2000; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
         .item.pick { transition: transform .05s, box-shadow .12s, border-color .12s, background .12s; }
-        .item.pick.selected {
-            border-color: var(--accent);
-            box-shadow: 0 0 18px rgba(251, 191, 36, 0.30);
-            background: radial-gradient(circle at top left, rgba(251, 191, 36, 0.16) 0, transparent 45%), linear-gradient(145deg, #0b0f18, #020617);
-        }
+        .item.pick.selected { border-color: var(--accent); box-shadow: 0 0 18px rgba(251, 191, 36, 0.30); background: radial-gradient(circle at top left, rgba(251, 191, 36, 0.16) 0, transparent 45%), linear-gradient(145deg, #0b0f18, #020617); }
+        .attack-form { background: rgba(127, 29, 29, 0.08); border: 1px solid rgba(127, 29, 29, 0.25); border-radius: 12px; padding: 12px; margin-top: 12px; }
+        .attack-form-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 8px; }
+        .attacks-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+        .attack-item-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(127, 29, 29, 0.25); border-radius: 8px; padding: 8px 10px; display: flex; justify-content: space-between; align-items: center; }
+        .attack-item-text { font-size: 12px; }
+        .attack-item-name { font-weight: 700; color: var(--text); }
+        .attack-item-stats { font-size: 10px; color: var(--muted); margin-top: 2px; }
+        .btn-del-attack { padding: 4px 8px; font-size: 11px; height: auto; background: linear-gradient(135deg, var(--danger), var(--danger2)); color: var(--onDanger); }
     </style>
 </head>
 <body>
@@ -182,564 +68,104 @@
 
     <!-- ЭКРАН A: КАМПАНИИ -->
     <div id="screenCampaigns">
-        <div class="top-card">
-            <div class="top-title">🎭 GM Кампании</div>
-            <div class="top-sub" id="topSubtitle">Ваши приключения</div>
-        </div>
+        <div class="top-card"><div class="top-title">🎭 GM Кампании</div><div class="top-sub" id="topSubtitle">Ваши приключения</div></div>
         <div class="section-title">Список кампаний</div>
         <div id="campaignList" class="list"></div>
         <div class="section-title">Мои схватки</div>
         <div id="myEncountersList" class="list"></div>
         <div class="hint">Создание — снизу. Тап по кампании открывает персонажей.</div>
         <button class="btn secondary" style="width: 100%; margin-top: 14px;" onclick="goHome()">🏠 Главное меню</button>
-        <div class="bottom-bar">
-            <div class="bottom-row">
-                <input id="newCampaignName" class="input" type="text" placeholder="Название кампании">
-                <button id="createCampaignBtn" class="btn">Создать</button>
-            </div>
-        </div>
+        <div class="bottom-bar"><div class="bottom-row"><input id="newCampaignName" class="input" type="text" placeholder="Название кампании"><button id="createCampaignBtn" class="btn">Создать</button></div></div>
     </div>
 
     <!-- ЭКРАН B: ПЕРСОНАЖИ -->
     <div id="screenCharacters" style="display:none;">
-        <div class="top-card">
-            <div class="top-title" id="campaignTitle">Кампания</div>
-            <div class="top-sub" id="campaignSubtitle">Персонажи</div>
-        </div>
+        <div class="top-card"><div class="top-title" id="campaignTitle">Кампания</div><div class="top-sub" id="campaignSubtitle">Персонажи</div></div>
         <div class="section-title">Персонажи</div>
         <div id="characterList" class="list"></div>
-        <div class="chips">
-            <button id="startSetupBtn" class="btn">Схватка</button>
-            <button class="btn secondary" id="backToCampaignsBtn">← Кампании</button>
-        </div>
-        <div class="bottom-bar">
-            <div class="bottom-row" style="flex-wrap:wrap;">
-                <input id="newCharName" class="input" type="text" placeholder="Имя">
-                <input id="newCharAC" class="input small" type="number" placeholder="КД">
-                <input id="newCharInit" class="input small" type="number" placeholder="ИНИЦ">
-                <button id="createCharBtn" class="btn">Добавить</button>
-            </div>
-        </div>
+        <div class="chips"><button id="startSetupBtn" class="btn">Схватка</button><button class="btn secondary" id="backToCampaignsBtn">← Кампании</button></div>
+        <div class="bottom-bar"><div class="bottom-row" style="flex-wrap:wrap;"><input id="newCharName" class="input" type="text" placeholder="Имя"><input id="newCharAC" class="input small" type="number" placeholder="КД"><input id="newCharInit" class="input small" type="number" placeholder="ИНИЦ"><button id="createCharBtn" class="btn">Добавить</button></div></div>
     </div>
 
     <!-- ЭКРАН C: ПОДГОТОВКА СХВАТКИ -->
     <div id="screenEncounterSetup" style="display:none;">
-        <div class="top-card">
-            <div class="top-title" id="encSetupTitle">Подготовка схватки</div>
-            <div class="top-sub" id="encSetupSubtitle">Выберите участников</div>
-        </div>
+        <div class="top-card"><div class="top-title" id="encSetupTitle">Подготовка схватки</div><div class="top-sub" id="encSetupSubtitle">Выберите участников</div></div>
         <div class="section-title" style="margin-top:20px;">🛡️ Игроки кампании</div>
         <div id="encPlayersList" class="list"></div>
+        
         <div class="section-title" style="margin-top:20px;">👹 Уникальные мобы</div>
         <div id="encUniqueMonsters" class="list"></div>
-        <div class="row-inline">
-            <input id="uniqueName" class="input" type="text" placeholder="Имя">
-            <input id="uniqueHP" class="input small" type="number" placeholder="ХП">
-            <input id="uniqueAC" class="input small" type="number" placeholder="КД">
-            <input id="uniqueInitMod" class="input small" type="number" placeholder="ИНИЦ+">
-            <button id="addUniqueBtn" class="btn secondary">+ Моб</button>
+        <div class="row-inline"><input id="uniqueName" class="input" type="text" placeholder="Имя"><input id="uniqueHP" class="input small" type="number" placeholder="ХП"><input id="uniqueAC" class="input small" type="number" placeholder="КД"><input id="uniqueInitMod" class="input small" type="number" placeholder="ИНИЦ+"><button id="addUniqueBtn" class="btn secondary">+ Моб</button></div>
+        <div class="attack-form" id="uniqueAttackForm" style="display:none;">
+            <div class="attack-form-title">⚔️ Атаки моба</div>
+            <div class="attacks-list" id="uniqueAttacksList"></div>
+            <div class="row-inline" style="margin-top:8px;"><input id="uniqueAtkName" class="input" type="text" placeholder="Название"><input id="uniqueAtkHit" class="input tiny" type="number" placeholder="+X"><input id="uniqueAtkDice" class="input tiny" type="number" placeholder="XdY"><input id="uniqueAtkDie" class="input tiny" type="number" placeholder="Y"><input id="uniqueAtkBonus" class="input tiny" type="number" placeholder="+Z"><button id="addUniqueAtkBtn" class="btn secondary" style="height:44px; padding:0 10px;">+ Атака</button></div>
+            <div class="hint">+X = бонус попадания, XdY+Z = урон (например 2d6+3)</div>
         </div>
+        
         <div class="section-title" style="margin-top:20px;">👥 Группы мобов</div>
         <div id="encGroupMonsters" class="list"></div>
-        <div class="row-inline">
-            <input id="groupName" class="input" type="text" placeholder="Имя группы">
-            <input id="groupCount" class="input small" type="number" placeholder="xN">
-            <input id="groupHP" class="input small" type="number" placeholder="ХП">
-            <input id="groupAC" class="input small" type="number" placeholder="КД">
-            <input id="groupInitMod" class="input small" type="number" placeholder="ИНИЦ+">
-            <button id="addGroupBtn" class="btn secondary">+ Группа</button>
+        <div class="row-inline"><input id="groupName" class="input" type="text" placeholder="Имя группы"><input id="groupCount" class="input small" type="number" placeholder="xN"><input id="groupHP" class="input small" type="number" placeholder="ХП"><input id="groupAC" class="input small" type="number" placeholder="КД"><input id="groupInitMod" class="input small" type="number" placeholder="ИНИЦ+"><button id="addGroupBtn" class="btn secondary">+ Группа</button></div>
+        <div class="attack-form" id="groupAttackForm" style="display:none;">
+            <div class="attack-form-title">⚔️ Атаки группы</div>
+            <div class="attacks-list" id="groupAttacksList"></div>
+            <div class="row-inline" style="margin-top:8px;"><input id="groupAtkName" class="input" type="text" placeholder="Название"><input id="groupAtkHit" class="input tiny" type="number" placeholder="+X"><input id="groupAtkDice" class="input tiny" type="number" placeholder="XdY"><input id="groupAtkDie" class="input tiny" type="number" placeholder="Y"><input id="groupAtkBonus" class="input tiny" type="number" placeholder="+Z"><button id="addGroupAtkBtn" class="btn secondary" style="height:44px; padding:0 10px;">+ Атака</button></div>
+            <div class="hint">+X = бонус попадания, XdY+Z = урон</div>
         </div>
-        <div class="chips" style="margin-top:20px;">
-            <button id="startEncounterBtn" class="btn">Начать</button>
-            <button class="btn secondary" id="backToCharsBtn">← Персонажи</button>
-        </div>
+        
+        <div class="chips" style="margin-top:20px;"><button id="startEncounterBtn" class="btn">Начать</button><button class="btn secondary" id="backToCharsBtn">← Персонажи</button></div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         const API_BASE = "";
-
-        function authHeaders() {
-            const initData = tg?.initData || "";
-            return initData ? { "Authorization": "tma " + initData } : {};
-        }
-
+        function authHeaders() { const initData = tg?.initData || ""; return initData ? { "Authorization": "tma " + initData } : {}; }
         let toastTimeout = null;
-        function showToast(text) {
-            const el = document.getElementById("toast");
-            if (!el) return;
-            el.innerText = text;
-            el.classList.add("show");
-            if (toastTimeout) clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => el.classList.remove("show"), 2200);
-        }
-
-        async function apiGet(path) {
-            const res = await fetch(API_BASE + path, { headers: { ...authHeaders() } });
-            if (!res.ok) throw new Error("HTTP " + res.status);
-            return await res.json();
-        }
-
-        async function apiPost(path, body) {
-            const res = await fetch(API_BASE + path, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", ...authHeaders() },
-                body: body ? JSON.stringify(body) : "{}"
-            });
-            if (!res.ok) throw new Error("HTTP " + res.status);
-            return await res.json();
-        }
-
-        async function apiPut(path, body) {
-            const res = await fetch(API_BASE + path, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json", ...authHeaders() },
-                body: JSON.stringify(body)
-            });
-            if (!res.ok) throw new Error("HTTP " + res.status);
-            return await res.json();
-        }
-
-        async function apiDelete(path) {
-            const res = await fetch(API_BASE + path, { method: "DELETE", headers: { ...authHeaders() } });
-            if (!res.ok) throw new Error("HTTP " + res.status);
-            return await res.json();
-        }
-
+        function showToast(text) { const el = document.getElementById("toast"); if (!el) return; el.innerText = text; el.classList.add("show"); if (toastTimeout) clearTimeout(toastTimeout); toastTimeout = setTimeout(() => el.classList.remove("show"), 2200); }
+        async function apiGet(path) { const res = await fetch(API_BASE + path, { headers: { ...authHeaders() } }); if (!res.ok) throw new Error("HTTP " + res.status); return await res.json(); }
+        async function apiPost(path, body) { const res = await fetch(API_BASE + path, { method: "POST", headers: { "Content-Type": "application/json", ...authHeaders() }, body: body ? JSON.stringify(body) : "{}" }); if (!res.ok) throw new Error("HTTP " + res.status); return await res.json(); }
+        async function apiPut(path, body) { const res = await fetch(API_BASE + path, { method: "PUT", headers: { "Content-Type": "application/json", ...authHeaders() }, body: JSON.stringify(body) }); if (!res.ok) throw new Error("HTTP " + res.status); return await res.json(); }
+        async function apiDelete(path) { const res = await fetch(API_BASE + path, { method: "DELETE", headers: { ...authHeaders() } }); if (!res.ok) throw new Error("HTTP " + res.status); return await res.json(); }
         function goHome() { window.location.href = '/static/index.html'; }
 
-        let currentCampaignId = null;
-        let currentCampaignName = "";
-        let setupPlayers = [];
-        let setupUniqueMonsters = [];
-        let setupGroupMonsters = [];
+        let currentCampaignId = null, currentCampaignName = "", setupPlayers = [], setupUniqueMonsters = [], setupGroupMonsters = [];
+        let uniqueAttacks = [], groupAttacks = [];
+        const screenCampaigns = document.getElementById("screenCampaigns"), screenCharacters = document.getElementById("screenCharacters"), screenEncounterSetup = document.getElementById("screenEncounterSetup");
 
-        const screenCampaigns = document.getElementById("screenCampaigns");
-        const screenCharacters = document.getElementById("screenCharacters");
-        const screenEncounterSetup = document.getElementById("screenEncounterSetup");
+        async function loadCampaigns() { try { const campaigns = await apiGet("/campaigns"); renderCampaigns(campaigns); } catch (e) { console.error(e); showToast("Не удалось загрузить кампании"); } }
+        async function loadMyEncounters() { try { const encs = await apiGet("/encounters/my"); renderMyEncounters(encs); } catch (e) { console.error(e); } }
+        function renderCampaigns(campaigns) { const list = document.getElementById('campaignList'); list.innerHTML = ''; if (!campaigns || campaigns.length === 0) { list.innerHTML = '<div class="item"><div><div class="item-title">Пока пусто</div><div class="item-sub">Создай первую кампанию снизу</div></div><div class="pill warn">Нет кампаний</div></div>'; return; } campaigns.forEach(c => { const row = document.createElement('div'); row.className = 'item'; const left = document.createElement('div'); const title = document.createElement('div'); title.className = 'item-title'; title.innerText = c.name; const sub = document.createElement('div'); sub.className = 'item-sub'; sub.innerText = `ID: ${c.id}`; left.appendChild(title); left.appendChild(sub); const right = document.createElement('div'); right.style.display = 'flex'; right.style.gap = '8px'; const shareBtn = document.createElement('button'); shareBtn.className = 'btn secondary'; shareBtn.style.height = '44px'; shareBtn.style.padding = '0 14px'; shareBtn.innerText = '📤'; shareBtn.onclick = (e) => { e.stopPropagation(); window.location.href = `/static/share_campaign.html?campaign_id=${c.id}`; }; const openBtn = document.createElement('div'); openBtn.className = 'pill'; openBtn.innerText = 'Открыть'; openBtn.onclick = () => openCampaign(c.id, c.name); right.appendChild(shareBtn); right.appendChild(openBtn); row.appendChild(left); row.appendChild(right); list.appendChild(row); }); }
+        function renderMyEncounters(encs) { const list = document.getElementById('myEncountersList'); list.innerHTML = ''; if (!encs || encs.length === 0) { list.innerHTML = '<div class="item"><div><div class="item-title">Нет незавершённых схваток</div><div class="item-sub">Когда начнёшь бой — он появится здесь</div></div><div class="pill">OK</div></div>'; return; } encs.forEach(e => { const row = document.createElement('div'); row.className = 'item'; row.onclick = () => { window.location.href = `/static/gm_encounter.html?encounter_id=${e.id}`; }; const left = document.createElement('div'); const title = document.createElement('div'); title.className = 'item-title'; title.innerText = e.name || `Схватка #${e.id}`; const sub = document.createElement('div'); sub.className = 'item-sub'; sub.innerText = `Кампания "${e.campaign_name}" • ${e.status}`; left.appendChild(title); left.appendChild(sub); const pill = document.createElement('div'); pill.className = 'pill ' + (e.status === 'active' ? 'ok' : 'warn'); pill.innerText = 'Продолжить'; row.appendChild(left); row.appendChild(pill); list.appendChild(row); }); }
+        document.getElementById('createCampaignBtn').onclick = async () => { const name = document.getElementById('newCampaignName').value.trim(); if (!name) { showToast('Введите название кампании'); return; } try { await apiPost('/campaigns', { name }); document.getElementById('newCampaignName').value = ''; showToast('Кампания создана'); await loadCampaigns(); } catch (e) { console.error(e); showToast('Ошибка создания кампании'); } };
 
-        async function loadCampaigns() {
-            try {
-                const campaigns = await apiGet("/campaigns");
-                renderCampaigns(campaigns);
-            } catch (e) {
-                console.error(e);
-                showToast("Не удалось загрузить кампании");
-            }
-        }
-
-        async function loadMyEncounters() {
-            try {
-                const encs = await apiGet("/encounters/my");
-                renderMyEncounters(encs);
-            } catch (e) { console.error(e); }
-        }
-
-        function renderCampaigns(campaigns) {
-            const list = document.getElementById('campaignList');
-            list.innerHTML = '';
-            if (!campaigns || campaigns.length === 0) {
-                list.innerHTML = '<div class="item"><div><div class="item-title">Пока пусто</div><div class="item-sub">Создай первую кампанию снизу</div></div><div class="pill warn">Нет кампаний</div></div>';
-                return;
-            }
-            campaigns.forEach(c => {
-                const row = document.createElement('div');
-                row.className = 'item';
-                const left = document.createElement('div');
-                const title = document.createElement('div');
-                title.className = 'item-title';
-                title.innerText = c.name;
-                const sub = document.createElement('div');
-                sub.className = 'item-sub';
-                sub.innerText = `ID: ${c.id}`;
-                left.appendChild(title);
-                left.appendChild(sub);
-                const right = document.createElement('div');
-                right.style.display = 'flex';
-                right.style.gap = '8px';
-                const shareBtn = document.createElement('button');
-                shareBtn.className = 'btn secondary';
-                shareBtn.style.height = '44px';
-                shareBtn.style.padding = '0 14px';
-                shareBtn.innerText = '📤';
-                shareBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    window.location.href = `/static/share_campaign.html?campaign_id=${c.id}`;
-                };
-                const openBtn = document.createElement('div');
-                openBtn.className = 'pill';
-                openBtn.innerText = 'Открыть';
-                openBtn.onclick = () => openCampaign(c.id, c.name);
-                right.appendChild(shareBtn);
-                right.appendChild(openBtn);
-                row.appendChild(left);
-                row.appendChild(right);
-                list.appendChild(row);
-            });
-        }
-
-        function renderMyEncounters(encs) {
-            const list = document.getElementById('myEncountersList');
-            list.innerHTML = '';
-            if (!encs || encs.length === 0) {
-                list.innerHTML = '<div class="item"><div><div class="item-title">Нет незавершённых схваток</div><div class="item-sub">Когда начнёшь бой — он появится здесь</div></div><div class="pill">OK</div></div>';
-                return;
-            }
-            encs.forEach(e => {
-                const row = document.createElement('div');
-                row.className = 'item';
-                row.onclick = () => { window.location.href = `/static/gm_encounter.html?encounter_id=${e.id}`; };
-                const left = document.createElement('div');
-                const title = document.createElement('div');
-                title.className = 'item-title';
-                title.innerText = e.name || `Схватка #${e.id}`;
-                const sub = document.createElement('div');
-                sub.className = 'item-sub';
-                sub.innerText = `Кампания "${e.campaign_name}" • ${e.status}`;
-                left.appendChild(title);
-                left.appendChild(sub);
-                const pill = document.createElement('div');
-                pill.className = 'pill ' + (e.status === 'active' ? 'ok' : 'warn');
-                pill.innerText = 'Продолжить';
-                row.appendChild(left);
-                row.appendChild(pill);
-                list.appendChild(row);
-            });
-        }
-
-        document.getElementById('createCampaignBtn').onclick = async () => {
-            const name = document.getElementById('newCampaignName').value.trim();
-            if (!name) { showToast('Введите название кампании'); return; }
-            try {
-                await apiPost('/campaigns', { name });
-                document.getElementById('newCampaignName').value = '';
-                showToast('Кампания создана');
-                await loadCampaigns();
-            } catch (e) {
-                console.error(e);
-                showToast('Ошибка создания кампании');
-            }
-        };
-
-        async function openCampaign(id, name) {
-            currentCampaignId = id;
-            currentCampaignName = name;
-            document.getElementById('campaignTitle').innerText = name;
-            document.getElementById('campaignSubtitle').innerText = `Персонажи кампании #${id}`;
-            screenCampaigns.style.display = 'none';
-            screenEncounterSetup.style.display = 'none';
-            screenCharacters.style.display = 'block';
-            await loadCharacters();
-        }
-
-        async function loadCharacters() {
-            if (!currentCampaignId) return;
-            try {
-                const chars = await apiGet(`/campaigns/${currentCampaignId}/characters`);
-                renderCharacters(chars);
-            } catch (e) {
-                console.error(e);
-                showToast('Не удалось загрузить персонажей');
-            }
-        }
-
-        function renderCharacters(chars) {
-            const list = document.getElementById('characterList');
-            list.innerHTML = '';
-            if (!chars || chars.length === 0) {
-                list.innerHTML = '<div class="item"><div><div class="item-title">Персонажей нет</div><div class="item-sub">Добавь первого снизу</div></div><div class="pill warn">Пусто</div></div>';
-                return;
-            }
-            chars.forEach(ch => {
-                const row = document.createElement('div');
-                row.className = 'item';
-                const left = document.createElement('div');
-                const name = document.createElement('div');
-                name.className = 'item-title';
-                name.innerText = ch.name;
-                const sub = document.createElement('div');
-                sub.className = 'item-sub';
-                sub.innerText = `КД: ${ch.ac}, ИНИЦ: ${ch.base_initiative}`;
-                left.appendChild(name);
-                left.appendChild(sub);
-                const right = document.createElement('div');
-                right.style.display = 'flex';
-                right.style.gap = '8px';
-                const editBtn = document.createElement('button');
-                editBtn.className = 'btn secondary';
-                editBtn.style.height = '44px';
-                editBtn.style.padding = '0 14px';
-                editBtn.innerText = '✎';
-                editBtn.onclick = (e) => { e.stopPropagation(); editCharacterPrompt(ch); };
-                const delBtn = document.createElement('button');
-                delBtn.className = 'btn danger';
-                delBtn.style.height = '44px';
-                delBtn.style.padding = '0 14px';
-                delBtn.innerText = '✕';
-                delBtn.onclick = async (e) => { e.stopPropagation(); await deleteCharacter(ch.id); };
-                right.appendChild(editBtn);
-                right.appendChild(delBtn);
-                row.appendChild(left);
-                row.appendChild(right);
-                list.appendChild(row);
-            });
-        }
-
-        document.getElementById('createCharBtn').onclick = async () => {
-            if (!currentCampaignId) return;
-            const name = document.getElementById('newCharName').value.trim();
-            const ac = parseInt(document.getElementById('newCharAC').value, 10);
-            const init = parseInt(document.getElementById('newCharInit').value, 10);
-            if (!name || isNaN(ac) || isNaN(init)) { showToast('Имя, КД и ИНИЦ обязательны'); return; }
-            try {
-                await apiPost('/characters', { campaign_id: currentCampaignId, name, ac, base_initiative: init });
-                document.getElementById('newCharName').value = '';
-                document.getElementById('newCharAC').value = '';
-                document.getElementById('newCharInit').value = '';
-                showToast('Персонаж добавлен');
-                await loadCharacters();
-            } catch (e) {
-                console.error(e);
-                showToast('Ошибка добавления персонажа');
-            }
-        };
-
-        document.getElementById('backToCampaignsBtn').onclick = () => {
-            screenCharacters.style.display = 'none';
-            screenEncounterSetup.style.display = 'none';
-            screenCampaigns.style.display = 'block';
-            currentCampaignId = null;
-            currentCampaignName = '';
-        };
-
+        async function openCampaign(id, name) { currentCampaignId = id; currentCampaignName = name; document.getElementById('campaignTitle').innerText = name; document.getElementById('campaignSubtitle').innerText = `Персонажи кампании #${id}`; screenCampaigns.style.display = 'none'; screenEncounterSetup.style.display = 'none'; screenCharacters.style.display = 'block'; await loadCharacters(); }
+        async function loadCharacters() { if (!currentCampaignId) return; try { const chars = await apiGet(`/campaigns/${currentCampaignId}/characters`); renderCharacters(chars); } catch (e) { console.error(e); showToast('Не удалось загрузить персонажей'); } }
+        function renderCharacters(chars) { const list = document.getElementById('characterList'); list.innerHTML = ''; if (!chars || chars.length === 0) { list.innerHTML = '<div class="item"><div><div class="item-title">Персонажей нет</div><div class="item-sub">Добавь первого снизу</div></div><div class="pill warn">Пусто</div></div>'; return; } chars.forEach(ch => { const row = document.createElement('div'); row.className = 'item'; const left = document.createElement('div'); const name = document.createElement('div'); name.className = 'item-title'; name.innerText = ch.name; const sub = document.createElement('div'); sub.className = 'item-sub'; sub.innerText = `КД: ${ch.ac}, ИНИЦ: ${ch.base_initiative}`; left.appendChild(name); left.appendChild(sub); const right = document.createElement('div'); right.style.display = 'flex'; right.style.gap = '8px'; const editBtn = document.createElement('button'); editBtn.className = 'btn secondary'; editBtn.style.height = '44px'; editBtn.style.padding = '0 14px'; editBtn.innerText = '✎'; editBtn.onclick = (e) => { e.stopPropagation(); editCharacterPrompt(ch); }; const delBtn = document.createElement('button'); delBtn.className = 'btn danger'; delBtn.style.height = '44px'; delBtn.style.padding = '0 14px'; delBtn.innerText = '✕'; delBtn.onclick = async (e) => { e.stopPropagation(); await deleteCharacter(ch.id); }; right.appendChild(editBtn); right.appendChild(delBtn); row.appendChild(left); row.appendChild(right); list.appendChild(row); }); }
+        document.getElementById('createCharBtn').onclick = async () => { if (!currentCampaignId) return; const name = document.getElementById('newCharName').value.trim(); const ac = parseInt(document.getElementById('newCharAC').value, 10); const init = parseInt(document.getElementById('newCharInit').value, 10); if (!name || isNaN(ac) || isNaN(init)) { showToast('Имя, КД и ИНИЦ обязательны'); return; } try { await apiPost('/characters', { campaign_id: currentCampaignId, name, ac, base_initiative: init }); document.getElementById('newCharName').value = ''; document.getElementById('newCharAC').value = ''; document.getElementById('newCharInit').value = ''; showToast('Персонаж добавлен'); await loadCharacters(); } catch (e) { console.error(e); showToast('Ошибка добавления персонажа'); } };
+        document.getElementById('backToCampaignsBtn').onclick = () => { screenCharacters.style.display = 'none'; screenEncounterSetup.style.display = 'none'; screenCampaigns.style.display = 'block'; currentCampaignId = null; currentCampaignName = ''; };
         document.getElementById('startSetupBtn').onclick = () => openEncounterSetup();
-        document.getElementById('backToCharsBtn').onclick = () => {
-            screenEncounterSetup.style.display = 'none';
-            screenCharacters.style.display = 'block';
-        };
+        document.getElementById('backToCharsBtn').onclick = () => { screenEncounterSetup.style.display = 'none'; screenCharacters.style.display = 'block'; };
 
-        async function openEncounterSetup() {
-            if (!currentCampaignId) { showToast('Сначала выберите кампанию'); return; }
-            try {
-                const chars = await apiGet(`/campaigns/${currentCampaignId}/characters`);
-                setupPlayers = chars.map(ch => ({
-                    character_id: ch.id,
-                    name: ch.name,
-                    ac: ch.ac,
-                    base_initiative: ch.base_initiative,
-                    include: false,
-                    initiative_total: ch.base_initiative
-                }));
-            } catch (e) {
-                console.error(e);
-                showToast('Не удалось загрузить персонажей для схватки');
-                return;
-            }
-            setupUniqueMonsters = [];
-            setupGroupMonsters = [];
-            renderSetupPlayers();
-            renderSetupUnique();
-            renderSetupGroups();
-            screenCharacters.style.display = 'none';
-            screenCampaigns.style.display = 'none';
-            screenEncounterSetup.style.display = 'block';
-            document.getElementById('encSetupTitle').innerText = 'Подготовка схватки';
-            document.getElementById('encSetupSubtitle').innerText = `Кампания: ${currentCampaignName}`;
-        }
+        async function openEncounterSetup() { if (!currentCampaignId) { showToast('Сначала выберите кампанию'); return; } try { const chars = await apiGet(`/campaigns/${currentCampaignId}/characters`); setupPlayers = chars.map(ch => ({ character_id: ch.id, name: ch.name, ac: ch.ac, base_initiative: ch.base_initiative, include: false, initiative_total: ch.base_initiative })); } catch (e) { console.error(e); showToast('Не удалось загрузить персонажей для схватки'); return; } setupUniqueMonsters = []; setupGroupMonsters = []; uniqueAttacks = []; groupAttacks = []; renderSetupPlayers(); renderSetupUnique(); renderSetupGroups(); document.getElementById('uniqueAttackForm').style.display = 'none'; document.getElementById('groupAttackForm').style.display = 'none'; screenCharacters.style.display = 'none'; screenCampaigns.style.display = 'none'; screenEncounterSetup.style.display = 'block'; document.getElementById('encSetupTitle').innerText = 'Подготовка схватки'; document.getElementById('encSetupSubtitle').innerText = `Кампания: ${currentCampaignName}`; }
+        function renderSetupPlayers() { const list = document.getElementById('encPlayersList'); list.innerHTML = ''; if (setupPlayers.length === 0) { list.innerHTML = '<div class="item"><div><div class="item-title">Нет персонажей</div><div class="item-sub">Вернись и добавь хотя бы одного</div></div><div class="pill warn">Пусто</div></div>'; return; } setupPlayers.forEach((p, idx) => { const row = document.createElement('div'); row.className = 'item pick' + (p.include ? ' selected' : ''); const left = document.createElement('div'); const name = document.createElement('div'); name.className = 'item-title'; name.innerText = p.name; const sub = document.createElement('div'); sub.className = 'item-sub'; sub.innerText = `КД: ${p.ac}, баз. ИНИЦ: ${p.base_initiative}`; left.appendChild(name); left.appendChild(sub); const right = document.createElement('div'); right.style.display = 'flex'; right.style.alignItems = 'center'; right.style.gap = '10px'; const pill = document.createElement('div'); pill.className = 'pill ' + (p.include ? 'ok' : ''); pill.innerText = p.include ? 'В бою' : 'Не в бою'; const initInput = document.createElement('input'); initInput.className = 'input small'; initInput.type = 'number'; initInput.value = p.initiative_total; initInput.onclick = (e) => e.stopPropagation(); initInput.onchange = () => { const val = parseInt(initInput.value, 10); if (!isNaN(val)) setupPlayers[idx].initiative_total = val; }; right.appendChild(pill); right.appendChild(initInput); row.appendChild(left); row.appendChild(right); row.onclick = () => { setupPlayers[idx].include = !setupPlayers[idx].include; renderSetupPlayers(); }; list.appendChild(row); }); }
+        function renderSetupUnique() { const list = document.getElementById('encUniqueMonsters'); list.innerHTML = ''; if (setupUniqueMonsters.length === 0) { list.innerHTML = '<div class="item"><div><div class="item-title">Пока нет уникальных мобов</div><div class="item-sub">Добавь ниже (имя, ХП, КД, ИНИЦ+)</div></div><div class="pill warn">0</div></div>'; return; } setupUniqueMonsters.forEach((m, idx) => { const row = document.createElement('div'); row.className = 'item'; const left = document.createElement('div'); const name = document.createElement('div'); name.className = 'item-title'; name.innerText = m.name; const sub = document.createElement('div'); sub.className = 'item-sub'; sub.innerText = `ХП: ${m.max_hp}, КД: ${m.ac}, ИНИЦ+: ${m.initiative_mod}`; if (m.attacks && m.attacks.length > 0) { sub.innerText += ` • Атак: ${m.attacks.length}`; } left.appendChild(name); left.appendChild(sub); const delBtn = document.createElement('button'); delBtn.className = 'btn danger'; delBtn.style.height = '44px'; delBtn.style.padding = '0 14px'; delBtn.innerText = '✕'; delBtn.onclick = () => { setupUniqueMonsters.splice(idx, 1); renderSetupUnique(); }; row.appendChild(left); row.appendChild(delBtn); list.appendChild(row); }); }
+        function renderSetupGroups() { const list = document.getElementById('encGroupMonsters'); list.innerHTML = ''; if (setupGroupMonsters.length === 0) { list.innerHTML = '<div class="item"><div><div class="item-title">Пока нет групп</div><div class="item-sub">Добавь ниже (имя, xN, ХП, КД, ИНИЦ+)</div></div><div class="pill warn">0</div></div>'; return; } setupGroupMonsters.forEach((g, idx) => { const row = document.createElement('div'); row.className = 'item'; const left = document.createElement('div'); const name = document.createElement('div'); name.className = 'item-title'; name.innerText = `${g.name} (x${g.count})`; const sub = document.createElement('div'); sub.className = 'item-sub'; sub.innerText = `ХП: ${g.max_hp}, КД: ${g.ac}, ИНИЦ+: ${g.initiative_mod}`; if (g.attacks && g.attacks.length > 0) { sub.innerText += ` • Атак: ${g.attacks.length}`; } left.appendChild(name); left.appendChild(sub); const delBtn = document.createElement('button'); delBtn.className = 'btn danger'; delBtn.style.height = '44px'; delBtn.style.padding = '0 14px'; delBtn.innerText = '✕'; delBtn.onclick = () => { setupGroupMonsters.splice(idx, 1); renderSetupGroups(); }; row.appendChild(left); row.appendChild(delBtn); list.appendChild(row); }); }
+        
+        function renderUniqueAttacks() { const list = document.getElementById('uniqueAttacksList'); list.innerHTML = ''; uniqueAttacks.forEach((a, idx) => { const box = document.createElement('div'); box.className = 'attack-item-box'; const txt = document.createElement('div'); txt.className = 'attack-item-text'; const name = document.createElement('div'); name.className = 'attack-item-name'; name.innerText = a.name; const stats = document.createElement('div'); stats.className = 'attack-item-stats'; stats.innerText = `+${a.hit_bonus} попадание, ${a.damage_dice}d${a.damage_die}+${a.damage_bonus} урон`; txt.appendChild(name); txt.appendChild(stats); const delBtn = document.createElement('button'); delBtn.className = 'btn btn-del-attack'; delBtn.innerText = '✕'; delBtn.onclick = () => { uniqueAttacks.splice(idx, 1); renderUniqueAttacks(); }; box.appendChild(txt); box.appendChild(delBtn); list.appendChild(box); }); }
+        function renderGroupAttacks() { const list = document.getElementById('groupAttacksList'); list.innerHTML = ''; groupAttacks.forEach((a, idx) => { const box = document.createElement('div'); box.className = 'attack-item-box'; const txt = document.createElement('div'); txt.className = 'attack-item-text'; const name = document.createElement('div'); name.className = 'attack-item-name'; name.innerText = a.name; const stats = document.createElement('div'); stats.className = 'attack-item-stats'; stats.innerText = `+${a.hit_bonus} попадание, ${a.damage_dice}d${a.damage_die}+${a.damage_bonus} урон`; txt.appendChild(name); txt.appendChild(stats); const delBtn = document.createElement('button'); delBtn.className = 'btn btn-del-attack'; delBtn.innerText = '✕'; delBtn.onclick = () => { groupAttacks.splice(idx, 1); renderGroupAttacks(); }; box.appendChild(txt); box.appendChild(delBtn); list.appendChild(box); }); }
 
-        function renderSetupPlayers() {
-            const list = document.getElementById('encPlayersList');
-            list.innerHTML = '';
-            if (setupPlayers.length === 0) {
-                list.innerHTML = '<div class="item"><div><div class="item-title">Нет персонажей</div><div class="item-sub">Вернись и добавь хотя бы одного</div></div><div class="pill warn">Пусто</div></div>';
-                return;
-            }
-            setupPlayers.forEach((p, idx) => {
-                const row = document.createElement('div');
-                row.className = 'item pick' + (p.include ? ' selected' : '');
-                const left = document.createElement('div');
-                const name = document.createElement('div');
-                name.className = 'item-title';
-                name.innerText = p.name;
-                const sub = document.createElement('div');
-                sub.className = 'item-sub';
-                sub.innerText = `КД: ${p.ac}, баз. ИНИЦ: ${p.base_initiative}`;
-                left.appendChild(name);
-                left.appendChild(sub);
-                const right = document.createElement('div');
-                right.style.display = 'flex';
-                right.style.alignItems = 'center';
-                right.style.gap = '10px';
-                const pill = document.createElement('div');
-                pill.className = 'pill ' + (p.include ? 'ok' : '');
-                pill.innerText = p.include ? 'В бою' : 'Не в бою';
-                const initInput = document.createElement('input');
-                initInput.className = 'input small';
-                initInput.type = 'number';
-                initInput.value = p.initiative_total;
-                initInput.onclick = (e) => e.stopPropagation();
-                initInput.onchange = () => {
-                    const val = parseInt(initInput.value, 10);
-                    if (!isNaN(val)) setupPlayers[idx].initiative_total = val;
-                };
-                right.appendChild(pill);
-                right.appendChild(initInput);
-                row.appendChild(left);
-                row.appendChild(right);
-                row.onclick = () => {
-                    setupPlayers[idx].include = !setupPlayers[idx].include;
-                    renderSetupPlayers();
-                };
-                list.appendChild(row);
-            });
-        }
+        document.getElementById('addUniqueBtn').onclick = () => { const name = document.getElementById('uniqueName').value.trim(); const hp = parseInt(document.getElementById('uniqueHP').value, 10); const ac = parseInt(document.getElementById('uniqueAC').value, 10); const initMod = parseInt(document.getElementById('uniqueInitMod').value, 10); if (!name || isNaN(hp) || isNaN(ac) || isNaN(initMod)) { showToast('Заполни имя, ХП, КД и ИНИЦ+'); return; } setupUniqueMonsters.push({ name, max_hp: hp, ac, initiative_mod: initMod, is_enemy: true, attacks: [...uniqueAttacks] }); document.getElementById('uniqueName').value = ''; document.getElementById('uniqueHP').value = ''; document.getElementById('uniqueAC').value = ''; document.getElementById('uniqueInitMod').value = ''; uniqueAttacks = []; document.getElementById('uniqueAttackForm').style.display = 'none'; renderSetupUnique(); renderUniqueAttacks(); showToast(`Моб '${name}' добавлен`); };
+        document.getElementById('uniqueName').oninput = () => { const hasName = document.getElementById('uniqueName').value.trim().length > 0; document.getElementById('uniqueAttackForm').style.display = hasName ? 'block' : 'none'; };
+        document.getElementById('addUniqueAtkBtn').onclick = () => { const name = document.getElementById('uniqueAtkName').value.trim(); const hit = parseInt(document.getElementById('uniqueAtkHit').value, 10) || 0; const dice = parseInt(document.getElementById('uniqueAtkDice').value, 10) || 0; const die = parseInt(document.getElementById('uniqueAtkDie').value, 10) || 0; const bonus = parseInt(document.getElementById('uniqueAtkBonus').value, 10) || 0; if (!name) { showToast('Введи название атаки'); return; } uniqueAttacks.push({ name, hit_bonus: hit, damage_dice: dice, damage_die: die, damage_bonus: bonus, damage_type: 'slashing', range: 5 }); document.getElementById('uniqueAtkName').value = ''; document.getElementById('uniqueAtkHit').value = ''; document.getElementById('uniqueAtkDice').value = ''; document.getElementById('uniqueAtkDie').value = ''; document.getElementById('uniqueAtkBonus').value = ''; renderUniqueAttacks(); showToast('Атака добавлена'); };
 
-        function renderSetupUnique() {
-            const list = document.getElementById('encUniqueMonsters');
-            list.innerHTML = '';
-            if (setupUniqueMonsters.length === 0) {
-                list.innerHTML = '<div class="item"><div><div class="item-title">Пока нет уникальных мобов</div><div class="item-sub">Добавь ниже (имя, ХП, КД, ИНИЦ+)</div></div><div class="pill warn">0</div></div>';
-                return;
-            }
-            setupUniqueMonsters.forEach((m, idx) => {
-                const row = document.createElement('div');
-                row.className = 'item';
-                const left = document.createElement('div');
-                const name = document.createElement('div');
-                name.className = 'item-title';
-                name.innerText = m.name;
-                const sub = document.createElement('div');
-                sub.className = 'item-sub';
-                sub.innerText = `ХП: ${m.max_hp}, КД: ${m.ac}, ИНИЦ+: ${m.initiative_mod}`;
-                left.appendChild(name);
-                left.appendChild(sub);
-                const delBtn = document.createElement('button');
-                delBtn.className = 'btn danger';
-                delBtn.style.height = '44px';
-                delBtn.style.padding = '0 14px';
-                delBtn.innerText = '✕';
-                delBtn.onclick = () => { setupUniqueMonsters.splice(idx, 1); renderSetupUnique(); };
-                row.appendChild(left);
-                row.appendChild(delBtn);
-                list.appendChild(row);
-            });
-        }
+        document.getElementById('addGroupBtn').onclick = () => { const name = document.getElementById('groupName').value.trim(); const count = parseInt(document.getElementById('groupCount').value, 10); const hp = parseInt(document.getElementById('groupHP').value, 10); const ac = parseInt(document.getElementById('groupAC').value, 10); const initMod = parseInt(document.getElementById('groupInitMod').value, 10); if (!name || isNaN(count) || isNaN(hp) || isNaN(ac) || isNaN(initMod)) { showToast('Заполни имя, xN, ХП, КД и ИНИЦ+'); return; } setupGroupMonsters.push({ name, count, max_hp: hp, ac, initiative_mod: initMod, is_enemy: true, attacks: [...groupAttacks] }); document.getElementById('groupName').value = ''; document.getElementById('groupCount').value = ''; document.getElementById('groupHP').value = ''; document.getElementById('groupAC').value = ''; document.getElementById('groupInitMod').value = ''; groupAttacks = []; document.getElementById('groupAttackForm').style.display = 'none'; renderSetupGroups(); renderGroupAttacks(); showToast(`Группа '${name}' (x${count}) добавлена`); };
+        document.getElementById('groupName').oninput = () => { const hasName = document.getElementById('groupName').value.trim().length > 0; document.getElementById('groupAttackForm').style.display = hasName ? 'block' : 'none'; };
+        document.getElementById('addGroupAtkBtn').onclick = () => { const name = document.getElementById('groupAtkName').value.trim(); const hit = parseInt(document.getElementById('groupAtkHit').value, 10) || 0; const dice = parseInt(document.getElementById('groupAtkDice').value, 10) || 0; const die = parseInt(document.getElementById('groupAtkDie').value, 10) || 0; const bonus = parseInt(document.getElementById('groupAtkBonus').value, 10) || 0; if (!name) { showToast('Введи название атаки'); return; } groupAttacks.push({ name, hit_bonus: hit, damage_dice: dice, damage_die: die, damage_bonus: bonus, damage_type: 'slashing', range: 5 }); document.getElementById('groupAtkName').value = ''; document.getElementById('groupAtkHit').value = ''; document.getElementById('groupAtkDice').value = ''; document.getElementById('groupAtkDie').value = ''; document.getElementById('groupAtkBonus').value = ''; renderGroupAttacks(); showToast('Атака добавлена'); };
 
-        function renderSetupGroups() {
-            const list = document.getElementById('encGroupMonsters');
-            list.innerHTML = '';
-            if (setupGroupMonsters.length === 0) {
-                list.innerHTML = '<div class="item"><div><div class="item-title">Пока нет групп</div><div class="item-sub">Добавь ниже (имя, xN, ХП, КД, ИНИЦ+)</div></div><div class="pill warn">0</div></div>';
-                return;
-            }
-            setupGroupMonsters.forEach((g, idx) => {
-                const row = document.createElement('div');
-                row.className = 'item';
-                const left = document.createElement('div');
-                const name = document.createElement('div');
-                name.className = 'item-title';
-                name.innerText = `${g.name} (x${g.count})`;
-                const sub = document.createElement('div');
-                sub.className = 'item-sub';
-                sub.innerText = `ХП: ${g.max_hp}, КД: ${g.ac}, ИНИЦ+: ${g.initiative_mod}`;
-                left.appendChild(name);
-                left.appendChild(sub);
-                const delBtn = document.createElement('button');
-                delBtn.className = 'btn danger';
-                delBtn.style.height = '44px';
-                delBtn.style.padding = '0 14px';
-                delBtn.innerText = '✕';
-                delBtn.onclick = () => { setupGroupMonsters.splice(idx, 1); renderSetupGroups(); };
-                row.appendChild(left);
-                row.appendChild(delBtn);
-                list.appendChild(row);
-            });
-        }
+        document.getElementById('startEncounterBtn').onclick = async () => { if (!currentCampaignId) { showToast('Нет выбранной кампании'); return; } const playersForEncounter = setupPlayers.filter(p => p.include).map(p => ({ character_id: p.character_id, initiative_total: p.initiative_total })); if (playersForEncounter.length === 0) { showToast('Выбери хотя бы одного игрока'); return; } try { let encName = prompt('Название схватки:', 'Засада у моста'); if (encName === null) return; encName = encName.trim(); if (!encName) encName = 'Схватка'; const enc = await apiPost('/encounters', { campaign_id: currentCampaignId, name: encName }); const encounterId = enc.id; await apiPost(`/encounters/${encounterId}/participants`, { players: playersForEncounter, unique_monsters: setupUniqueMonsters, group_monsters: setupGroupMonsters }); await apiPost(`/encounters/${encounterId}/start`, {}); showToast('Схватка началась'); window.location.href = `/static/gm_encounter.html?encounter_id=${encounterId}`; } catch (e) { console.error(e); showToast('Ошибка при запуске схватки'); } };
 
-        document.getElementById('addUniqueBtn').onclick = () => {
-            const name = document.getElementById('uniqueName').value.trim();
-            const hp = parseInt(document.getElementById('uniqueHP').value, 10);
-            const ac = parseInt(document.getElementById('uniqueAC').value, 10);
-            const initMod = parseInt(document.getElementById('uniqueInitMod').value, 10);
-            if (!name || isNaN(hp) || isNaN(ac) || isNaN(initMod)) { showToast('Заполни имя, ХП, КД и ИНИЦ+'); return; }
-            setupUniqueMonsters.push({ name, max_hp: hp, ac, initiative_mod: initMod, is_enemy: true });
-            document.getElementById('uniqueName').value = '';
-            document.getElementById('uniqueHP').value = '';
-            document.getElementById('uniqueAC').value = '';
-            document.getElementById('uniqueInitMod').value = '';
-            renderSetupUnique();
-            showToast(`Моб '${name}' добавлен`);
-        };
-
-        document.getElementById('addGroupBtn').onclick = () => {
-            const name = document.getElementById('groupName').value.trim();
-            const count = parseInt(document.getElementById('groupCount').value, 10);
-            const hp = parseInt(document.getElementById('groupHP').value, 10);
-            const ac = parseInt(document.getElementById('groupAC').value, 10);
-            const initMod = parseInt(document.getElementById('groupInitMod').value, 10);
-            if (!name || isNaN(count) || isNaN(hp) || isNaN(ac) || isNaN(initMod)) { showToast('Заполни имя, xN, ХП, КД и ИНИЦ+'); return; }
-            setupGroupMonsters.push({ name, count, max_hp: hp, ac, initiative_mod: initMod, is_enemy: true });
-            document.getElementById('groupName').value = '';
-            document.getElementById('groupCount').value = '';
-            document.getElementById('groupHP').value = '';
-            document.getElementById('groupAC').value = '';
-            document.getElementById('groupInitMod').value = '';
-            renderSetupGroups();
-            showToast(`Группа '${name}' (x${count}) добавлена`);
-        };
-
-        document.getElementById('startEncounterBtn').onclick = async () => {
-            if (!currentCampaignId) { showToast('Нет выбранной кампании'); return; }
-            const playersForEncounter = setupPlayers.filter(p => p.include).map(p => ({ character_id: p.character_id, initiative_total: p.initiative_total }));
-            if (playersForEncounter.length === 0) { showToast('Выбери хотя бы одного игрока'); return; }
-            try {
-                let encName = prompt('Название схватки:', 'Засада у моста');
-                if (encName === null) return;
-                encName = encName.trim();
-                if (!encName) encName = 'Схватка';
-                const enc = await apiPost('/encounters', { campaign_id: currentCampaignId, name: encName });
-                const encounterId = enc.id;
-                await apiPost(`/encounters/${encounterId}/participants`, { players: playersForEncounter, unique_monsters: setupUniqueMonsters, group_monsters: setupGroupMonsters });
-                await apiPost(`/encounters/${encounterId}/start`, {});
-                showToast('Схватка началась');
-                window.location.href = `/static/gm_encounter.html?encounter_id=${encounterId}`;
-            } catch (e) {
-                console.error(e);
-                showToast('Ошибка при запуске схватки');
-            }
-        };
-
-        async function editCharacterPrompt(ch) {
-            const name = prompt('Имя персонажа:', ch.name);
-            if (name === null) return;
-            const acStr = prompt('КД:', ch.ac);
-            if (acStr === null) return;
-            const initStr = prompt('ИНИЦ:', ch.base_initiative);
-            if (initStr === null) return;
-            const ac = parseInt(acStr, 10);
-            const init = parseInt(initStr, 10);
-            if (!name || isNaN(ac) || isNaN(init)) { showToast('Некорректные данные'); return; }
-            try {
-                await apiPut(`/characters/${ch.id}`, { name, ac, base_initiative: init });
-                showToast('Персонаж обновлён');
-                await loadCharacters();
-            } catch (e) {
-                console.error(e);
-                showToast('Ошибка обновления персонажа');
-            }
-        }
-
-        async function deleteCharacter(id) {
-            if (!confirm('Удалить персонажа?')) return;
-            try {
-                await apiDelete(`/characters/${id}`);
-                showToast('Персонаж удалён');
-                await loadCharacters();
-            } catch (e) {
-                console.error(e);
-                showToast('Ошибка удаления персонажа');
-            }
-        }
+        async function editCharacterPrompt(ch) { const name = prompt('Имя персонажа:', ch.name); if (name === null) return; const acStr = prompt('КД:', ch.ac); if (acStr === null) return; const initStr = prompt('ИНИЦ:', ch.base_initiative); if (initStr === null) return; const ac = parseInt(acStr, 10); const init = parseInt(initStr, 10); if (!name || isNaN(ac) || isNaN(init)) { showToast('Некорректные данные'); return; } try { await apiPut(`/characters/${ch.id}`, { name, ac, base_initiative: init }); showToast('Персонаж обновлён'); await loadCharacters(); } catch (e) { console.error(e); showToast('Ошибка обновления персонажа'); } }
+        async function deleteCharacter(id) { if (!confirm('Удалить персонажа?')) return; try { await apiDelete(`/characters/${id}`); showToast('Персонаж удалён'); await loadCharacters(); } catch (e) { console.error(e); showToast('Ошибка удаления персонажа'); } }
 
         if (tg && tg.ready) tg.ready();
         loadCampaigns();
