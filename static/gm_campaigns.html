@@ -3,47 +3,28 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Кампании</title>
+    <title>Кампании GM</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
         :root {
-            /* Base */
-            --font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-                Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            --font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;
             --bg: #000000;
             --surface: #070707;
-            /* карточки */
             --surface2: #0b0b0b;
-            /* приподнятые */
             --stroke: #242424;
-            /* границы/разделители */
             --stroke2: #303030;
-            /* активные границы */
-
-            /* Text */
             --text: #f8fafc;
             --muted: rgba(248, 250, 252, .66);
-
-            /* Accent (yellow) */
             --accent: #fbbf24;
-            /* amber-400 */
             --accent2: #f59e0b;
-            /* amber-500 */
             --onAccent: #111827;
-            /* текст на жёлтом */
-
-            /* States */
             --danger: #ef4444;
             --danger2: #991b1b;
             --onDanger: #ffffff;
-
             --focus: rgba(251, 191, 36, .55);
         }
-
-
-
 
         body {
             font-family: var(--font);
@@ -51,11 +32,8 @@
             color: var(--text);
             margin: 0;
             padding: 14px 14px 108px;
-            /* в gm_encounter оставь своё значение под bottom-bar */
         }
 
-
-        /* "Пергамент" для верхней карточки */
         .top-card {
             background: linear-gradient(180deg, #060606, #000000);
             border: 1px solid rgba(251, 191, 36, .55);
@@ -66,12 +44,12 @@
 
         .top-title {
             color: var(--accent);
+            font-weight: 900;
         }
 
         .top-sub {
             color: var(--muted);
         }
-
 
         .section-title {
             font-size: 12px;
@@ -92,11 +70,10 @@
             align-items: center;
             justify-content: space-between;
             gap: 12px;
-            padding: 14px 14px;
+            padding: 14px;
             border-radius: 16px;
             background: linear-gradient(180deg, var(--surface), var(--surface2));
-            border: 1px solid var(--stroke);
-            border-color: #27272a;
+            border: 1px solid #27272a;
             min-height: 58px;
             user-select: none;
         }
@@ -128,21 +105,8 @@
             cursor: pointer;
         }
 
-        .pill.ok {
-            background: rgba(34, 197, 94, .12);
-        }
-
-        .pill.warn {
-            background: rgba(245, 158, 11, .12);
-        }
-
-        .row-inline {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
+        .pill.ok { background: rgba(34, 197, 94, .12); }
+        .pill.warn { background: rgba(245, 158, 11, .12); }
 
         .btn {
             height: 54px;
@@ -159,19 +123,7 @@
             box-shadow: 0 2px 6px rgba(15, 23, 42, 0.7);
         }
 
-        .top-title {
-            font-weight: 900;
-        }
-
-        .item-title,
-        .title {
-            font-weight: 800;
-        }
-
-
-        .btn:active {
-            transform: scale(0.99);
-        }
+        .btn:active { transform: scale(0.99); }
 
         .btn.secondary {
             background: linear-gradient(135deg, #2a2a2a, #1d1d1d);
@@ -182,13 +134,6 @@
         .btn.danger {
             background: linear-gradient(135deg, var(--danger), var(--danger2));
             color: var(--onDanger);
-            border: 1px solid rgba(0, 0, 0, .35);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: default;
-            box-shadow: none;
         }
 
         .input {
@@ -200,49 +145,11 @@
             color: var(--text);
             font-size: 16px;
             outline: none;
-            box-sizing: border-box;
         }
 
-        .input.small {
-            width: 92px;
-        }
+        .input.small { width: 92px; }
+        .input.tiny { width: 56px; }
 
-        .input.tiny {
-            width: 56px;
-        }
-
-        .input:focus {
-            outline: 2px solid var(--focus);
-            outline-offset: 1px;
-        }
-
-        .toast {
-            position: fixed;
-            left: 50%;
-            bottom: 18px;
-            transform: translateX(-50%) translateY(20px);
-            min-width: 220px;
-            max-width: 90vw;
-            padding: 10px 14px;
-            border-radius: 999px;
-            background: rgba(15, 23, 42, 0.95);
-            border: 1px solid #78350f;
-            color: #f9fafb;
-            font-size: 12px;
-            text-align: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.25s ease-out, transform 0.25s ease-out;
-            z-index: 2000;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        /* Нижняя панель */
         .bottom-bar {
             position: fixed;
             left: 0;
@@ -260,9 +167,7 @@
             gap: 10px;
         }
 
-        .bottom-row .input {
-            flex: 1;
-        }
+        .bottom-row .input { flex: 1; }
 
         .hint {
             font-size: 12px;
@@ -270,119 +175,27 @@
             margin: 6px 2px 0;
         }
 
-        .hint.warning {
-            color: #fbbf24;
-            font-weight: 700;
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 18px;
+            transform: translateX(-50%) translateY(20px);
+            min-width: 220px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid #78350f;
+            color: #f9fafb;
+            font-size: 12px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.25s, transform 0.25s;
+            z-index: 2000;
         }
 
-        .chips {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-
-        /* Подсветка выбранного игрока в подготовке схватки */
-        .item.pick {
-            transition: transform .05s, box-shadow .12s, border-color .12s, background .12s;
-        }
-
-        .item.pick.selected {
-            border-color: var(--brand);
-            box-shadow: 0 0 18px rgba(251, 191, 36, 0.30);
-            background:
-                radial-gradient(circle at top left, rgba(251, 191, 36, 0.16) 0, transparent 45%),
-                linear-gradient(145deg, #0b0f18, #020617);
-        }
-
-        /* Стили для блока атак */
-        .attacks-section {
-            margin-top: 12px;
-            padding: 12px;
-            background: rgba(15, 23, 42, 0.3);
-            border-radius: 12px;
-            border: 1px solid var(--stroke);
-        }
-
-        .attack-item {
-            padding: 8px;
-            margin-top: 6px;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 8px;
-            border: 1px solid var(--stroke);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .attack-info {
-            flex: 1;
-        }
-
-        .attack-name {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .attack-stats {
-            font-size: 11px;
-            color: var(--muted);
-            margin-top: 2px;
-        }
-
-        /* Разграничение блоков */
-        .setup-block {
-            margin-top: 20px;
-            padding: 14px;
-            background: rgba(15, 23, 42, 0.2);
-            border-radius: 16px;
-            border: 1px solid var(--stroke);
-        }
-
-        .setup-block.players {
-            border-color: rgba(37, 99, 235, .35);
-            background: rgba(37, 99, 235, 0.08);
-        }
-
-        .setup-block.unique {
-            border-color: rgba(220, 38, 38, .35);
-            background: rgba(220, 38, 38, 0.08);
-        }
-
-        .setup-block.groups {
-            border-color: rgba(245, 158, 11, .35);
-            background: rgba(245, 158, 11, 0.08);
-        }
-
-        /* Кнопка с атаками - визуальный индикатор */
-        .btn.has-attacks {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: var(--onAccent);
-            border: 2px solid var(--accent);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                box-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
-            }
-            50% {
-                box-shadow: 0 0 18px rgba(251, 191, 36, 0.7);
-            }
-        }
-
-        /* Стиль для dice group */
-        .dice-group {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .dice-separator {
-            font-size: 18px;
-            font-weight: 900;
-            color: var(--accent);
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
     </style>
 </head>
@@ -390,15 +203,15 @@
 <body>
     <div id="toast" class="toast"></div>
 
-    <!-- Экран A: кампании -->
     <div id="screenCampaigns">
         <div class="top-card">
-            <div class="top-title">Кампейны</div>
+            <div class="top-title">🎭 GM Кампании</div>
             <div class="top-sub" id="topSubtitle">Ваши приключения</div>
         </div>
 
         <div class="section-title">Список кампаний</div>
         <div id="campaignList" class="list"></div>
+
         <div class="section-title">Мои схватки</div>
         <div id="myEncountersList" class="list"></div>
 
@@ -406,7 +219,6 @@
 
         <button class="btn secondary" style="width: 100%; margin-top: 14px;" onclick="goHome()">🏠 Главное меню</button>
 
-        <!-- Нижняя панель: создать кампанию -->
         <div class="bottom-bar">
             <div class="bottom-row">
                 <input id="newCampaignName" class="input" type="text" placeholder="Название кампании">
@@ -415,8 +227,195 @@
         </div>
     </div>
 
-    <!-- ... rest of file unchanged ... -->
-    <script src="/static/gm_campaigns.js"></script>
+    <script>
+        const tg = window.Telegram.WebApp;
+        const API_BASE = "";
+
+        function authHeaders() {
+            const initData = tg?.initData || "";
+            return initData ? { "Authorization": "tma " + initData } : {};
+        }
+
+        let toastTimeout = null;
+        function showToast(text) {
+            const el = document.getElementById("toast");
+            if (!el) return;
+            el.innerText = text;
+            el.classList.add("show");
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => el.classList.remove("show"), 2200);
+        }
+
+        async function apiGet(path) {
+            const res = await fetch(API_BASE + path, { headers: { ...authHeaders() } });
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return await res.json();
+        }
+
+        async function apiPost(path, body) {
+            const res = await fetch(API_BASE + path, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", ...authHeaders() },
+                body: body ? JSON.stringify(body) : "{}"
+            });
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return await res.json();
+        }
+
+        function goHome() {
+            window.location.href = '/static/index.html';
+        }
+
+        async function loadCampaigns() {
+            try {
+                const campaigns = await apiGet("/campaigns");
+                renderCampaigns(campaigns);
+            } catch (e) {
+                console.error(e);
+                showToast("Не удалось загрузить кампании");
+            }
+        }
+
+        async function loadMyEncounters() {
+            try {
+                const encs = await apiGet("/encounters/my");
+                renderMyEncounters(encs);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function renderCampaigns(campaigns) {
+            const list = document.getElementById('campaignList');
+            list.innerHTML = '';
+
+            if (!campaigns || campaigns.length === 0) {
+                list.innerHTML = `
+                    <div class="item">
+                        <div>
+                            <div class="item-title">Пока пусто</div>
+                            <div class="item-sub">Создай первую кампанию снизу</div>
+                        </div>
+                        <div class="pill warn">Нет кампаний</div>
+                    </div>
+                `;
+                return;
+            }
+
+            campaigns.forEach(c => {
+                const row = document.createElement('div');
+                row.className = 'item';
+
+                const left = document.createElement('div');
+                const title = document.createElement('div');
+                title.className = 'item-title';
+                title.innerText = c.name;
+
+                const sub = document.createElement('div');
+                sub.className = 'item-sub';
+                sub.innerText = `ID: ${c.id}`;
+
+                left.appendChild(title);
+                left.appendChild(sub);
+
+                const right = document.createElement('div');
+                right.style.display = 'flex';
+                right.style.gap = '8px';
+
+                const shareBtn = document.createElement('button');
+                shareBtn.className = 'btn secondary';
+                shareBtn.style.height = '44px';
+                shareBtn.style.padding = '0 14px';
+                shareBtn.innerText = '📤';
+                shareBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    window.location.href = `/static/share_campaign.html?campaign_id=${c.id}`;
+                };
+
+                const openBtn = document.createElement('div');
+                openBtn.className = 'pill';
+                openBtn.innerText = 'Открыть';
+                openBtn.onclick = () => {
+                    window.location.href = `/static/characters.html?campaign_id=${c.id}`;
+                };
+
+                right.appendChild(shareBtn);
+                right.appendChild(openBtn);
+
+                row.appendChild(left);
+                row.appendChild(right);
+                list.appendChild(row);
+            });
+        }
+
+        function renderMyEncounters(encs) {
+            const list = document.getElementById('myEncountersList');
+            list.innerHTML = '';
+
+            if (!encs || encs.length === 0) {
+                list.innerHTML = `
+                    <div class="item">
+                        <div>
+                            <div class="item-title">Нет незавершённых схваток</div>
+                            <div class="item-sub">Когда начнёшь бой — он появится здесь</div>
+                        </div>
+                        <div class="pill">OK</div>
+                    </div>
+                `;
+                return;
+            }
+
+            encs.forEach(e => {
+                const row = document.createElement('div');
+                row.className = 'item';
+                row.onclick = () => {
+                    window.location.href = `/static/gm_encounter.html?encounter_id=${e.id}`;
+                };
+
+                const left = document.createElement('div');
+                const title = document.createElement('div');
+                title.className = 'item-title';
+                title.innerText = e.name || `Схватка #${e.id}`;
+
+                const sub = document.createElement('div');
+                sub.className = 'item-sub';
+                sub.innerText = `Кампания "${e.campaign_name}" • ${e.status}`;
+
+                left.appendChild(title);
+                left.appendChild(sub);
+
+                const pill = document.createElement('div');
+                pill.className = 'pill ' + (e.status === 'active' ? 'ok' : 'warn');
+                pill.innerText = 'Продолжить';
+
+                row.appendChild(left);
+                row.appendChild(pill);
+                list.appendChild(row);
+            });
+        }
+
+        document.getElementById('createCampaignBtn').onclick = async () => {
+            const name = document.getElementById('newCampaignName').value.trim();
+            if (!name) {
+                showToast('Введите название кампании');
+                return;
+            }
+
+            try {
+                await apiPost('/campaigns', { name });
+                document.getElementById('newCampaignName').value = '';
+                showToast('Кампания создана');
+                await loadCampaigns();
+            } catch (e) {
+                console.error(e);
+                showToast('Ошибка создания кампании');
+            }
+        };
+
+        if (tg && tg.ready) tg.ready();
+        loadCampaigns();
+        loadMyEncounters();
+    </script>
 </body>
 
 </html>
