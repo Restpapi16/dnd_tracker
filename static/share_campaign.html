@@ -244,9 +244,9 @@
                     }
                 };
 
-                // Кнопка отправки в Telegram
+                // Кнопка отправки в Telegram (ИСПРАВЛЕНО)
                 document.getElementById('shareBtn').onclick = () => {
-                    const text = `🎲 Присоединяйся к моей D&D кампании "${campaign.name}"!\n\n${inviteData.invite_url}`;
+                    const text = `🎲 Присоединяйся к моей D&D кампании "${campaign.name}"!`;
                     const url = `https://t.me/share/url?url=${encodeURIComponent(inviteData.invite_url)}&text=${encodeURIComponent(text)}`;
                     window.open(url, '_blank');
                 };
