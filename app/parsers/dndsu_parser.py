@@ -3,6 +3,7 @@ import httpx
 from bs4 import BeautifulSoup
 from typing import Dict, Optional, List
 import re
+import asyncio
 
 
 class DndSuParser:
@@ -30,6 +31,12 @@ class DndSuParser:
         
         try:
             response = await self.client.get(url)
+            
+            # Обработка 503 - сервер перегружен
+            if response.status_code == 503:
+                print(f"  ⚠️  503 для ID {external_id}, пропускаем")
+                return None
+            
             response.raise_for_status()
             soup = BeautifulSoup(response.text, 'html.parser')
             
@@ -132,9 +139,7 @@ class DndSuParser:
             }
             
         except Exception as e:
-            print(f"Error parsing spell {external_id}-{slug}: {e}")
-            import traceback
-            traceback.print_exc()
+            print(f"Error parsing spell {external_id}: {e}")
             return None
     
     async def parse_item(self, external_id: int, slug: str) -> Optional[Dict]:
