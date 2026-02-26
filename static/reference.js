@@ -78,6 +78,9 @@ async function fetchSuggestions(query) {
         if (!response.ok) throw new Error('Failed to fetch suggestions');
 
         const data = await response.json();
+        console.log('API Response:', data); // DEBUG
+        console.log('Spells:', data.spells); // DEBUG
+        console.log('Spells length:', data.spells?.length); // DEBUG
         showSuggestions(data);
     } catch (error) {
         console.error('Error fetching suggestions:', error);
@@ -89,7 +92,11 @@ function showSuggestions(data) {
     const dropdown = document.getElementById('suggestions');
     let html = '';
 
+    console.log('showSuggestions called with:', data); // DEBUG
+
     const hasResults = data.spells?.length || data.items?.length || data.creatures?.length;
+
+    console.log('hasResults:', hasResults); // DEBUG
 
     if (!hasResults) {
         dropdown.classList.remove('show');
