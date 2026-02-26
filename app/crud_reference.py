@@ -58,9 +58,9 @@ def search_spells(
     """Поиск заклинаний по названию"""
     q = db.query(models_reference.ReferenceSpell)
     
-    # Поиск по названию
+    # Поиск по названию (без учета регистра для кириллицы)
     if query:
-        q = q.filter(models_reference.ReferenceSpell.name.ilike(f"%{query}%"))
+        q = q.filter(func.lower(models_reference.ReferenceSpell.name).like(f"%{query.lower()}%"))
     
     # Фильтр по уровню
     if level is not None:
@@ -85,7 +85,7 @@ def get_spells_suggestions(
         models_reference.ReferenceSpell.level,
         models_reference.ReferenceSpell.school
     ).filter(
-        models_reference.ReferenceSpell.name.ilike(f"%{query}%")
+        func.lower(models_reference.ReferenceSpell.name).like(f"%{query.lower()}%")
     ).order_by(models_reference.ReferenceSpell.name).limit(limit).all()
     
     return [
@@ -128,10 +128,10 @@ def search_items(
     q = db.query(models_reference.ReferenceItem)
     
     if query:
-        q = q.filter(models_reference.ReferenceItem.name.ilike(f"%{query}%"))
+        q = q.filter(func.lower(models_reference.ReferenceItem.name).like(f"%{query.lower()}%"))
     
     if category:
-        q = q.filter(models_reference.ReferenceItem.category.ilike(f"%{category}%"))
+        q = q.filter(func.lower(models_reference.ReferenceItem.category).like(f"%{category.lower()}%"))
     
     return q.order_by(models_reference.ReferenceItem.name).limit(limit).all()
 
@@ -147,7 +147,7 @@ def get_items_suggestions(
         models_reference.ReferenceItem.name,
         models_reference.ReferenceItem.category
     ).filter(
-        models_reference.ReferenceItem.name.ilike(f"%{query}%")
+        func.lower(models_reference.ReferenceItem.name).like(f"%{query.lower()}%")
     ).order_by(models_reference.ReferenceItem.name).limit(limit).all()
     
     return [
@@ -190,13 +190,13 @@ def search_creatures(
     q = db.query(models_reference.ReferenceCreature)
     
     if query:
-        q = q.filter(models_reference.ReferenceCreature.name.ilike(f"%{query}%"))
+        q = q.filter(func.lower(models_reference.ReferenceCreature.name).like(f"%{query.lower()}%"))
     
     if cr:
         q = q.filter(models_reference.ReferenceCreature.cr == cr)
     
     if creature_type:
-        q = q.filter(models_reference.ReferenceCreature.creature_type.ilike(f"%{creature_type}%"))
+        q = q.filter(func.lower(models_reference.ReferenceCreature.creature_type).like(f"%{creature_type.lower()}%"))
     
     return q.order_by(models_reference.ReferenceCreature.name).limit(limit).all()
 
@@ -213,7 +213,7 @@ def get_creatures_suggestions(
         models_reference.ReferenceCreature.cr,
         models_reference.ReferenceCreature.creature_type
     ).filter(
-        models_reference.ReferenceCreature.name.ilike(f"%{query}%")
+        func.lower(models_reference.ReferenceCreature.name).like(f"%{query.lower()}%")
     ).order_by(models_reference.ReferenceCreature.name).limit(limit).all()
     
     return [
