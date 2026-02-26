@@ -26,12 +26,13 @@ class SpellCrawler:
         """Запустить браузер"""
         chrome_options = Options()
 
+        chrome_options.binary_location = "/usr/bin/google-chrome"  # Добавили
+
         if self.headless:
             chrome_options.add_argument("--headless=new")
             chrome_options.add_argument("--no-sandbox")
             chrome_options.add_argument("--disable-dev-shm-usage")
             chrome_options.add_argument("--disable-gpu")
-            chrome_options.add_argument("--disable-software-rasterizer")
 
         chrome_options.add_argument(
             "--disable-blink-features=AutomationControlled")
@@ -39,10 +40,11 @@ class SpellCrawler:
             "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"
         )
 
-        # Используем системный chromedriver
-        service = Service("/usr/bin/chromedriver")
-        self.driver = webdriver.Chrome(service=service, options=chrome_options)
+        # Используем ChromeDriverManager для автоматической установки
+        from webdriver_manager.chrome import ChromeDriverManager
+        service = Service(ChromeDriverManager().install())
 
+        self.driver = webdriver.Chrome(service=service, options=chrome_options)
         print("✅ Selenium браузер запущен")
 
     def stop(self):
