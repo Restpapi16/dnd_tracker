@@ -30,16 +30,17 @@ class SpellCrawler:
             chrome_options.add_argument("--headless=new")
             chrome_options.add_argument("--no-sandbox")
             chrome_options.add_argument("--disable-dev-shm-usage")
+            chrome_options.add_argument("--disable-gpu")
+            chrome_options.add_argument("--disable-software-rasterizer")
 
         chrome_options.add_argument(
-            "--disable-blink-features=AutomationControlled"
-        )
+            "--disable-blink-features=AutomationControlled")
         chrome_options.add_argument(
-            "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"
         )
 
-        service = Service(ChromeDriverManager().install())
+        # Используем системный chromedriver
+        service = Service("/usr/bin/chromedriver")
         self.driver = webdriver.Chrome(service=service, options=chrome_options)
 
         print("✅ Selenium браузер запущен")
@@ -58,7 +59,8 @@ class SpellCrawler:
             [{'external_id': 123, 'slug': 'heroism', 'name': 'Героизм'}, ...]
         """
         if not self.driver:
-            raise RuntimeError("Браузер не запущен. Вызови start() или используй контекстный менеджер.")
+            raise RuntimeError(
+                "Браузер не запущен. Вызови start() или используй контекстный менеджер.")
 
         url = f"{self.BASE_URL}/spells/"
         print(f"🔍 Открываем {url}")
@@ -68,17 +70,21 @@ class SpellCrawler:
 
         print("🔄 Прокручиваем страницу для загрузки всех заклинаний...")
 
-        last_height = self.driver.execute_script("return document.body.scrollHeight")
+        last_height = self.driver.execute_script(
+            "return document.body.scrollHeight")
         scrolls = 0
 
         while scrolls < max_scrolls:
-            self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            self.driver.execute_script(
+                "window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(2)
 
-            new_height = self.driver.execute_script("return document.body.scrollHeight")
+            new_height = self.driver.execute_script(
+                "return document.body.scrollHeight")
 
             if new_height == last_height:
-                print(f"  ✅ Достигнут конец страницы после {scrolls} прокруток")
+                print(
+                    f"  ✅ Достигнут конец страницы после {scrolls} прокруток")
                 break
 
             last_height = new_height
