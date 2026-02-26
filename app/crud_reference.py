@@ -58,9 +58,19 @@ def search_spells(
     """Поиск заклинаний по названию"""
     q = db.query(models_reference.ReferenceSpell)
     
-    # Поиск по названию (без учета регистра для кириллицы)
+    # Поиск по названию (регистронезависимый для кириллицы)
     if query:
-        q = q.filter(func.lower(models_reference.ReferenceSpell.name).like(f"%{query.lower()}%"))
+        # SQLite lower() не работает с кириллицей, используем OR с обоими вариантами
+        pattern_lower = f"%{query.lower()}%"
+        pattern_upper = f"%{query.upper()}%"
+        pattern_title = f"%{query.capitalize()}%"
+        q = q.filter(
+            or_(
+                models_reference.ReferenceSpell.name.like(pattern_lower),
+                models_reference.ReferenceSpell.name.like(pattern_upper),
+                models_reference.ReferenceSpell.name.like(pattern_title)
+            )
+        )
     
     # Фильтр по уровню
     if level is not None:
@@ -79,13 +89,22 @@ def get_spells_suggestions(
     limit: int = 10
 ) -> List[schemas_reference.SpellSuggestion]:
     """Быстрый поиск для автодополнения (только id и name)"""
+    # SQLite lower() не работает с кириллицей, используем OR с обоими вариантами
+    pattern_lower = f"%{query.lower()}%"
+    pattern_upper = f"%{query.upper()}%"
+    pattern_title = f"%{query.capitalize()}%"
+    
     results = db.query(
         models_reference.ReferenceSpell.id,
         models_reference.ReferenceSpell.name,
         models_reference.ReferenceSpell.level,
         models_reference.ReferenceSpell.school
     ).filter(
-        func.lower(models_reference.ReferenceSpell.name).like(f"%{query.lower()}%")
+        or_(
+            models_reference.ReferenceSpell.name.like(pattern_lower),
+            models_reference.ReferenceSpell.name.like(pattern_upper),
+            models_reference.ReferenceSpell.name.like(pattern_title)
+        )
     ).order_by(models_reference.ReferenceSpell.name).limit(limit).all()
     
     return [
@@ -128,7 +147,16 @@ def search_items(
     q = db.query(models_reference.ReferenceItem)
     
     if query:
-        q = q.filter(func.lower(models_reference.ReferenceItem.name).like(f"%{query.lower()}%"))
+        pattern_lower = f"%{query.lower()}%"
+        pattern_upper = f"%{query.upper()}%"
+        pattern_title = f"%{query.capitalize()}%"
+        q = q.filter(
+            or_(
+                models_reference.ReferenceItem.name.like(pattern_lower),
+                models_reference.ReferenceItem.name.like(pattern_upper),
+                models_reference.ReferenceItem.name.like(pattern_title)
+            )
+        )
     
     if category:
         q = q.filter(func.lower(models_reference.ReferenceItem.category).like(f"%{category.lower()}%"))
@@ -142,12 +170,20 @@ def get_items_suggestions(
     limit: int = 10
 ) -> List[schemas_reference.ItemSuggestion]:
     """Быстрый поиск для автодополнения"""
+    pattern_lower = f"%{query.lower()}%"
+    pattern_upper = f"%{query.upper()}%"
+    pattern_title = f"%{query.capitalize()}%"
+    
     results = db.query(
         models_reference.ReferenceItem.id,
         models_reference.ReferenceItem.name,
         models_reference.ReferenceItem.category
     ).filter(
-        func.lower(models_reference.ReferenceItem.name).like(f"%{query.lower()}%")
+        or_(
+            models_reference.ReferenceItem.name.like(pattern_lower),
+            models_reference.ReferenceItem.name.like(pattern_upper),
+            models_reference.ReferenceItem.name.like(pattern_title)
+        )
     ).order_by(models_reference.ReferenceItem.name).limit(limit).all()
     
     return [
@@ -190,7 +226,16 @@ def search_creatures(
     q = db.query(models_reference.ReferenceCreature)
     
     if query:
-        q = q.filter(func.lower(models_reference.ReferenceCreature.name).like(f"%{query.lower()}%"))
+        pattern_lower = f"%{query.lower()}%"
+        pattern_upper = f"%{query.upper()}%"
+        pattern_title = f"%{query.capitalize()}%"
+        q = q.filter(
+            or_(
+                models_reference.ReferenceCreature.name.like(pattern_lower),
+                models_reference.ReferenceCreature.name.like(pattern_upper),
+                models_reference.ReferenceCreature.name.like(pattern_title)
+            )
+        )
     
     if cr:
         q = q.filter(models_reference.ReferenceCreature.cr == cr)
@@ -207,13 +252,21 @@ def get_creatures_suggestions(
     limit: int = 10
 ) -> List[schemas_reference.CreatureSuggestion]:
     """Быстрый поиск для автодополнения"""
+    pattern_lower = f"%{query.lower()}%"
+    pattern_upper = f"%{query.upper()}%"
+    pattern_title = f"%{query.capitalize()}%"
+    
     results = db.query(
         models_reference.ReferenceCreature.id,
         models_reference.ReferenceCreature.name,
         models_reference.ReferenceCreature.cr,
         models_reference.ReferenceCreature.creature_type
     ).filter(
-        func.lower(models_reference.ReferenceCreature.name).like(f"%{query.lower()}%")
+        or_(
+            models_reference.ReferenceCreature.name.like(pattern_lower),
+            models_reference.ReferenceCreature.name.like(pattern_upper),
+            models_reference.ReferenceCreature.name.like(pattern_title)
+        )
     ).order_by(models_reference.ReferenceCreature.name).limit(limit).all()
     
     return [
