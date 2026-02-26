@@ -39,6 +39,7 @@ class DndSuParser:
             
             response.raise_for_status()
             soup = BeautifulSoup(response.text, 'html.parser')
+            html_text = soup.get_text()
             
             # 1. Название - card-title
             name_elem = soup.find(class_='card-title')
@@ -89,13 +90,29 @@ class DndSuParser:
             if duration and 'концентрац' in duration.lower():
                 concentration = True
             
-            # 8. Описание - description
-            description_elem = soup.find(class_='description')
+            # 8. Классы - ищем **Классы:** в тексте
+            classes = []
+            classes_match = re.search(r'\*\*Классы:\*\*([^\*]+)', html_text)
+            if classes_match:
+                classes_text = classes_match.group(1).strip()
+                # Разбиваем по запятой
+                classes = [c.strip() for c in classes_text.split(',') if c.strip()]
+            
+            # 9. Подклассы - ищем **Подклассы:** в тексте
+            subclasses = []
+            subclasses_match = re.search(r'\*\*Подклассы:\*\*([^\*\n]+)', html_text)
+            if subclasses_match:
+                subclasses_text = subclasses_match.group(1).strip()
+                # Разбиваем по запятой
+                subclasses = [s.strip() for s in subclasses_text.split(',') if s.strip()]
+            
+            # 10. Описание - subsection (правильный класс!)
             description = None
             at_higher_levels = None
             
-            if description_elem:
-                full_text = description_elem.get_text(separator='\n\n', strip=True)
+            subsection_elem = soup.find(class_='subsection')
+            if subsection_elem:
+                full_text = subsection_elem.get_text(separator='\n\n', strip=True)
                 
                 # Разделяем основное описание и "На более высоких уровнях"
                 if 'на более высоких уровнях' in full_text.lower():
@@ -108,17 +125,7 @@ class DndSuParser:
                     description = full_text
             
             # Ритуал
-            page_text = soup.get_text()
-            ritual = 'ритуал' in page_text.lower()
-            
-            # Классы
-            classes = []
-            class_keywords = ['бард', 'варвар', 'воин', 'волшебник', 
-                            'друид', 'жрец', 'колдун', 'монах', 
-                            'паладин', 'плут', 'следопыт', 'чародей']
-            for cls in class_keywords:
-                if cls in page_text.lower():
-                    classes.append(cls.capitalize())
+            ritual = 'ритуал' in html_text.lower()
             
             return {
                 'external_id': external_id,
@@ -135,7 +142,8 @@ class DndSuParser:
                 'ritual': ritual,
                 'description': description,
                 'at_higher_levels': at_higher_levels,
-                'classes': classes
+                'classes': classes,
+                'subclasses': subclasses
             }
             
         except Exception as e:
