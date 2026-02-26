@@ -63,11 +63,13 @@ INFO_TEXT = (
     "Что умею:\n"
     "• 🎲 Быстрые броски: d20 по кнопке.\n"
     "• ⚔️ Поддержка боя: инициатива, список участников, отметка текущего хода (в Mini App).\n"
-    "• ❤️ HP и статусы: удобно отмечать кто жив, а кто уже в таверне.\n\n"
+    "• ❤️ HP и статусы: удобно отмечать кто жив, а кто уже в таверне.\n"
+    "• 📚 Справочник D&D: заклинания, предметы и существа.\n\n"
     "Как пользоваться:\n"
     "1) Нажми «🎲 Бросить d20» — я пришлю результат.\n"
     "2) Нажми «📋 Кампании» — откроется Mini App.\n"
-    "3) Нажми «💥 Крит» — откроется бот/чат с критами.\n\n"
+    "3) Нажми «📚 Справочник» — база знаний по D&D 5e.\n"
+    "4) Нажми «💥 Крит» — откроется бот/чат с критами.\n\n"
     "Подсказка:\n"
     "• Mini App открывается внутри Telegram и не требует установки.\n"
     "• Если клавиатура пропала — нажми /start ещё раз."
@@ -76,13 +78,14 @@ INFO_TEXT = (
 BTN_ROLL = "🎲 Бросить d20"
 BTN_INFO = "ℹ️ Информация"
 BTN_CRIT = "💥 Крит"
+BTN_REFERENCE = "📚 Справочник"
 
 
 def main_kb() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text=BTN_ROLL), KeyboardButton(text=BTN_INFO)],
-            [KeyboardButton(text=BTN_CRIT)],
+            [KeyboardButton(text=BTN_CRIT), KeyboardButton(text=BTN_REFERENCE)],
         ],
         resize_keyboard=True,
         is_persistent=False,
@@ -113,6 +116,7 @@ async def main():
     await bot.set_my_commands([
         BotCommand(command="roll", description="Бросить d20 🎲"),
         BotCommand(command="info", description="Информация"),
+        BotCommand(command="reference", description="Справочник D&D 📚"),
     ])
 
     @dp.message(CommandStart())
@@ -151,6 +155,23 @@ async def main():
     async def cmd_info(message: Message):
         await message.answer(INFO_TEXT, reply_markup=main_kb())
 
+    @dp.message(Command("reference"))
+    async def cmd_reference(message: Message):
+        kb = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(
+                text="📚 Открыть справочник",
+                web_app=WebAppInfo(url=f"{WEBAPP_URL}/static/reference.html")
+            )]
+        ])
+        await message.answer(
+            "📚 D&D Справочник\n\n"
+            "✨ Заклинания с фильтрами по уровню и школе магии\n"
+            "🗡️ Предметы: оружие, доспехи, снаряжение\n"
+            "🐉 Существа из бестиария с полными характеристиками\n\n"
+            "🔍 Поиск с автодополнением для быстрого доступа",
+            reply_markup=kb
+        )
+
     @dp.message(F.text == BTN_ROLL)
     async def on_btn_roll(message: Message):
         await message.answer(roll_d20_text(), reply_markup=main_kb())
@@ -162,6 +183,23 @@ async def main():
     @dp.message(F.text == BTN_CRIT)
     async def on_btn_crit(message: Message):
         await message.answer(f"Открыть крит-бота: {CRIT_BOT_URL}", reply_markup=main_kb())
+
+    @dp.message(F.text == BTN_REFERENCE)
+    async def on_btn_reference(message: Message):
+        kb = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(
+                text="📚 Открыть справочник",
+                web_app=WebAppInfo(url=f"{WEBAPP_URL}/static/reference.html")
+            )]
+        ])
+        await message.answer(
+            "📚 D&D Справочник\n\n"
+            "✨ Заклинания с фильтрами по уровню и школе магии\n"
+            "🗡️ Предметы: оружие, доспехи, снаряжение\n"
+            "🐉 Существа из бестиария с полными характеристиками\n\n"
+            "🔍 Поиск с автодополнением для быстрого доступа",
+            reply_markup=kb
+        )
 
     await dp.start_polling(bot)
 
