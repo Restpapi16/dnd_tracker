@@ -98,7 +98,7 @@ async def load_spells_by_range(
             # Rate limiting - УВЕЛИЧЕННЫЕ задержки
             if (loaded + updated) % 5 == 0 and (loaded + updated) > 0:
                 print(f"  ⏸️  Пауза 10 сек для избежания блокировки...")
-                await asyncio.sleep(10)
+                await asyncio.sleep(5)
             else:
                 await asyncio.sleep(1)
         
