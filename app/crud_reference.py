@@ -16,6 +16,24 @@ def create_spell(db: Session, spell_data: dict) -> models_reference.ReferenceSpe
     return db_spell
 
 
+def update_spell(db: Session, spell_id: int, spell_data: dict) -> Optional[models_reference.ReferenceSpell]:
+    """Обновить существующее заклинание"""
+    db_spell = db.query(models_reference.ReferenceSpell).filter(
+        models_reference.ReferenceSpell.id == spell_id
+    ).first()
+    
+    if not db_spell:
+        return None
+    
+    # Обновляем все поля
+    for key, value in spell_data.items():
+        setattr(db_spell, key, value)
+    
+    db.commit()
+    db.refresh(db_spell)
+    return db_spell
+
+
 def get_spell_by_id(db: Session, spell_id: int) -> Optional[models_reference.ReferenceSpell]:
     """Получить заклинание по ID"""
     return db.query(models_reference.ReferenceSpell).filter(
