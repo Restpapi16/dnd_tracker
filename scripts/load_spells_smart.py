@@ -6,9 +6,8 @@
 
 Использование:
     python scripts/load_spells_smart.py --limit 50
-    python scripts/load_spells_smart.py --all
-    python scripts/load_spells_smart.py --start 10000 --end 10200
-    python scripts/load_spells_smart.py --limit 20 --force  # Обновить существующие
+    python scripts/load_spells_smart.py --start 10000 --end 10100 --limit 50
+    python scripts/load_spells_smart.py --start 10500 --end 10600 --all
 """
 
 import asyncio
@@ -24,10 +23,9 @@ from app import crud_reference
 
 
 async def load_spells_by_range(
-    start_id: int = 10000,
-    end_id: int = 10500,
-    limit: int = None,
-    force_update: bool = False
+    start_id: int,
+    end_id: int,
+    limit: int = None
 ):
     """
     Загрузка заклинаний по диапазону ID
@@ -36,14 +34,11 @@ async def load_spells_by_range(
         start_id: Начальный ID
         end_id: Конечный ID
         limit: Максимальное количество
-        force_update: Обновлять существующие заклинания
     """
     
     print("✨ Умная загрузка заклинаний с next.dnd.su\n")
     print(f"📊 Диапазон ID: {start_id} - {end_id}")
-    if force_update:
-        print("🔄 Режим: Обновление существующих заклинаний")
-    
+    print("🔄 Режим: Автоматическое обновление существующих")
     print("🐌 Задержки: 3 сек между запросами, 10 сек каждые 5 заклинаний\n")
     
     # Создаем таблицы
@@ -56,7 +51,6 @@ async def load_spells_by_range(
     try:
         loaded = 0
         updated = 0
-        skipped = 0
         not_found = 0
         
         total = end_id - start_id + 1
@@ -69,15 +63,8 @@ async def load_spells_by_range(
                 print(f"\n✅ Достигнут лимит: {limit} заклинаний")
                 break
             
-            # Проверка дубликатов
+            # Проверка существующего
             existing = crud_reference.get_spell_by_external_id(db, external_id)
-            
-            if existing and not force_update:
-                # Пропускаем существующие
-                skipped += 1
-                if i % 50 == 0:
-                    print(f"[{i}/{total}] Прогресс: загружено {loaded}, обновлено {updated}, пропущено {skipped}")
-                continue
             
             # Используем ID как slug (сайт сам редиректит)
             slug = str(external_id)
@@ -104,14 +91,13 @@ async def load_spells_by_range(
             # Rate limiting - УВЕЛИЧЕННЫЕ задержки
             if (loaded + updated) % 5 == 0 and (loaded + updated) > 0:
                 print(f"  ⏸️  Пауза 10 сек для избежания блокировки...")
-                await asyncio.sleep(10)  # Было 5, стало 10
+                await asyncio.sleep(10)
             else:
-                await asyncio.sleep(3)  # Было 2, стало 3
+                await asyncio.sleep(3)
         
         print(f"\n{'='*60}")
         print(f"✅ Загружено новых: {loaded}")
         print(f"🔄 Обновлено: {updated}")
-        print(f"⏭️  Пропущено (уже есть): {skipped}")
         print(f"❌ Не найдено (404): {not_found}")
         print(f"📊 Проверено ID: {i}")
         print(f"{'='*60}\n")
@@ -131,7 +117,12 @@ async def load_spells_by_range(
 
 async def main():
     parser = argparse.ArgumentParser(
-        description="Умная загрузка заклинаний по диапазону ID"
+        description="Умная загрузка заклинаний по диапазону ID",
+        epilog="Примеры:\n"
+               "  python scripts/load_spells_smart.py --start 10000 --end 10100 --limit 20\n"
+               "  python scripts/load_spells_smart.py --start 10500 --end 10600 --all\n"
+               "  python scripts/load_spells_smart.py --limit 50  # использует диапазон по умолчанию",
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument(
         '--start',
@@ -148,26 +139,25 @@ async def main():
     parser.add_argument(
         '--limit',
         type=int,
-        help="Максимальное количество заклинаний для загрузки"
+        help="Максимальное количество заклинаний для загрузки/обновления"
     )
     parser.add_argument(
         '--all',
         action='store_true',
-        help="Загрузить все заклинания в диапазоне"
-    )
-    parser.add_argument(
-        '--force',
-        action='store_true',
-        help="Обновить существующие заклинания"
+        help="Загрузить/обновить все заклинания в диапазоне (игнорирует --limit)"
     )
     
     args = parser.parse_args()
     
+    # Валидация диапазона
+    if args.start > args.end:
+        print("❌ Ошибка: --start должен быть меньше или равен --end")
+        sys.exit(1)
+    
     await load_spells_by_range(
         start_id=args.start,
         end_id=args.end,
-        limit=None if args.all else args.limit,
-        force_update=args.force
+        limit=None if args.all else args.limit
     )
 
 
