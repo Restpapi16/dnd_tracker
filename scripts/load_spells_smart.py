@@ -52,6 +52,7 @@ async def load_spells_by_range(
         loaded = 0
         updated = 0
         not_found = 0
+        skipped_invalid = 0
         
         total = end_id - start_id + 1
         
@@ -72,6 +73,12 @@ async def load_spells_by_range(
             spell_data = await parser.parse_spell(external_id, slug)
             
             if spell_data and spell_data.get('name'):
+                # ВАЛИДАЦИЯ: проверяем обязательные поля
+                if spell_data.get('level') is None:
+                    skipped_invalid += 1
+                    print(f"[{i}/{total}] ⚠️  [{external_id}] {spell_data['name']} - пропущено (нет уровня)")
+                    continue
+                
                 if existing:
                     # Обновляем существующее
                     crud_reference.update_spell(db, existing.id, spell_data)
@@ -98,6 +105,7 @@ async def load_spells_by_range(
         print(f"\n{'='*60}")
         print(f"✅ Загружено новых: {loaded}")
         print(f"🔄 Обновлено: {updated}")
+        print(f"⚠️  Пропущено (невалидные): {skipped_invalid}")
         print(f"❌ Не найдено (404): {not_found}")
         print(f"📊 Проверено ID: {i}")
         print(f"{'='*60}\n")
