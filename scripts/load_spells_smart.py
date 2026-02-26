@@ -81,11 +81,12 @@ async def load_spells_by_range(
                 if not_found % 100 == 0:
                     print(f"[{i}/{total}] ⚠️  Пропущено 404: {not_found}")
             
-            # Rate limiting
-            if loaded % 10 == 0 and loaded > 0:
-                await asyncio.sleep(1)
+            # Rate limiting - большие задержки чтобы не получить 503
+            if loaded % 5 == 0 and loaded > 0:
+                print(f"  ⏸️  Пауза 5 сек для избежания блокировки...")
+                await asyncio.sleep(5)
             else:
-                await asyncio.sleep(0.2)
+                await asyncio.sleep(2)
         
         print(f"\n{'='*60}")
         print(f"✅ Загружено: {loaded}")
