@@ -77,7 +77,7 @@ def get_spells_suggestions(
     db: Session,
     query: str,
     limit: int = 10
-) -> List[dict]:
+) -> List[schemas_reference.SpellSuggestion]:
     """Быстрый поиск для автодополнения (только id и name)"""
     results = db.query(
         models_reference.ReferenceSpell.id,
@@ -89,13 +89,13 @@ def get_spells_suggestions(
     ).order_by(models_reference.ReferenceSpell.name).limit(limit).all()
     
     return [
-        {
-            'id': r.id,
-            'name': r.name,
-            'level': r.level,
-            'school': r.school,
-            'type': 'spell'
-        }
+        schemas_reference.SpellSuggestion(
+            id=r.id,
+            name=r.name,
+            level=r.level,
+            school=r.school,
+            type='spell'
+        )
         for r in results
     ]
 
@@ -140,7 +140,7 @@ def get_items_suggestions(
     db: Session,
     query: str,
     limit: int = 10
-) -> List[dict]:
+) -> List[schemas_reference.ItemSuggestion]:
     """Быстрый поиск для автодополнения"""
     results = db.query(
         models_reference.ReferenceItem.id,
@@ -151,12 +151,12 @@ def get_items_suggestions(
     ).order_by(models_reference.ReferenceItem.name).limit(limit).all()
     
     return [
-        {
-            'id': r.id,
-            'name': r.name,
-            'category': r.category,
-            'type': 'item'
-        }
+        schemas_reference.ItemSuggestion(
+            id=r.id,
+            name=r.name,
+            category=r.category,
+            type='item'
+        )
         for r in results
     ]
 
@@ -205,7 +205,7 @@ def get_creatures_suggestions(
     db: Session,
     query: str,
     limit: int = 10
-) -> List[dict]:
+) -> List[schemas_reference.CreatureSuggestion]:
     """Быстрый поиск для автодополнения"""
     results = db.query(
         models_reference.ReferenceCreature.id,
@@ -217,13 +217,13 @@ def get_creatures_suggestions(
     ).order_by(models_reference.ReferenceCreature.name).limit(limit).all()
     
     return [
-        {
-            'id': r.id,
-            'name': r.name,
-            'cr': r.cr,
-            'type': 'creature',
-            'creature_type': r.creature_type
-        }
+        schemas_reference.CreatureSuggestion(
+            id=r.id,
+            name=r.name,
+            cr=r.cr,
+            creature_type=r.creature_type,
+            type='creature'
+        )
         for r in results
     ]
 
@@ -234,10 +234,10 @@ def get_all_suggestions(
     db: Session,
     query: str,
     limit_per_type: int = 5
-) -> dict:
+) -> schemas_reference.AllSuggestions:
     """Получить подсказки по всем типам одновременно"""
-    return {
-        'spells': get_spells_suggestions(db, query, limit_per_type),
-        'items': get_items_suggestions(db, query, limit_per_type),
-        'creatures': get_creatures_suggestions(db, query, limit_per_type)
-    }
+    return schemas_reference.AllSuggestions(
+        spells=get_spells_suggestions(db, query, limit_per_type),
+        items=get_items_suggestions(db, query, limit_per_type),
+        creatures=get_creatures_suggestions(db, query, limit_per_type)
+    )
