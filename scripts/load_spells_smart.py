@@ -93,7 +93,7 @@ async def load_spells_by_range(
                 print(f"  ⏸️  Пауза 10 сек для избежания блокировки...")
                 await asyncio.sleep(10)
             else:
-                await asyncio.sleep(3)
+                await asyncio.sleep(1)
         
         print(f"\n{'='*60}")
         print(f"✅ Загружено новых: {loaded}")
