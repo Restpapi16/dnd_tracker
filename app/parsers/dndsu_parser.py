@@ -26,7 +26,7 @@ class DndSuParser:
     
     async def parse_spell(self, external_id: int, slug: str) -> Optional[Dict]:
         """Парсинг заклинания с next.dnd.su"""
-        url = f"{self.BASE_URL}/spells/{external_id}-{slug}/"
+        url = f"{self.BASE_URL}/spells/{external_id}/"
         
         try:
             response = await self.client.get(url)
