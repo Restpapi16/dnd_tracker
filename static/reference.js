@@ -340,6 +340,22 @@ function renderSpellDetail(spell) {
         </div>`;
     }
 
+    // Классы
+    if (spell.classes && spell.classes.length > 0) {
+        html += `<div class="modal-section">
+            <div class="modal-section-title">Классы</div>
+            <div class="modal-section-content">${spell.classes.join(', ')}</div>
+        </div>`;
+    }
+
+    // Подклассы
+    if (spell.subclasses && spell.subclasses.length > 0) {
+        html += `<div class="modal-section">
+            <div class="modal-section-title">Подклассы</div>
+            <div class="modal-section-content">${spell.subclasses.join(', ')}</div>
+        </div>`;
+    }
+
     if (spell.description) {
         html += `<div class="modal-section">
             <div class="modal-section-title">Описание</div>
