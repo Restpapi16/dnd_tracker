@@ -6,7 +6,7 @@ import re
 
 
 class DndSuParser:
-    """Парсер для сайта next.dnd.su"""
+    """Парсер для next.dnd.su с правильными CSS-селекторами"""
     
     BASE_URL = "https://next.dnd.su"
     TIMEOUT = 30.0
@@ -25,7 +25,7 @@ class DndSuParser:
         await self.client.aclose()
     
     async def parse_spell(self, external_id: int, slug: str) -> Optional[Dict]:
-        """Парсинг страницы заклинания"""
+        """Парсинг заклинания с next.dnd.su"""
         url = f"{self.BASE_URL}/spells/{external_id}-{slug}/"
         
         try:
@@ -33,64 +33,112 @@ class DndSuParser:
             response.raise_for_status()
             soup = BeautifulSoup(response.text, 'html.parser')
             
-            # Название заклинания
-            name = soup.find('h1').text.strip() if soup.find('h1') else slug
+            # 1. Название - card-title
+            name_elem = soup.find(class_='card-title')
+            name = name_elem.text.strip() if name_elem else slug
             
-            # Основные характеристики (обычно в div с классом или в таблице)
-            # TODO: Нужно изучить реальную структуру HTML
-            data = {
+            # 2-3. Уровень и Школа - school_level
+            school_level_elem = soup.find(class_='school_level')
+            level = None
+            school = None
+            
+            if school_level_elem:
+                text = school_level_elem.text.strip()
+                # Уровень
+                if 'заговор' in text.lower():
+                    level = 0
+                else:
+                    level_match = re.search(r'(\d+)\s*уровень', text)
+                    if level_match:
+                        level = int(level_match.group(1))
+                
+                # Школа
+                schools = ['Очарование', 'Воплощение', 'Преграждение', 
+                           'Иллюзия', 'Некромантия', 'Прорицание', 
+                           'Превращение', 'Вызов']
+                for s in schools:
+                    if s in text:
+                        school = s
+                        break
+            
+            # 4. Время сотворения - cast_time
+            cast_time_elem = soup.find(class_='cast_time')
+            casting_time = cast_time_elem.text.strip() if cast_time_elem else None
+            
+            # 5. Дистанция - range
+            range_elem = soup.find(class_='range')
+            spell_range = range_elem.text.strip() if range_elem else None
+            
+            # 6. Компоненты - components
+            components_elem = soup.find(class_='components')
+            components = components_elem.text.strip() if components_elem else None
+            
+            # 7. Длительность - duration
+            duration_elem = soup.find(class_='duration')
+            duration = duration_elem.text.strip() if duration_elem else None
+            
+            # Концентрация
+            concentration = False
+            if duration and 'концентрац' in duration.lower():
+                concentration = True
+            
+            # 8. Описание - description
+            description_elem = soup.find(class_='description')
+            description = None
+            at_higher_levels = None
+            
+            if description_elem:
+                full_text = description_elem.get_text(separator='\n\n', strip=True)
+                
+                # Разделяем основное описание и "На более высоких уровнях"
+                if 'на более высоких уровнях' in full_text.lower():
+                    parts = re.split(r'На более высоких уровнях', full_text, 
+                                    maxsplit=1, flags=re.IGNORECASE)
+                    description = parts[0].strip()
+                    if len(parts) > 1:
+                        at_higher_levels = 'На более высоких уровнях. ' + parts[1].strip()
+                else:
+                    description = full_text
+            
+            # Ритуал
+            page_text = soup.get_text()
+            ritual = 'ритуал' in page_text.lower()
+            
+            # Классы
+            classes = []
+            class_keywords = ['бард', 'варвар', 'воин', 'волшебник', 
+                            'друид', 'жрец', 'колдун', 'монах', 
+                            'паладин', 'плут', 'следопыт', 'чародей']
+            for cls in class_keywords:
+                if cls in page_text.lower():
+                    classes.append(cls.capitalize())
+            
+            return {
                 'external_id': external_id,
                 'slug': slug,
                 'name': name,
                 'source_url': url,
-                'level': None,
-                'school': None,
-                'casting_time': None,
-                'range': None,
-                'components': None,
-                'duration': None,
-                'concentration': False,
-                'ritual': False,
-                'description': None,
-                'at_higher_levels': None,
-                'classes': []
+                'level': level,
+                'school': school,
+                'casting_time': casting_time,
+                'range': spell_range,
+                'components': components,
+                'duration': duration,
+                'concentration': concentration,
+                'ritual': ritual,
+                'description': description,
+                'at_higher_levels': at_higher_levels,
+                'classes': classes
             }
-            
-            # Парсинг характеристик
-            # Пример: ищем паттерны в тексте
-            text_content = soup.get_text()
-            
-            # Парсинг уровня (например: "1 уровень")
-            level_match = re.search(r'(\d+)\s*уровень', text_content)
-            if level_match:
-                data['level'] = int(level_match.group(1))
-            elif 'заговор' in text_content.lower():
-                data['level'] = 0
-            
-            # Парсинг школы магии
-            schools = ['Очарование', 'Воплощение', 'Преграждение', 'Иллюзия', 'Некромантия', 'Прорицание', 'Превращение', 'Вызов']
-            for school in schools:
-                if school in text_content:
-                    data['school'] = school
-                    break
-            
-            # Концентрация
-            if 'Концентрация' in text_content or 'концентрац' in text_content.lower():
-                data['concentration'] = True
-            
-            # Описание (обычно в основном блоке контента)
-            description_elem = soup.find('div', class_=re.compile(r'content|description|spell-text'))
-            if description_elem:
-                data['description'] = description_elem.get_text(separator='\n', strip=True)
-            
-            return data
             
         except Exception as e:
             print(f"Error parsing spell {external_id}-{slug}: {e}")
+            import traceback
+            traceback.print_exc()
             return None
     
     async def parse_item(self, external_id: int, slug: str) -> Optional[Dict]:
-        """Парсинг страницы предмета"""
+        """Парсинг предмета"""
         url = f"{self.BASE_URL}/equipment/{external_id}-{slug}"
         
         try:
@@ -98,55 +146,53 @@ class DndSuParser:
             response.raise_for_status()
             soup = BeautifulSoup(response.text, 'html.parser')
             
-            name = soup.find('h1').text.strip() if soup.find('h1') else slug
+            name_elem = soup.find(class_='card-title')
+            name = name_elem.text.strip() if name_elem else slug
             
-            data = {
+            description_elem = soup.find(class_='description')
+            description = description_elem.get_text(separator='\n', strip=True) if description_elem else None
+            
+            text_content = soup.get_text()
+            
+            category = None
+            if 'оружие' in text_content.lower():
+                category = 'Оружие'
+            elif 'доспех' in text_content.lower():
+                category = 'Доспехи'
+            
+            cost_match = re.search(r'(\d+)\s*(зм|см|мм)', text_content, re.IGNORECASE)
+            cost = cost_match.group(0) if cost_match else None
+            
+            weight_match = re.search(r'(\d+[\.,]?\d*)\s*фнт', text_content)
+            weight = weight_match.group(0) if weight_match else None
+            
+            damage_match = re.search(r'\d+к\d+', text_content)
+            damage = damage_match.group(0) if damage_match else None
+            
+            ac_match = re.search(r'КД[:\s]*(\d+)', text_content)
+            ac = int(ac_match.group(1)) if ac_match else None
+            
+            return {
                 'external_id': external_id,
                 'slug': slug,
                 'name': name,
                 'source_url': url,
-                'category': None,
+                'category': category,
                 'subcategory': None,
-                'cost': None,
-                'weight': None,
-                'damage': None,
-                'ac': None,
+                'cost': cost,
+                'weight': weight,
+                'damage': damage,
+                'ac': ac,
                 'properties': [],
-                'description': None
+                'description': description
             }
-            
-            text_content = soup.get_text()
-            
-            # Парсинг характеристик предмета
-            # TODO: Адаптировать под реальную структуру HTML
-            
-            # Стоимость
-            cost_match = re.search(r'(\d+)\s*(ЗМ|СМ|ММ|ПМ|ЭМ)', text_content)
-            if cost_match:
-                data['cost'] = cost_match.group(0)
-            
-            # Вес
-            weight_match = re.search(r'(\d+[\.,]?\d*)\s*фнт', text_content)
-            if weight_match:
-                data['weight'] = weight_match.group(0)
-            
-            # Урон оружия
-            damage_match = re.search(r'(\d+к\d+)[^\n]*?(Колющий|Рубящий|Дробящий)', text_content)
-            if damage_match:
-                data['damage'] = damage_match.group(0)
-            
-            description_elem = soup.find('div', class_=re.compile(r'content|description'))
-            if description_elem:
-                data['description'] = description_elem.get_text(separator='\n', strip=True)
-            
-            return data
             
         except Exception as e:
             print(f"Error parsing item {external_id}-{slug}: {e}")
             return None
     
     async def parse_creature(self, external_id: int, slug: str) -> Optional[Dict]:
-        """Парсинг страницы существа"""
+        """Парсинг существа"""
         url = f"{self.BASE_URL}/bestiary/{external_id}-{slug}/"
         
         try:
@@ -154,31 +200,61 @@ class DndSuParser:
             response.raise_for_status()
             soup = BeautifulSoup(response.text, 'html.parser')
             
-            name = soup.find('h1').text.strip() if soup.find('h1') else slug
+            name_elem = soup.find(class_='card-title')
+            name = name_elem.text.strip() if name_elem else slug
             
-            data = {
+            text_content = soup.get_text()
+            
+            size = None
+            sizes = ['Крошечный', 'Маленький', 'Средний', 'Большой', 'Огромный', 'Громадный']
+            for s in sizes:
+                if s in text_content:
+                    size = s
+                    break
+            
+            cr_match = re.search(r'(Показатель опасности|CR)[:\s]*(\d+/?\d*)', text_content)
+            cr = cr_match.group(2) if cr_match else None
+            
+            ac_match = re.search(r'КД[:\s]*(\d+)', text_content)
+            ac = int(ac_match.group(1)) if ac_match else None
+            
+            hp_match = re.search(r'(\d+)\s*\((\d+к\d+)', text_content)
+            hp = hp_match.group(0) if hp_match else None
+            
+            stats = {}
+            stats_pattern = r'(СИЛ|ЛОВ|ТЕЛ|ИНТ|МДР|ХАР)[:\s]*(\d+)'
+            stats_matches = re.findall(stats_pattern, text_content)
+            
+            stats_map = {'СИЛ': 'strength', 'ЛОВ': 'dexterity', 'ТЕЛ': 'constitution',
+                        'ИНТ': 'intelligence', 'МДР': 'wisdom', 'ХАР': 'charisma'}
+            
+            for stat_abbr, value in stats_matches:
+                if stat_abbr in stats_map:
+                    stats[stats_map[stat_abbr]] = int(value)
+            
+            return {
                 'external_id': external_id,
                 'slug': slug,
                 'name': name,
                 'source_url': url,
-                'size': None,
+                'size': size,
                 'creature_type': None,
                 'alignment': None,
-                'ac': None,
-                'hp': None,
+                'ac': ac,
+                'hp': hp,
                 'initiative': None,
                 'speed': {},
-                'strength': None,
-                'dexterity': None,
-                'constitution': None,
-                'intelligence': None,
-                'wisdom': None,
-                'charisma': None,
+                'strength': stats.get('strength'),
+                'dexterity': stats.get('dexterity'),
+                'constitution': stats.get('constitution'),
+                'intelligence': stats.get('intelligence'),
+                'wisdom': stats.get('wisdom'),
+                'charisma': stats.get('charisma'),
                 'saving_throws': {},
                 'skills': {},
                 'senses': None,
                 'languages': None,
-                'cr': None,
+                'cr': cr,
                 'xp': None,
                 'features': [],
                 'actions': [],
@@ -187,54 +263,18 @@ class DndSuParser:
                 'legendary_actions': []
             }
             
-            text_content = soup.get_text()
-            
-            # Парсинг характеристик существа
-            # TODO: Детальный парсинг структуры страницы существа
-            
-            # CR (Challenge Rating)
-            cr_match = re.search(r'Показатель опасности[:\s]*(\d+/?\d*)', text_content)
-            if cr_match:
-                data['cr'] = cr_match.group(1)
-            
-            # КД
-            ac_match = re.search(r'КД[:\s]*(\d+)', text_content)
-            if ac_match:
-                data['ac'] = int(ac_match.group(1))
-            
-            # Характеристики (СИЛ, ЛОВ и т.д.)
-            stats_pattern = r'(СИЛ|ЛОВ|ТЕЛ|ИНТ|МДР|ХАР)[:\s]*(\d+)'
-            stats_matches = re.findall(stats_pattern, text_content)
-            
-            stats_map = {
-                'СИЛ': 'strength',
-                'ЛОВ': 'dexterity',
-                'ТЕЛ': 'constitution',
-                'ИНТ': 'intelligence',
-                'МДР': 'wisdom',
-                'ХАР': 'charisma'
-            }
-            
-            for stat_abbr, value in stats_matches:
-                if stat_abbr in stats_map:
-                    data[stats_map[stat_abbr]] = int(value)
-            
-            return data
-            
         except Exception as e:
             print(f"Error parsing creature {external_id}-{slug}: {e}")
             return None
     
     async def get_spells_list(self, page: int = 1) -> List[Dict]:
         """Получить список заклинаний"""
-        # TODO: Парсинг списка заклинаний с пагинацией
         url = f"{self.BASE_URL}/spells/"
         try:
             response = await self.client.get(url)
             response.raise_for_status()
             soup = BeautifulSoup(response.text, 'html.parser')
             
-            # Найти все ссылки на заклинания
             spell_links = soup.find_all('a', href=re.compile(r'/spells/\d+-[\w-]+/'))
             
             spells = []
