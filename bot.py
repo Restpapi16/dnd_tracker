@@ -3,6 +3,7 @@ import logging
 import os
 import random
 
+
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import (
@@ -15,6 +16,7 @@ from aiogram.types import (
     InlineKeyboardButton,
 )
 
+
 logging.basicConfig(level=logging.INFO)
 
 
@@ -22,8 +24,10 @@ API_TOKEN = os.getenv("BOT_TOKEN")
 if not API_TOKEN:
     raise RuntimeError("Не задана переменная окружения BOT_TOKEN")
 
+
 WEBAPP_URL = "https://pavelcode.ru"
 CRIT_BOT_URL = "https://t.me/dndcriticalsfbot"
+
 
 D20_PHRASES = [
     "Кости брошены — судьба улыбается или скалится.",
@@ -58,22 +62,23 @@ D20_PHRASES = [
     "Рандом — лучший соавтор кампании.",
 ]
 
-INFO_TEXT = (
-    "ℹ️ Кидай d20 — помощник мастера и игроков для D&D.\n\n"
-    "Что умею:\n"
-    "• 🎲 Быстрые броски: d20 по кнопке.\n"
-    "• ⚔️ Поддержка боя: инициатива, список участников, отметка текущего хода (в Mini App).\n"
-    "• ❤️ HP и статусы: удобно отмечать кто жив, а кто уже в таверне.\n"
-    "• 📚 Справочник D&D: заклинания, предметы и существа.\n\n"
-    "Как пользоваться:\n"
-    "1) Нажми «🎲 Бросить d20» — я пришлю результат.\n"
-    "2) Нажми «📋 Кампании» — откроется Mini App.\n"
-    "3) Нажми «📚 Справочник» — база знаний по D&D 5e.\n"
-    "4) Нажми «💥 Крит» — откроется бот/чат с критами.\n\n"
-    "Подсказка:\n"
-    "• Mini App открывается внутри Telegram и не требует установки.\n"
-    "• Если клавиатура пропала — нажми /start ещё раз."
-)
+
+INFO_TEXT = """✨ <b>Ключевые возможности</b>
+
+
+🎭 <b>Для Мастера игры (GM):</b>
+• <b>Управление кампаниями</b> — создание и редактирование игровых кампаний
+• <b>Библиотека врагов</b> — добавление монстров с полной статистикой (HP, КД, атаки, инициатива)
+• <b>Трекер боя</b> — автоматический подсчет инициативы и порядка хода
+• <b>Управление HP</b> — быстрое изменение здоровья участников (+/- кнопки)
+• <b>Мультиплеер</b> — возможность приглашать игроков в свой кампейн в качестве зрителей
+
+
+👥 <b>Для игроков (Наблюдатель):</b>
+• <b>Просмотр порядка хода</b> — видят текущий раунд и очередность действий
+• <b>Автообновление</b> — боевой экран обновляется автоматически
+• <b>Интрига сохранена</b> — точные HP, КД и атаки врагов скрыты"""
+
 
 BTN_ROLL = "🎲 Бросить d20"
 BTN_INFO = "ℹ️ Информация"
@@ -122,19 +127,21 @@ async def main():
     @dp.message(CommandStart())
     async def cmd_start(message: Message):
         # Проверяем наличие deep link параметра
-        start_param = message.text.split(maxsplit=1)[1] if len(message.text.split()) > 1 else None
-        
+        start_param = message.text.split(maxsplit=1)[1] if len(
+            message.text.split()) > 1 else None
+
         if start_param and start_param.startswith("invite_"):
             # Извлекаем токен из invite_{token}
             invite_token = start_param[7:]  # убираем "invite_"
-            
+
             # Создаём inline-кнопку для перехода к join.html
             join_url = f"{WEBAPP_URL}/static/join.html?token={invite_token}"
-            
+
             kb = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text="✅ Присоединиться к кампании", web_app=WebAppInfo(url=join_url))]
+                [InlineKeyboardButton(
+                    text="✅ Присоединиться к кампании", web_app=WebAppInfo(url=join_url))]
             ])
-            
+
             await message.answer(
                 "🎲 Тебя пригласили в D&D кампанию!\n\n"
                 "Нажми кнопку ниже, чтобы присоединиться как наблюдатель.",
@@ -153,7 +160,7 @@ async def main():
 
     @dp.message(Command("info"))
     async def cmd_info(message: Message):
-        await message.answer(INFO_TEXT, reply_markup=main_kb())
+        await message.answer(INFO_TEXT, parse_mode='HTML', reply_markup=main_kb())
 
     @dp.message(Command("reference"))
     async def cmd_reference(message: Message):
@@ -178,7 +185,7 @@ async def main():
 
     @dp.message(F.text == BTN_INFO)
     async def on_btn_info(message: Message):
-        await message.answer(INFO_TEXT, reply_markup=main_kb())
+        await message.answer(INFO_TEXT, parse_mode='HTML', reply_markup=main_kb())
 
     @dp.message(F.text == BTN_CRIT)
     async def on_btn_crit(message: Message):
@@ -202,6 +209,7 @@ async def main():
         )
 
     await dp.start_polling(bot)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
