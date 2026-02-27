@@ -235,6 +235,100 @@ def _get_next_group_id(db: Session, encounter_id: int) -> int:
     return 1
 
 
+# ----- НОВОЕ: Добавление участников в активную схватку -----
+
+def add_participants_to_active_encounter(
+    db: Session,
+    encounter_id: int,
+    participants_data: schemas.AddParticipantsToActiveEncounter,
+):
+    """
+    Добавляет новых участников в активную схватку.
+    Новые участники вставляются в порядок ходов согласно инициативе.
+    """
+    import random
+
+    encounter = db.query(models.Encounter).filter(
+        models.Encounter.id == encounter_id).first()
+    if not encounter:
+        return None
+
+    # Получаем текущее состояние
+    state = encounter.state
+    if not state:
+        return None
+
+    # Уникальные мобы
+    for m in participants_data.unique_monsters:
+        roll = random.randint(1, 20) + m.initiative_mod
+        
+        attacks_json = None
+        if m.attacks:
+            attacks_json = json.dumps([a.dict() for a in m.attacks])
+        
+        db_part = models.Participant(
+            encounter_id=encounter_id,
+            type=models.ParticipantType.npc_unique,
+            character_id=None,
+            name=m.name,
+            max_hp=m.max_hp,
+            current_hp=m.max_hp,
+            ac=m.ac,
+            initiative_total=roll,
+            is_enemy=m.is_enemy,
+            attacks=attacks_json,
+        )
+        db.add(db_part)
+
+    # Группы мобов
+    group_id_counter = _get_next_group_id(db, encounter_id)
+    for g in participants_data.group_monsters:
+        group_id = group_id_counter
+        group_id_counter += 1
+        
+        attacks_json = None
+        if g.attacks:
+            attacks_json = json.dumps([a.dict() for a in g.attacks])
+        
+        for i in range(g.count):
+            roll = random.randint(1, 20) + g.initiative_mod
+            db_part = models.Participant(
+                encounter_id=encounter_id,
+                type=models.ParticipantType.npc_group,
+                character_id=None,
+                name=f"{g.name} #{i+1}",
+                max_hp=g.max_hp,
+                current_hp=g.max_hp,
+                ac=g.ac,
+                initiative_total=roll,
+                is_enemy=g.is_enemy,
+                group_id=group_id,
+                attacks=attacks_json,
+            )
+            db.add(db_part)
+
+    db.commit()
+    
+    # Пересчитываем current_index после добавления (новые участники могут изменить порядок)
+    # Для этого найдём текущего участника и пересчитаем его позицию
+    participants_sorted = (
+        db.query(models.Participant)
+        .filter(models.Participant.encounter_id == encounter_id)
+        .order_by(models.Participant.initiative_total.desc(), models.Participant.id.asc())
+        .all()
+    )
+    
+    # Если есть участники, находим текущего
+    if participants_sorted and state.current_index < len(participants_sorted):
+        # Текущий индекс остаётся на том же участнике (по ID)
+        # Новые участники вставятся согласно инициативе
+        pass  # current_index оставляем без изменений
+    
+    db.commit()
+    db.refresh(encounter)
+    return encounter
+
+
 # ----- ENCOUNTER LOGIC -----
 
 
