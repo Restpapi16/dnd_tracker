@@ -13,7 +13,7 @@ from sqlalchemy.orm import joinedload
 import json
 
 # Импортируем модели справочника для создания таблиц
-from .models_reference import ReferenceSpell, ReferenceItem, ReferenceCreature
+ from .models_reference import ReferenceSpell, ReferenceItem, ReferenceCreature
 
 # Импортируем роутер справочника
 from .routers import reference
@@ -272,67 +272,26 @@ def delete_character(
     return {"status": "deleted"}
 
 
-# ----- ENEMIES API -----
+# ----- НОВОЕ: ENEMY TEMPLATES FROM PAST ENCOUNTERS API -----
 
-@app.post("/campaigns/{campaign_id}/enemies", response_model=schemas.Enemy)
-def create_enemy_api(
+@app.get("/campaigns/{campaign_id}/enemy_templates")
+def get_enemy_templates(
     campaign_id: int,
-    enemy: schemas.EnemyBase,
     db: Session = Depends(get_db),
     tg_user_id: int = Depends(get_current_tg_user_id),
 ):
-    """Создать врага в библиотеке кампании (GM only)"""
+    """
+    Получить шаблоны врагов из прошлых схваток кампании.
+    Возвращает уникальных npc_unique и npc_group (по одному на группу).
+    """
     campaign = crud.get_campaign(db, campaign_id)
     if not campaign:
         raise HTTPException(status_code=404, detail="Кампания не найдена")
     
     if campaign.owner_id != tg_user_id:
-        raise HTTPException(status_code=403, detail="Только GM может добавлять врагов")
+        raise HTTPException(status_code=403, detail="Только GM может просматривать шаблоны")
     
-    enemy_create = schemas.EnemyCreate(
-        campaign_id=campaign_id,
-        name=enemy.name,
-        max_hp=enemy.max_hp,
-        ac=enemy.ac,
-        initiative_modifier=enemy.initiative_modifier,
-        attacks=enemy.attacks
-    )
-    
-    db_enemy = crud.create_enemy(db, enemy_create)
-    
-    # Десериализуем атаки для ответа
-    attacks = None
-    if db_enemy.attacks:
-        attacks_data = json.loads(db_enemy.attacks)
-        attacks = [schemas.Attack(**a) for a in attacks_data]
-    
-    return schemas.Enemy(
-        id=db_enemy.id,
-        campaign_id=db_enemy.campaign_id,
-        name=db_enemy.name,
-        max_hp=db_enemy.max_hp,
-        ac=db_enemy.ac,
-        initiative_modifier=db_enemy.initiative_modifier,
-        attacks=attacks,
-        created_at=db_enemy.created_at
-    )
-
-
-@app.get("/campaigns/{campaign_id}/enemies", response_model=List[schemas.Enemy])
-def list_enemies_api(
-    campaign_id: int,
-    db: Session = Depends(get_db),
-    tg_user_id: int = Depends(get_current_tg_user_id),
-):
-    """Получить всех врагов из библиотеки кампании (GM only)"""
-    campaign = crud.get_campaign(db, campaign_id)
-    if not campaign:
-        raise HTTPException(status_code=404, detail="Кампания не найдена")
-    
-    if campaign.owner_id != tg_user_id:
-        raise HTTPException(status_code=403, detail="Только GM может просматривать библиотеку")
-    
-    enemies = crud.get_enemies_by_campaign(db, campaign_id)
+    enemies = crud.get_enemy_templates_from_past_encounters(db, campaign_id)
     
     result = []
     for e in enemies:
@@ -341,44 +300,17 @@ def list_enemies_api(
             attacks_data = json.loads(e.attacks)
             attacks = [schemas.Attack(**a) for a in attacks_data]
         
-        result.append(schemas.Enemy(
-            id=e.id,
-            campaign_id=e.campaign_id,
-            name=e.name,
-            max_hp=e.max_hp,
-            ac=e.ac,
-            initiative_modifier=e.initiative_modifier,
-            attacks=attacks,
-            created_at=e.created_at
-        ))
+        result.append({
+            "id": e.id,
+            "name": e.name,
+            "max_hp": e.max_hp,
+            "ac": e.ac,
+            "initiative_modifier": e.initiative_total - 10,  # Примерный модификатор
+            "attacks": attacks,
+            "type": e.type.value
+        })
     
     return result
-
-
-@app.delete("/campaigns/{campaign_id}/enemies/{enemy_id}")
-def delete_enemy_api(
-    campaign_id: int,
-    enemy_id: int,
-    db: Session = Depends(get_db),
-    tg_user_id: int = Depends(get_current_tg_user_id),
-):
-    """Удалить врага из библиотеки (GM only)"""
-    campaign = crud.get_campaign(db, campaign_id)
-    if not campaign:
-        raise HTTPException(status_code=404, detail="Кампания не найдена")
-    
-    if campaign.owner_id != tg_user_id:
-        raise HTTPException(status_code=403, detail="Только GM может удалять врагов")
-    
-    enemy = crud.get_enemy(db, enemy_id)
-    if not enemy or enemy.campaign_id != campaign_id:
-        raise HTTPException(status_code=404, detail="Враг не найден")
-    
-    success = crud.delete_enemy(db, enemy_id)
-    if not success:
-        raise HTTPException(status_code=400, detail="Не удалось удалить")
-    
-    return {"status": "deleted"}
 
 
 # ----- ENCOUNTERS API -----
@@ -540,9 +472,20 @@ def participant_hp_change(
     db: Session = Depends(get_db),
     tg_user_id: int = Depends(get_current_tg_user_id),
 ):
-    participant = crud.change_hp(db, participant_id, data.delta)
+    """
+    Изменить HP участника.
+    Для групп: нужно указать group_index.
+    """
+    participant = crud.change_hp(db, participant_id, data.delta, data.group_index)
     if participant is None:
         raise HTTPException(status_code=404, detail="Participant not found")
+    
+    # Для групп возвращаем HP из массива
+    if participant.type == models.ParticipantType.npc_group and participant.hp_array:
+        hp_list = json.loads(participant.hp_array)
+        current_hp = hp_list[data.group_index] if data.group_index is not None and data.group_index < len(hp_list) else None
+        return {"status": "ok", "participant_id": participant_id, "current_hp": current_hp, "group_index": data.group_index}
+    
     return {"status": "ok", "participant_id": participant_id, "current_hp": participant.current_hp}
 
 
