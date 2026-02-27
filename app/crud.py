@@ -49,76 +49,6 @@ def create_campaign(db: Session, campaign: schemas.CampaignCreate, owner_id: int
     return db_campaign
 
 
-# ----- ENEMIES (LIBRARY) -----
-
-def create_enemy(db: Session, enemy: schemas.EnemyCreate):
-    """Создать врага в библиотеке кампании"""
-    attacks_json = None
-    if enemy.attacks:
-        attacks_json = json.dumps([a.dict() for a in enemy.attacks])
-    
-    db_enemy = models.Enemy(
-        campaign_id=enemy.campaign_id,
-        name=enemy.name,
-        max_hp=enemy.max_hp,
-        ac=enemy.ac,
-        initiative_modifier=enemy.initiative_modifier,
-        attacks=attacks_json,
-    )
-    db.add(db_enemy)
-    db.commit()
-    db.refresh(db_enemy)
-    return db_enemy
-
-
-def get_enemies_by_campaign(db: Session, campaign_id: int):
-    """Получить всех врагов кампании"""
-    return (
-        db.query(models.Enemy)
-        .filter(models.Enemy.campaign_id == campaign_id)
-        .order_by(models.Enemy.created_at.desc())
-        .all()
-    )
-
-
-def get_enemy(db: Session, enemy_id: int):
-    """Получить врага по ID"""
-    return db.query(models.Enemy).filter(models.Enemy.id == enemy_id).first()
-
-
-def update_enemy(db: Session, enemy_id: int, enemy_update: schemas.EnemyUpdate):
-    """Обновить врага"""
-    db_enemy = get_enemy(db, enemy_id)
-    if not db_enemy:
-        return None
-
-    if enemy_update.name is not None:
-        db_enemy.name = enemy_update.name
-    if enemy_update.max_hp is not None:
-        db_enemy.max_hp = enemy_update.max_hp
-    if enemy_update.ac is not None:
-        db_enemy.ac = enemy_update.ac
-    if enemy_update.initiative_modifier is not None:
-        db_enemy.initiative_modifier = enemy_update.initiative_modifier
-    if enemy_update.attacks is not None:
-        attacks_json = json.dumps([a.dict() for a in enemy_update.attacks])
-        db_enemy.attacks = attacks_json
-
-    db.commit()
-    db.refresh(db_enemy)
-    return db_enemy
-
-
-def delete_enemy(db: Session, enemy_id: int):
-    """Удалить врага"""
-    db_enemy = get_enemy(db, enemy_id)
-    if not db_enemy:
-        return False
-    db.delete(db_enemy)
-    db.commit()
-    return True
-
-
 # ----- CHARACTERS -----
 
 
@@ -305,7 +235,7 @@ def _get_next_group_id(db: Session, encounter_id: int) -> int:
     return 1
 
 
-# ----- НОВОЕ: Добавление участников в активную схватку -----
+# ----- Добавление участников в активную схватку -----
 
 def add_participants_to_active_encounter(
     db: Session,
@@ -313,7 +243,7 @@ def add_participants_to_active_encounter(
     participants_data: schemas.AddParticipantsToActiveEncounter,
 ):
     """
-    Добавляет новых участников в активную схватку.
+    Добавляет новых участников в активную схватку используя шаблоны мобов.
     Новые участники вставляются в порядок ходов согласно инициативе.
     """
     import random
@@ -328,44 +258,42 @@ def add_participants_to_active_encounter(
     if not state:
         return None
 
-    # 1) Из библиотеки
-    for lib in participants_data.from_library:
-        enemy = get_enemy(db, lib.enemy_id)
-        if not enemy:
-            continue
+    # 1) Добавление мобов из шаблонов
+    for template in participants_data.from_templates:
+        # Сериализуем атаки
+        attacks_json = None
+        if template.attacks:
+            attacks_json = json.dumps([a.dict() for a in template.attacks])
         
-        # Десериализуем атаки
-        attacks_json = enemy.attacks
-        
-        if lib.count == 1:
+        if template.count == 1:
             # Уникальный моб
-            roll = random.randint(1, 20) + enemy.initiative_modifier
+            roll = random.randint(1, 20) + template.initiative_mod
             db_part = models.Participant(
                 encounter_id=encounter_id,
                 type=models.ParticipantType.npc_unique,
                 character_id=None,
-                name=enemy.name,
-                max_hp=enemy.max_hp,
-                current_hp=enemy.max_hp,
-                ac=enemy.ac,
+                name=template.name,
+                max_hp=template.max_hp,
+                current_hp=template.max_hp,
+                ac=template.ac,
                 initiative_total=roll,
                 is_enemy=True,
                 attacks=attacks_json,
             )
             db.add(db_part)
         else:
-            # Группа
+            # Группа мобов
             group_id = _get_next_group_id(db, encounter_id)
-            for i in range(lib.count):
-                roll = random.randint(1, 20) + enemy.initiative_modifier
+            for i in range(template.count):
+                roll = random.randint(1, 20) + template.initiative_mod
                 db_part = models.Participant(
                     encounter_id=encounter_id,
                     type=models.ParticipantType.npc_group,
                     character_id=None,
-                    name=f"{enemy.name} #{i+1}",
-                    max_hp=enemy.max_hp,
-                    current_hp=enemy.max_hp,
-                    ac=enemy.ac,
+                    name=f"{template.name} #{i+1}",
+                    max_hp=template.max_hp,
+                    current_hp=template.max_hp,
+                    ac=template.ac,
                     initiative_total=roll,
                     is_enemy=True,
                     group_id=group_id,
