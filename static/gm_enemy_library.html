@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>Библиотека врагов</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      --bg: #000000;
+      --surface: #070707;
+      --surface2: #0b0b0b;
+      --stroke: #242424;
+      --stroke2: #303030;
+      --text: #f8fafc;
+      --muted: rgba(248, 250, 252, .66);
+      --accent: #fbbf24;
+      --accent2: #f59e0b;
+      --onAccent: #111827;
+      --danger: #ef4444;
+      --danger2: #991b1b;
+    }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 14px 14px 100px;
+    }
+    .top-card {
+      background: linear-gradient(180deg, #060606, #000000);
+      border: 1px solid rgba(251, 191, 36, .55);
+      border-radius: 14px;
+      padding: 12px 14px;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, .6), 0 10px 30px rgba(0, 0, 0, .55);
+      margin-bottom: 20px;
+    }
+    .top-title { color: var(--accent); font-weight: 900; font-size: 20px; }
+    .top-sub { color: var(--muted); margin-top: 4px; font-size: 13px; }
+    .section-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.10em; opacity: 0.7; margin: 20px 2px 12px; }
+    .list { display: flex; flex-direction: column; gap: 10px; }
+    .card {
+      padding: 14px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, var(--surface), var(--surface2));
+      border: 1px solid var(--stroke);
+      position: relative;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .card-title { font-size: 16px; font-weight: 900; }
+    .card-stats { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .delete-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--danger);
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .delete-btn:active { transform: scale(0.98); }
+    .bottom-bar {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      background: rgba(2, 6, 23, .92);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--stroke);
+      z-index: 1500;
+    }
+    .bottom-row { display: flex; gap: 10px; }
+    .btn {
+      flex: 1;
+      height: 52px;
+      border-radius: 16px;
+      border: 1px solid #0f172a;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: var(--onAccent);
+    }
+    .btn.secondary {
+      background: linear-gradient(135deg, #2a2a2a, #1d1d1d);
+      color: var(--text);
+      border: 1px solid var(--stroke2);
+    }
+    .btn:active { transform: scale(0.99); }
+    .modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+      padding: 20px;
+    }
+    .modal.show { display: flex; }
+    .modal-content {
+      background: linear-gradient(180deg, #0a0a0a, #000000);
+      border: 1px solid rgba(251, 191, 36, .45);
+      border-radius: 20px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    .modal-header {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .modal-form-group { margin-bottom: 14px; }
+    .modal-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: block;
+    }
+    .modal-input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--stroke2);
+      background: var(--surface2);
+      color: var(--text);
+      font-size: 14px;
+      font-family: var(--font);
+    }
+    .modal-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .modal-btn {
+      flex: 1;
+      height: 48px;
+      border-radius: 14px;
+      border: none;
+      font-weight: 900;
+      font-size: 13px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .modal-btn.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: var(--onAccent);
+    }
+    .modal-btn.secondary {
+      background: linear-gradient(135deg, #2a2a2a, #1d1d1d);
+      color: var(--text);
+      border: 1px solid var(--stroke2);
+    }
+    .modal-btn:active { transform: scale(0.98); }
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .toast {
+      position: fixed; left: 50%; bottom: 18px;
+      transform: translateX(-50%) translateY(20px);
+      min-width: 220px; max-width: 90vw;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid #78350f;
+      color: #f9fafb;
+      font-size: 12px;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+      z-index: 2500;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+  <div class="top-card">
+    <div class="top-title">📚 Библиотека врагов</div>
+    <div class="top-sub" id="campaignName">Загрузка...</div>
+  </div>
+
+  <div class="section-title">Шаблоны врагов</div>
+  <div id="enemyList" class="list"></div>
+
+  <div class="bottom-bar">
+    <div class="bottom-row">
+      <button id="addEnemyBtn" class="btn primary">➕ Добавить врага</button>
+      <button id="backBtn" class="btn secondary">← Назад</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- Модальное окно -->
+  <div id="enemyModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">➕ Новый враг</div>
+      
+      <div class="modal-form-group">
+        <label class="modal-label">Имя</label>
+        <input type="text" id="enemyName" class="modal-input" placeholder="Например: Гоблин" />
+      </div>
+      
+      <div class="modal-form-group">
+        <label class="modal-label">Max HP</label>
+        <input type="number" id="enemyMaxHP" class="modal-input" value="20" min="1" />
+      </div>
+      
+      <div class="modal-form-group">
+        <label class="modal-label">КД (AC)</label>
+        <input type="number" id="enemyAC" class="modal-input" value="12" min="1" />
+      </div>
+      
+      <div class="modal-form-group">
+        <label class="modal-label">Модификатор инициативы</label>
+        <input type="number" id="enemyInitMod" class="modal-input" value="0" />
+      </div>
+      
+      <div class="modal-actions">
+        <button id="modalCancelBtn" class="modal-btn secondary">Отмена</button>
+        <button id="modalSaveBtn" class="modal-btn primary">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    function authHeaders() {
+      const initData = tg?.initData || "";
+      return initData ? { "Authorization": "tma " + initData } : {};
+    }
+    const API_BASE = "";
+    const urlParams = new URLSearchParams(window.location.search);
+    let campaignId = urlParams.get("campaign_id") || urlParams.get("tgWebAppStartParam");
+    if (!campaignId && tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) {
+      campaignId = tg.initDataUnsafe.start_param;
+    }
+
+    let enemies = [];
+    let campaignName = '';
+
+    async function apiGet(path) {
+      const res = await fetch(API_BASE + path, { headers: { ...authHeaders() } });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return await res.json();
+    }
+
+    async function apiPost(path, body) {
+      const res = await fetch(API_BASE + path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeaders() },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return await res.json();
+    }
+
+    async function apiDelete(path) {
+      const res = await fetch(API_BASE + path, {
+        method: "DELETE",
+        headers: { ...authHeaders() }
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return await res.json();
+    }
+
+    async function loadCampaign() {
+      if (!campaignId) {
+        document.getElementById('campaignName').innerText = 'Campaign ID не указан';
+        return;
+      }
+      try {
+        const campaign = await apiGet(`/campaigns/${campaignId}`);
+        campaignName = campaign.name;
+        document.getElementById('campaignName').innerText = `Кампания: ${campaignName}`;
+      } catch (e) {
+        console.error('Error loading campaign:', e);
+        document.getElementById('campaignName').innerText = 'Ошибка загрузки';
+      }
+    }
+
+    async function loadEnemies() {
+      if (!campaignId) return;
+      try {
+        enemies = await apiGet(`/campaigns/${campaignId}/enemies`);
+        renderEnemies();
+      } catch (e) {
+        console.error('Error loading enemies:', e);
+        showToast('Ошибка загрузки');
+      }
+    }
+
+    function renderEnemies() {
+      const container = document.getElementById('enemyList');
+      
+      if (enemies.length === 0) {
+        container.innerHTML = '<div class="empty-state">📭 Библиотека пуста<br>Добавьте первого врага</div>';
+        return;
+      }
+
+      container.innerHTML = '';
+      enemies.forEach(enemy => {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const header = document.createElement('div');
+        header.className = 'card-header';
+
+        const left = document.createElement('div');
+        left.style.flex = '1';
+
+        const title = document.createElement('div');
+        title.className = 'card-title';
+        title.textContent = enemy.name;
+
+        const stats = document.createElement('div');
+        stats.className = 'card-stats';
+        stats.textContent = `HP: ${enemy.max_hp} | КД: ${enemy.ac} | Иниц.: +${enemy.initiative_modifier}`;
+
+        left.appendChild(title);
+        left.appendChild(stats);
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.textContent = '🗑️ Удалить';
+        deleteBtn.onclick = () => deleteEnemy(enemy.id);
+
+        header.appendChild(left);
+        header.appendChild(deleteBtn);
+        card.appendChild(header);
+        container.appendChild(card);
+      });
+    }
+
+    async function deleteEnemy(enemyId) {
+      if (!confirm('Удалить этого врага из библиотеки?')) return;
+      try {
+        await apiDelete(`/campaigns/${campaignId}/enemies/${enemyId}`);
+        showToast('Удалено');
+        await loadEnemies();
+      } catch (e) {
+        console.error('Error deleting enemy:', e);
+        showToast('Ошибка удаления');
+      }
+    }
+
+    // Модальное окно
+    const enemyModal = document.getElementById('enemyModal');
+    const addEnemyBtn = document.getElementById('addEnemyBtn');
+    const modalCancelBtn = document.getElementById('modalCancelBtn');
+    const modalSaveBtn = document.getElementById('modalSaveBtn');
+
+    addEnemyBtn.onclick = () => {
+      document.getElementById('enemyName').value = '';
+      document.getElementById('enemyMaxHP').value = '20';
+      document.getElementById('enemyAC').value = '12';
+      document.getElementById('enemyInitMod').value = '0';
+      enemyModal.classList.add('show');
+    };
+
+    modalCancelBtn.onclick = () => {
+      enemyModal.classList.remove('show');
+    };
+
+    modalSaveBtn.onclick = async () => {
+      const name = document.getElementById('enemyName').value.trim();
+      const maxHP = parseInt(document.getElementById('enemyMaxHP').value, 10);
+      const ac = parseInt(document.getElementById('enemyAC').value, 10);
+      const initMod = parseInt(document.getElementById('enemyInitMod').value, 10);
+
+      if (!name) {
+        alert('Введите имя врага');
+        return;
+      }
+
+      try {
+        showToast('Сохранение...');
+        await apiPost(`/campaigns/${campaignId}/enemies`, {
+          campaign_id: parseInt(campaignId, 10),
+          name: name,
+          max_hp: maxHP,
+          ac: ac,
+          initiative_modifier: initMod
+        });
+        enemyModal.classList.remove('show');
+        showToast('Враг добавлен!');
+        await loadEnemies();
+      } catch (e) {
+        console.error('Error creating enemy:', e);
+        showToast('Ошибка сохранения');
+      }
+    };
+
+    document.getElementById('backBtn').onclick = () => {
+      window.location.href = `/static/gm_campaigns.html`;
+    };
+
+    let toastTimeout = null;
+    function showToast(text) {
+      const el = document.getElementById("toast");
+      if (!el) return;
+      el.innerText = text;
+      el.classList.add("show");
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => el.classList.remove("show"), 2200);
+    }
+
+    if (tg && tg.ready) tg.ready();
+    loadCampaign();
+    loadEnemies();
+  </script>
+</body>
+</html>
