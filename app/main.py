@@ -12,10 +12,19 @@ from .deps import get_current_tg_user_id
 from sqlalchemy.orm import joinedload
 import json
 
+# Импортируем модели справочника для создания таблиц
+from .models_reference import ReferenceSpell, ReferenceItem, ReferenceCreature
+
+# Импортируем роутер справочника
+from .routers import reference
+
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+# Подключаем роутер справочника
+app.include_router(reference.router)
 
 
 @app.get("/health")
