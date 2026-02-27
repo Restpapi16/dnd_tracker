@@ -103,6 +103,37 @@ class InviteJoinRequest(BaseModel):
     invite_token: str
 
 
+# ----- НОВОЕ: Библиотека врагов -----
+
+class EnemyBase(BaseModel):
+    name: str
+    max_hp: int
+    ac: int
+    initiative_modifier: int = 0
+    attacks: Optional[List[Attack]] = None
+
+
+class EnemyCreate(EnemyBase):
+    campaign_id: int
+
+
+class Enemy(EnemyBase):
+    id: int
+    campaign_id: int
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class EnemyUpdate(BaseModel):
+    name: Optional[str] = None
+    max_hp: Optional[int] = None
+    ac: Optional[int] = None
+    initiative_modifier: Optional[int] = None
+    attacks: Optional[List[Attack]] = None
+
+
 # ----- Персонажи (игроки кампании) -----
 
 class CharacterBase(BaseModel):
@@ -287,8 +318,15 @@ class EncounterParticipantsCreate(BaseModel):
 
 # ----- НОВОЕ: схема для добавления участников в активную схватку -----
 
+class AddParticipantsFromLibrary(BaseModel):
+    """Добавление врагов из библиотеки"""
+    enemy_id: int
+    count: int = 1
+
+
 class AddParticipantsToActiveEncounter(BaseModel):
     """Схема для добавления новых участников во время боя"""
+    from_library: List[AddParticipantsFromLibrary] = []
     unique_monsters: List[UniqueMonsterInput] = []
     group_monsters: List[GroupMonsterInput] = []
 
