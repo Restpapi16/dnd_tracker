@@ -36,6 +36,7 @@ class Campaign(Base):
     encounters = relationship("Encounter", back_populates="campaign")
     members = relationship("CampaignMember", back_populates="campaign", cascade="all, delete-orphan")
     invites = relationship("CampaignInvite", back_populates="campaign", cascade="all, delete-orphan")
+    enemies = relationship("Enemy", back_populates="campaign", cascade="all, delete-orphan")
 
 
 class CampaignMember(Base):
@@ -75,6 +76,22 @@ class Character(Base):
     base_initiative = Column(Integer, nullable=False)
 
     campaign = relationship("Campaign", back_populates="characters")
+
+
+# НОВАЯ МОДЕЛЬ: Библиотека врагов кампании
+class Enemy(Base):
+    __tablename__ = "enemies"
+
+    id = Column(Integer, primary_key=True, index=True)
+    campaign_id = Column(Integer, ForeignKey("campaigns.id"), nullable=False, index=True)
+    name = Column(String, nullable=False)
+    max_hp = Column(Integer, nullable=False)
+    ac = Column(Integer, nullable=False)
+    initiative_modifier = Column(Integer, nullable=False, default=0)
+    attacks = Column(Text, nullable=True)  # JSON массив атак
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    campaign = relationship("Campaign", back_populates="enemies")
 
 
 class Encounter(Base):
