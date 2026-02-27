@@ -104,7 +104,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
     
-    /* Эффект битого стекла */
     .card::before {
       content: '';
       position: absolute;
@@ -119,19 +118,16 @@
       background-size: 100% 100%;
     }
     
-    /* 50% HP - один удар (правый верхний угол) */
     .card.wounded-50::before {
       opacity: 0.6;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 100'%3E%3Cg%3E%3Ccircle cx='240' cy='20' r='3' fill='%23dc2626' opacity='0.8'/%3E%3Cline x1='240' y1='20' x2='260' y2='10' stroke='%239a0000' stroke-width='1.2' opacity='0.7'/%3E%3Cline x1='240' y1='20' x2='270' y2='25' stroke='%239a0000' stroke-width='1' opacity='0.6'/%3E%3Cline x1='240' y1='20' x2='265' y2='35' stroke='%23a00000' stroke-width='0.9' opacity='0.6'/%3E%3Cline x1='240' y1='20' x2='230' y2='10' stroke='%239a0000' stroke-width='1.1' opacity='0.6'/%3E%3Cline x1='240' y1='20' x2='220' y2='15' stroke='%23a00000' stroke-width='0.9' opacity='0.5'/%3E%3Cline x1='240' y1='20' x2='235' y2='35' stroke='%239a0000' stroke-width='1' opacity='0.6'/%3E%3Cline x1='240' y1='20' x2='225' y2='30' stroke='%23a00000' stroke-width='0.8' opacity='0.5'/%3E%3Cline x1='240' y1='20' x2='245' y2='40' stroke='%239a0000' stroke-width='0.9' opacity='0.5'/%3E%3Cline x1='240' y1='20' x2='255' y2='45' stroke='%23a00000' stroke-width='0.8' opacity='0.5'/%3E%3C/g%3E%3C/svg%3E");
     }
     
-    /* 25% HP - два удара (правый верх + левый низ) */
     .card.wounded-25::before {
       opacity: 0.7;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 100'%3E%3Cg%3E%3Ccircle cx='240' cy='20' r='3' fill='%23dc2626' opacity='0.9'/%3E%3Cline x1='240' y1='20' x2='265' y2='8' stroke='%238b0000' stroke-width='1.4' opacity='0.8'/%3E%3Cline x1='240' y1='20' x2='275' y2='22' stroke='%238b0000' stroke-width='1.2' opacity='0.7'/%3E%3Cline x1='240' y1='20' x2='270' y2='38' stroke='%239a0000' stroke-width='1.1' opacity='0.7'/%3E%3Cline x1='240' y1='20' x2='225' y2='8' stroke='%238b0000' stroke-width='1.3' opacity='0.7'/%3E%3Cline x1='240' y1='20' x2='215' y2='15' stroke='%239a0000' stroke-width='1.1' opacity='0.6'/%3E%3Cline x1='240' y1='20' x2='230' y2='38' stroke='%238b0000' stroke-width='1.2' opacity='0.7'/%3E%3Cline x1='240' y1='20' x2='220' y2='32' stroke='%239a0000' stroke-width='1' opacity='0.6'/%3E%3Cline x1='240' y1='20' x2='245' y2='42' stroke='%238b0000' stroke-width='1.1' opacity='0.6'/%3E%3Cline x1='240' y1='20' x2='258' y2='48' stroke='%239a0000' stroke-width='1' opacity='0.6'/%3E%3Cline x1='240' y1='20' x2='210' y2='25' stroke='%239a0000' stroke-width='0.9' opacity='0.5'/%3E%3Cline x1='240' y1='20' x2='280' y2='32' stroke='%239a0000' stroke-width='0.9' opacity='0.5'/%3E%3C/g%3E%3Cg%3E%3Ccircle cx='60' cy='75' r='3' fill='%23dc2626' opacity='0.9'/%3E%3Cline x1='60' y1='75' x2='40' y2='68' stroke='%238b0000' stroke-width='1.3' opacity='0.8'/%3E%3Cline x1='60' y1='75' x2='30' y2='75' stroke='%238b0000' stroke-width='1.2' opacity='0.7'/%3E%3Cline x1='60' y1='75' x2='35' y2='85' stroke='%239a0000' stroke-width='1.1' opacity='0.7'/%3E%3Cline x1='60' y1='75' x2='75' y2='65' stroke='%238b0000' stroke-width='1.2' opacity='0.7'/%3E%3Cline x1='60' y1='75' x2='85' y2='70' stroke='%239a0000' stroke-width='1' opacity='0.6'/%3E%3Cline x1='60' y1='75' x2='70' y2='88' stroke='%238b0000' stroke-width='1.1' opacity='0.7'/%3E%3Cline x1='60' y1='75' x2='80' y2='82' stroke='%239a0000' stroke-width='1' opacity='0.6'/%3E%3Cline x1='60' y1='75' x2='50' y2='90' stroke='%238b0000' stroke-width='1' opacity='0.6'/%3E%3Cline x1='60' y1='75' x2='45' y2='55' stroke='%239a0000' stroke-width='0.9' opacity='0.6'/%3E%3Cline x1='60' y1='75' x2='90' y2='78' stroke='%239a0000' stroke-width='0.9' opacity='0.5'/%3E%3Cline x1='60' y1='75' x2='25' y2='65' stroke='%239a0000' stroke-width='0.8' opacity='0.5'/%3E%3C/g%3E%3C/svg%3E");
     }
     
-    /* 10% HP - три удара (правый верх + левый низ + центр) + пульсация */
     .card.wounded-10::before {
       opacity: 0.85;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 100'%3E%3Cg%3E%3Ccircle cx='240' cy='18' r='4' fill='%23dc2626' opacity='1'/%3E%3Cline x1='240' y1='18' x2='268' y2='5' stroke='%237a0000' stroke-width='1.6' opacity='0.9'/%3E%3Cline x1='240' y1='18' x2='280' y2='20' stroke='%237a0000' stroke-width='1.4' opacity='0.85'/%3E%3Cline x1='240' y1='18' x2='275' y2='38' stroke='%238b0000' stroke-width='1.3' opacity='0.8'/%3E%3Cline x1='240' y1='18' x2='220' y2='5' stroke='%237a0000' stroke-width='1.5' opacity='0.85'/%3E%3Cline x1='240' y1='18' x2='210' y2='12' stroke='%238b0000' stroke-width='1.3' opacity='0.75'/%3E%3Cline x1='240' y1='18' x2='225' y2='38' stroke='%237a0000' stroke-width='1.4' opacity='0.8'/%3E%3Cline x1='240' y1='18' x2='215' y2='30' stroke='%238b0000' stroke-width='1.2' opacity='0.7'/%3E%3Cline x1='240' y1='18' x2='245' y2='45' stroke='%237a0000' stroke-width='1.3' opacity='0.75'/%3E%3Cline x1='240' y1='18' x2='260' y2='50' stroke='%238b0000' stroke-width='1.2' opacity='0.7'/%3E%3Cline x1='240' y1='18' x2='205' y2='22' stroke='%238b0000' stroke-width='1.1' opacity='0.65'/%3E%3Cline x1='240' y1='18' x2='285' y2='30' stroke='%238b0000' stroke-width='1.1' opacity='0.65'/%3E%3Cline x1='268' y1='5' x2='280' y2='0' stroke='%238b0000' stroke-width='0.8' opacity='0.6'/%3E%3Cline x1='220' y1='5' x2='208' y2='0' stroke='%238b0000' stroke-width='0.8' opacity='0.6'/%3E%3C/g%3E%3Cg%3E%3Ccircle cx='55' cy='78' r='4' fill='%23dc2626' opacity='1'/%3E%3Cline x1='55' y1='78' x2='32' y2='68' stroke='%237a0000' stroke-width='1.5' opacity='0.9'/%3E%3Cline x1='55' y1='78' x2='25' y2='75' stroke='%237a0000' stroke-width='1.4' opacity='0.85'/%3E%3Cline x1='55' y1='78' x2='30' y2='88' stroke='%238b0000' stroke-width='1.3' opacity='0.8'/%3E%3Cline x1='55' y1='78' x2='75' y2='65' stroke='%237a0000' stroke-width='1.4' opacity='0.85'/%3E%3Cline x1='55' y1='78' x2='88' y2='70' stroke='%238b0000' stroke-width='1.3' opacity='0.75'/%3E%3Cline x1='55' y1='78' x2='68' y2='90' stroke='%237a0000' stroke-width='1.3' opacity='0.8'/%3E%3Cline x1='55' y1='78' x2='82' y2='85' stroke='%238b0000' stroke-width='1.2' opacity='0.7'/%3E%3Cline x1='55' y1='78' x2='48' y2='95' stroke='%237a0000' stroke-width='1.2' opacity='0.75'/%3E%3Cline x1='55' y1='78' x2='42' y2='55' stroke='%238b0000' stroke-width='1.2' opacity='0.7'/%3E%3Cline x1='55' y1='78' x2='95' y2='80' stroke='%238b0000' stroke-width='1.1' opacity='0.65'/%3E%3Cline x1='55' y1='78' x2='20' y2='65' stroke='%238b0000' stroke-width='1' opacity='0.6'/%3E%3Cline x1='32' y1='68' x2='22' y2='60' stroke='%238b0000' stroke-width='0.8' opacity='0.6'/%3E%3Cline x1='75' y1='65' x2='85' y2='55' stroke='%238b0000' stroke-width='0.8' opacity='0.6'/%3E%3C/g%3E%3Cg%3E%3Ccircle cx='150' cy='45' r='4' fill='%23dc2626' opacity='1'/%3E%3Cline x1='150' y1='45' x2='170' y2='30' stroke='%237a0000' stroke-width='1.5' opacity='0.85'/%3E%3Cline x1='150' y1='45' x2='180' y2='42' stroke='%237a0000' stroke-width='1.4' opacity='0.8'/%3E%3Cline x1='150' y1='45' x2='175' y2='60' stroke='%238b0000' stroke-width='1.3' opacity='0.75'/%3E%3Cline x1='150' y1='45' x2='130' y2='30' stroke='%237a0000' stroke-width='1.4' opacity='0.8'/%3E%3Cline x1='150' y1='45' x2='120' y2='40' stroke='%238b0000' stroke-width='1.3' opacity='0.75'/%3E%3Cline x1='150' y1='45' x2='135' y2='62' stroke='%237a0000' stroke-width='1.3' opacity='0.75'/%3E%3Cline x1='150' y1='45' x2='125' y2='55' stroke='%238b0000' stroke-width='1.2' opacity='0.7'/%3E%3Cline x1='150' y1='45' x2='155' y2='68' stroke='%237a0000' stroke-width='1.2' opacity='0.7'/%3E%3Cline x1='150' y1='45' x2='165' y2='70' stroke='%238b0000' stroke-width='1.1' opacity='0.65'/%3E%3Cline x1='150' y1='45' x2='115' y2='48' stroke='%238b0000' stroke-width='1.1' opacity='0.65'/%3E%3Cline x1='150' y1='45' x2='185' y2='52' stroke='%238b0000' stroke-width='1' opacity='0.6'/%3E%3Cline x1='150' y1='45' x2='145' y2='25' stroke='%238b0000' stroke-width='1.1' opacity='0.65'/%3E%3Cline x1='170' y1='30' x2='182' y2='22' stroke='%239a0000' stroke-width='0.8' opacity='0.6'/%3E%3Cline x1='130' y1='30' x2='118' y2='22' stroke='%239a0000' stroke-width='0.8' opacity='0.6'/%3E%3C/g%3E%3C/svg%3E");
@@ -257,6 +253,70 @@
       color: var(--accent);
       margin-bottom: 16px;
     }
+    
+    /* Вкладки */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--stroke);
+    }
+    .tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* Список врагов */
+    .enemy-list {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 16px;
+    }
+    .enemy-item {
+      padding: 12px;
+      margin-bottom: 8px;
+      background: var(--surface);
+      border: 1px solid var(--stroke);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .enemy-item:hover {
+      background: var(--surface2);
+      border-color: var(--accent);
+    }
+    .enemy-item.selected {
+      background: rgba(251, 191, 36, 0.12);
+      border-color: var(--accent);
+    }
+    .enemy-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .enemy-stats {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    
     .modal-form-group {
       margin-bottom: 14px;
     }
@@ -352,26 +412,46 @@
   <div id="addModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">➤ Добавить участников</div>
-      <div class="modal-form-group">
-        <label class="modal-label">Имя</label>
-        <input type="text" id="modalName" class="modal-input" placeholder="Например: Гоблин" />
+      
+      <!-- Вкладки -->
+      <div class="tabs">
+        <div class="tab active" data-tab="library">📚 Из библиотеки</div>
+        <div class="tab" data-tab="new">✨ Новый</div>
       </div>
-      <div class="modal-form-group">
-        <label class="modal-label">Количество</label>
-        <input type="number" id="modalCount" class="modal-input" value="1" min="1" />
+      
+      <!-- Вкладка: Из библиотеки -->
+      <div id="tabLibrary" class="tab-content active">
+        <div id="enemyList" class="enemy-list"></div>
+        <div class="modal-form-group">
+          <label class="modal-label">Количество</label>
+          <input type="number" id="libraryCount" class="modal-input" value="1" min="1" />
+        </div>
       </div>
-      <div class="modal-form-group">
-        <label class="modal-label">Max HP</label>
-        <input type="number" id="modalMaxHP" class="modal-input" value="20" min="1" />
+      
+      <!-- Вкладка: Новый -->
+      <div id="tabNew" class="tab-content">
+        <div class="modal-form-group">
+          <label class="modal-label">Имя</label>
+          <input type="text" id="modalName" class="modal-input" placeholder="Например: Гоблин" />
+        </div>
+        <div class="modal-form-group">
+          <label class="modal-label">Количество</label>
+          <input type="number" id="modalCount" class="modal-input" value="1" min="1" />
+        </div>
+        <div class="modal-form-group">
+          <label class="modal-label">Max HP</label>
+          <input type="number" id="modalMaxHP" class="modal-input" value="20" min="1" />
+        </div>
+        <div class="modal-form-group">
+          <label class="modal-label">КД (AC)</label>
+          <input type="number" id="modalAC" class="modal-input" value="12" min="1" />
+        </div>
+        <div class="modal-form-group">
+          <label class="modal-label">Модификатор инициативы</label>
+          <input type="number" id="modalInitMod" class="modal-input" value="0" />
+        </div>
       </div>
-      <div class="modal-form-group">
-        <label class="modal-label">КД (AC)</label>
-        <input type="number" id="modalAC" class="modal-input" value="12" min="1" />
-      </div>
-      <div class="modal-form-group">
-        <label class="modal-label">Модификатор инициативы</label>
-        <input type="number" id="modalInitMod" class="modal-input" value="0" />
-      </div>
+      
       <div class="modal-actions">
         <button id="modalCancelBtn" class="modal-btn secondary">Отмена</button>
         <button id="modalAddBtn" class="modal-btn primary">Добавить</button>
@@ -393,11 +473,9 @@
     }
     if (!encounterId) document.getElementById("statusLine").innerText = "Нет encounter_id";
     
-    // Observer mode state
     let observerMode = localStorage.getItem('gm_observer_mode') === 'true';
     const observerToggle = document.getElementById('observerToggle');
     
-    // Toggle observer mode
     observerToggle.onclick = () => {
       observerMode = !observerMode;
       localStorage.setItem('gm_observer_mode', observerMode);
@@ -414,7 +492,12 @@
     }
     
     let currentState = null;
+    let campaignId = null;
     let selectedParticipantId = null;
+    let enemies = [];
+    let selectedEnemyId = null;
+    let currentTab = 'library';
+    
     async function apiGet(path) {
       const res = await fetch(API_BASE + path, { headers: { ...authHeaders() } });
       if (!res.ok) throw new Error("HTTP " + res.status);
@@ -429,6 +512,7 @@
       if (!res.ok) throw new Error("HTTP " + res.status);
       return await res.json();
     }
+    
     function formatDamage(numDice, dieSize, bonus) {
       let result = '';
       if (numDice > 0 && dieSize > 0) {
@@ -441,12 +525,14 @@
       }
       return result;
     }
+    
     async function loadState() {
       if (!encounterId) return;
       setFlavorStatus("loading_state");
       try {
         const state = await apiGet(`/encounters/${encounterId}/state?role=gm`);
         currentState = state;
+        campaignId = state.campaign_id;
         renderState();
         clearStatus();
       } catch (e) {
@@ -454,6 +540,49 @@
         setFlavorStatus("error_state");
       }
     }
+    
+    async function loadEnemies() {
+      if (!campaignId) return;
+      try {
+        enemies = await apiGet(`/campaigns/${campaignId}/enemies`);
+        renderEnemyList();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    
+    function renderEnemyList() {
+      const container = document.getElementById('enemyList');
+      if (enemies.length === 0) {
+        container.innerHTML = '<div style="text-align:center; color: var(--muted); padding: 20px;">Библиотека пуста</div>';
+        return;
+      }
+      
+      container.innerHTML = '';
+      enemies.forEach(enemy => {
+        const item = document.createElement('div');
+        item.className = 'enemy-item';
+        if (selectedEnemyId === enemy.id) item.classList.add('selected');
+        
+        item.onclick = () => {
+          selectedEnemyId = (selectedEnemyId === enemy.id) ? null : enemy.id;
+          renderEnemyList();
+        };
+        
+        const name = document.createElement('div');
+        name.className = 'enemy-name';
+        name.textContent = enemy.name;
+        
+        const stats = document.createElement('div');
+        stats.className = 'enemy-stats';
+        stats.textContent = `HP: ${enemy.max_hp}, КД: ${enemy.ac}, Иниц.: +${enemy.initiative_modifier}`;
+        
+        item.appendChild(name);
+        item.appendChild(stats);
+        container.appendChild(item);
+      });
+    }
+    
     function renderState() {
       if (!currentState) return;
       document.getElementById("encounterName").innerText = currentState.encounter_name ? currentState.encounter_name : `Схватка #${currentState.encounter_id}`;
@@ -473,7 +602,6 @@
         if (!p.is_alive) cardClasses += " dead";
         if (selectedParticipantId === p.id) cardClasses += " selected";
         
-        // Add wound classes in observer mode for enemies
         if (observerMode && p.is_enemy && p.is_alive && p.current_hp !== undefined && p.max_hp !== undefined) {
           const hpPercent = (p.current_hp / p.max_hp) * 100;
           if (hpPercent <= 10) {
@@ -518,7 +646,6 @@
         const right = document.createElement("div");
         right.className = "right";
         
-        // HP display: always show exact numbers, cracks show status
         const hp = document.createElement("div");
         hp.className = "hp" + ((p.max_hp == null || p.current_hp == null) ? " muted" : "");
         if (p.max_hp != null && p.current_hp != null) {
@@ -532,7 +659,6 @@
         mainRow.appendChild(right);
         card.appendChild(mainRow);
         
-        // Hide attacks in observer mode
         if (!observerMode && p.attacks && p.attacks.length > 0) {
           const attacksBlock = document.createElement("div");
           attacksBlock.className = "attacks-block";
@@ -567,6 +693,7 @@
         hpWho.innerText = "HP";
       }
     }
+    
     async function changeHp(participantId, delta) {
       try {
         setFlavorStatus("hp_change");
@@ -577,6 +704,7 @@
         setFlavorStatus("error_hp");
       }
     }
+    
     const hpBarRow = document.getElementById("hpBarRow");
     const hpWho = document.getElementById("hpWho");
     document.querySelectorAll(".hpbtn").forEach(b => {
@@ -586,6 +714,7 @@
         changeHp(selectedParticipantId, d);
       };
     });
+    
     async function nextTurn() {
       if (!encounterId) return;
       try {
@@ -597,6 +726,7 @@
         setFlavorStatus("error_next");
       }
     }
+    
     async function finishEncounter() {
       if (!encounterId) return;
       const ok = confirm("Завершить схватку?");
@@ -617,7 +747,21 @@
     const modalCancelBtn = document.getElementById('modalCancelBtn');
     const modalAddBtn = document.getElementById('modalAddBtn');
     
-    addParticipantBtn.onclick = () => {
+    // Вкладки
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.onclick = () => {
+        const tabName = tab.dataset.tab;
+        currentTab = tabName;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
+      };
+    });
+    
+    addParticipantBtn.onclick = async () => {
+      selectedEnemyId = null;
+      await loadEnemies();
       addModal.classList.add('show');
     };
     
@@ -626,58 +770,86 @@
     };
     
     modalAddBtn.onclick = async () => {
-      const name = document.getElementById('modalName').value.trim();
-      const count = parseInt(document.getElementById('modalCount').value, 10);
-      const maxHP = parseInt(document.getElementById('modalMaxHP').value, 10);
-      const ac = parseInt(document.getElementById('modalAC').value, 10);
-      const initMod = parseInt(document.getElementById('modalInitMod').value, 10);
-      
-      if (!name) {
-        alert('Введите имя');
-        return;
-      }
-      
-      try {
-        showToast('Добавление участников...');
-        
-        const payload = {
-          unique_monsters: [],
-          group_monsters: []
-        };
-        
-        if (count === 1) {
-          payload.unique_monsters.push({
-            name: name,
-            max_hp: maxHP,
-            ac: ac,
-            initiative_mod: initMod,
-            is_enemy: true
-          });
-        } else {
-          payload.group_monsters.push({
-            name: name,
-            count: count,
-            max_hp: maxHP,
-            ac: ac,
-            initiative_mod: initMod,
-            is_enemy: true
-          });
+      if (currentTab === 'library') {
+        if (!selectedEnemyId) {
+          alert('Выберите врага из списка');
+          return;
         }
         
-        await apiPost(`/encounters/${encounterId}/add_participants`, payload);
-        addModal.classList.remove('show');
-        showToast(`Добавлено: ${count} × ${name}`);
-        await loadState();
+        const count = parseInt(document.getElementById('libraryCount').value, 10);
         
-        // Очистка формы
-        document.getElementById('modalName').value = '';
-        document.getElementById('modalCount').value = '1';
-        document.getElementById('modalMaxHP').value = '20';
-        document.getElementById('modalAC').value = '12';
-        document.getElementById('modalInitMod').value = '0';
-      } catch (e) {
-        console.error(e);
-        showToast('Ошибка добавления');
+        try {
+          showToast('Добавление...');
+          
+          const payload = {
+            from_library: [{ enemy_id: selectedEnemyId, count: count }],
+            unique_monsters: [],
+            group_monsters: []
+          };
+          
+          await apiPost(`/encounters/${encounterId}/add_participants`, payload);
+          addModal.classList.remove('show');
+          showToast('Добавлено!');
+          await loadState();
+        } catch (e) {
+          console.error(e);
+          showToast('Ошибка');
+        }
+      } else {
+        // Новый
+        const name = document.getElementById('modalName').value.trim();
+        const count = parseInt(document.getElementById('modalCount').value, 10);
+        const maxHP = parseInt(document.getElementById('modalMaxHP').value, 10);
+        const ac = parseInt(document.getElementById('modalAC').value, 10);
+        const initMod = parseInt(document.getElementById('modalInitMod').value, 10);
+        
+        if (!name) {
+          alert('Введите имя');
+          return;
+        }
+        
+        try {
+          showToast('Добавление...');
+          
+          const payload = {
+            from_library: [],
+            unique_monsters: [],
+            group_monsters: []
+          };
+          
+          if (count === 1) {
+            payload.unique_monsters.push({
+              name: name,
+              max_hp: maxHP,
+              ac: ac,
+              initiative_mod: initMod,
+              is_enemy: true
+            });
+          } else {
+            payload.group_monsters.push({
+              name: name,
+              count: count,
+              max_hp: maxHP,
+              ac: ac,
+              initiative_mod: initMod,
+              is_enemy: true
+            });
+          }
+          
+          await apiPost(`/encounters/${encounterId}/add_participants`, payload);
+          addModal.classList.remove('show');
+          showToast(`Добавлено: ${count} × ${name}`);
+          await loadState();
+          
+          document.getElementById('modalName').value = '';
+          document.getElementById('modalCount').value = '1';
+          document.getElementById('modalMaxHP').value = '20';
+          document.getElementById('modalAC').value = '12';
+          document.getElementById('modalInitMod').value = '0';
+        } catch (e) {
+          console.error(e);
+          showToast('Ошибка');
+        }
       }
     };
     
@@ -686,6 +858,7 @@
     document.getElementById("backToCampaignsBtn").onclick = () => {
       window.location.href = "/static/gm_campaigns.html";
     };
+    
     let toastTimeout = null;
     function showToast(text) {
       const el = document.getElementById("toast");
