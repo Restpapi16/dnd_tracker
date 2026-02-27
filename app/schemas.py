@@ -103,37 +103,6 @@ class InviteJoinRequest(BaseModel):
     invite_token: str
 
 
-# ----- НОВОЕ: Библиотека врагов -----
-
-class EnemyBase(BaseModel):
-    name: str
-    max_hp: int
-    ac: int
-    initiative_modifier: int = 0
-    attacks: Optional[List[Attack]] = None
-
-
-class EnemyCreate(EnemyBase):
-    campaign_id: int
-
-
-class Enemy(EnemyBase):
-    id: int
-    campaign_id: int
-    created_at: datetime
-
-    class Config:
-        orm_mode = True
-
-
-class EnemyUpdate(BaseModel):
-    name: Optional[str] = None
-    max_hp: Optional[int] = None
-    ac: Optional[int] = None
-    initiative_modifier: Optional[int] = None
-    attacks: Optional[List[Attack]] = None
-
-
 # ----- Персонажи (игроки кампании) -----
 
 class CharacterBase(BaseModel):
@@ -316,17 +285,25 @@ class EncounterParticipantsCreate(BaseModel):
     group_monsters: List[GroupMonsterInput] = []
 
 
-# ----- НОВОЕ: схема для добавления участников в активную схватку -----
+# ----- Шаблоны мобов для добавления в активную схватку -----
 
-class AddParticipantsFromLibrary(BaseModel):
-    """Добавление врагов из библиотеки"""
-    enemy_id: int
-    count: int = 1
+class MobTemplate(BaseModel):
+    """Шаблон моба для добавления в схватку.
+    ГМ передаёт характеристики одного моба и количество.
+    """
+    name: str
+    max_hp: int
+    ac: int
+    initiative_mod: int
+    attacks: Optional[List[Attack]] = None
+    count: int = 1  # количество мобов этого типа
 
 
 class AddParticipantsToActiveEncounter(BaseModel):
-    """Схема для добавления новых участников во время боя"""
-    from_library: List[AddParticipantsFromLibrary] = []
+    """Схема для добавления новых участников во время боя.
+    Использует шаблоны вместо библиотеки врагов.
+    """
+    from_templates: List[MobTemplate] = []
     unique_monsters: List[UniqueMonsterInput] = []
     group_monsters: List[GroupMonsterInput] = []
 
