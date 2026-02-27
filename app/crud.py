@@ -49,74 +49,32 @@ def create_campaign(db: Session, campaign: schemas.CampaignCreate, owner_id: int
     return db_campaign
 
 
-# ----- ENEMIES (LIBRARY) -----
+# ----- ENEMY TEMPLATES FROM PAST ENCOUNTERS -----
 
-def create_enemy(db: Session, enemy: schemas.EnemyCreate):
-    """Создать врага в библиотеке кампании"""
-    attacks_json = None
-    if enemy.attacks:
-        attacks_json = json.dumps([a.dict() for a in enemy.attacks])
-    
-    db_enemy = models.Enemy(
-        campaign_id=enemy.campaign_id,
-        name=enemy.name,
-        max_hp=enemy.max_hp,
-        ac=enemy.ac,
-        initiative_modifier=enemy.initiative_modifier,
-        attacks=attacks_json,
+def get_enemy_templates_from_past_encounters(db: Session, campaign_id: int):
+    """
+    Получить уникальных врагов из прошлых схваток кампании.
+    Возвращает только npc_unique и npc_group (по одному на группу).
+    """
+    subquery = (
+        db.query(models.Participant.name, models.Participant.id)
+        .join(models.Encounter)
+        .filter(models.Encounter.campaign_id == campaign_id)
+        .filter(models.Participant.is_enemy == True)
+        .filter(
+            (models.Participant.type == models.ParticipantType.npc_unique) |
+            (models.Participant.type == models.ParticipantType.npc_group)
+        )
+        .order_by(models.Participant.name, models.Participant.id.desc())
+        .distinct(models.Participant.name)
+        .subquery()
     )
-    db.add(db_enemy)
-    db.commit()
-    db.refresh(db_enemy)
-    return db_enemy
-
-
-def get_enemies_by_campaign(db: Session, campaign_id: int):
-    """Получить всех врагов кампании"""
+    
     return (
-        db.query(models.Enemy)
-        .filter(models.Enemy.campaign_id == campaign_id)
-        .order_by(models.Enemy.created_at.desc())
+        db.query(models.Participant)
+        .filter(models.Participant.id.in_(db.query(subquery.c.id)))
         .all()
     )
-
-
-def get_enemy(db: Session, enemy_id: int):
-    """Получить врага по ID"""
-    return db.query(models.Enemy).filter(models.Enemy.id == enemy_id).first()
-
-
-def update_enemy(db: Session, enemy_id: int, enemy_update: schemas.EnemyUpdate):
-    """Обновить врага"""
-    db_enemy = get_enemy(db, enemy_id)
-    if not db_enemy:
-        return None
-
-    if enemy_update.name is not None:
-        db_enemy.name = enemy_update.name
-    if enemy_update.max_hp is not None:
-        db_enemy.max_hp = enemy_update.max_hp
-    if enemy_update.ac is not None:
-        db_enemy.ac = enemy_update.ac
-    if enemy_update.initiative_modifier is not None:
-        db_enemy.initiative_modifier = enemy_update.initiative_modifier
-    if enemy_update.attacks is not None:
-        attacks_json = json.dumps([a.dict() for a in enemy_update.attacks])
-        db_enemy.attacks = attacks_json
-
-    db.commit()
-    db.refresh(db_enemy)
-    return db_enemy
-
-
-def delete_enemy(db: Session, enemy_id: int):
-    """Удалить врага"""
-    db_enemy = get_enemy(db, enemy_id)
-    if not db_enemy:
-        return False
-    db.delete(db_enemy)
-    db.commit()
-    return True
 
 
 # ----- CHARACTERS -----
@@ -229,6 +187,8 @@ def add_participants_to_encounter(
             initiative_total=p.initiative_total,
             is_enemy=False,
             attacks=None,
+            count=1,
+            hp_array=None,
         )
         db.add(db_part)
 
@@ -236,7 +196,6 @@ def add_participants_to_encounter(
     for m in participants_data.unique_monsters:
         roll = random.randint(1, 20) + m.initiative_mod
         
-        # Сериализуем атаки в JSON, если они есть
         attacks_json = None
         if m.attacks:
             attacks_json = json.dumps([a.dict() for a in m.attacks])
@@ -252,36 +211,37 @@ def add_participants_to_encounter(
             initiative_total=roll,
             is_enemy=m.is_enemy,
             attacks=attacks_json,
+            count=1,
+            hp_array=None,
         )
         db.add(db_part)
 
-    # 3) Группы мобов
-    group_id_counter = _get_next_group_id(db, encounter_id)
+    # 3) Группы мобов - теперь ОДНА ЗАПИСЬ с count и hp_array
     for g in participants_data.group_monsters:
-        group_id = group_id_counter
-        group_id_counter += 1
+        roll = random.randint(1, 20) + g.initiative_mod
         
-        # Сериализуем атаки
         attacks_json = None
         if g.attacks:
             attacks_json = json.dumps([a.dict() for a in g.attacks])
         
-        for i in range(g.count):
-            roll = random.randint(1, 20) + g.initiative_mod
-            db_part = models.Participant(
-                encounter_id=encounter_id,
-                type=models.ParticipantType.npc_group,
-                character_id=None,
-                name=f"{g.name} #{i+1}",
-                max_hp=g.max_hp,
-                current_hp=g.max_hp,
-                ac=g.ac,
-                initiative_total=roll,
-                is_enemy=g.is_enemy,
-                group_id=group_id,
-                attacks=attacks_json,
-            )
-            db.add(db_part)
+        # Создаём массив HP для каждого существа в группе
+        hp_array = [g.max_hp] * g.count
+        
+        db_part = models.Participant(
+            encounter_id=encounter_id,
+            type=models.ParticipantType.npc_group,
+            character_id=None,
+            name=g.name,
+            max_hp=g.max_hp,
+            current_hp=None,  # Не используется для групп
+            ac=g.ac,
+            initiative_total=roll,
+            is_enemy=g.is_enemy,
+            count=g.count,
+            hp_array=json.dumps(hp_array),
+            attacks=attacks_json,
+        )
+        db.add(db_part)
 
     db.commit()
     return encounter
@@ -294,6 +254,7 @@ def _get_character_name(db: Session, character_id: int) -> str:
 
 
 def _get_next_group_id(db: Session, encounter_id: int) -> int:
+    """Deprecated - больше не нужно"""
     last = (
         db.query(models.Participant)
         .filter(models.Participant.encounter_id == encounter_id)
@@ -323,55 +284,55 @@ def add_participants_to_active_encounter(
     if not encounter:
         return None
 
-    # Получаем текущее состояние
     state = encounter.state
     if not state:
         return None
 
-    # 1) Из библиотеки
-    for lib in participants_data.from_library:
-        enemy = get_enemy(db, lib.enemy_id)
-        if not enemy:
+    # 1) Из прошлых схваток (шаблоны)
+    for template_data in participants_data.from_library:
+        template = db.query(models.Participant).filter(
+            models.Participant.id == template_data.enemy_id
+        ).first()
+        if not template:
             continue
         
-        # Десериализуем атаки
-        attacks_json = enemy.attacks
+        roll = random.randint(1, 20) + (template.initiative_total - 10)  # Примерная оценка модификатора
         
-        if lib.count == 1:
-            # Уникальный моб
-            roll = random.randint(1, 20) + enemy.initiative_modifier
+        if template_data.count == 1:
+            # Уникальный
             db_part = models.Participant(
                 encounter_id=encounter_id,
                 type=models.ParticipantType.npc_unique,
                 character_id=None,
-                name=enemy.name,
-                max_hp=enemy.max_hp,
-                current_hp=enemy.max_hp,
-                ac=enemy.ac,
+                name=template.name,
+                max_hp=template.max_hp,
+                current_hp=template.max_hp,
+                ac=template.ac,
                 initiative_total=roll,
                 is_enemy=True,
-                attacks=attacks_json,
+                attacks=template.attacks,
+                count=1,
+                hp_array=None,
             )
             db.add(db_part)
         else:
             # Группа
-            group_id = _get_next_group_id(db, encounter_id)
-            for i in range(lib.count):
-                roll = random.randint(1, 20) + enemy.initiative_modifier
-                db_part = models.Participant(
-                    encounter_id=encounter_id,
-                    type=models.ParticipantType.npc_group,
-                    character_id=None,
-                    name=f"{enemy.name} #{i+1}",
-                    max_hp=enemy.max_hp,
-                    current_hp=enemy.max_hp,
-                    ac=enemy.ac,
-                    initiative_total=roll,
-                    is_enemy=True,
-                    group_id=group_id,
-                    attacks=attacks_json,
-                )
-                db.add(db_part)
+            hp_array = [template.max_hp] * template_data.count
+            db_part = models.Participant(
+                encounter_id=encounter_id,
+                type=models.ParticipantType.npc_group,
+                character_id=None,
+                name=template.name,
+                max_hp=template.max_hp,
+                current_hp=None,
+                ac=template.ac,
+                initiative_total=roll,
+                is_enemy=True,
+                count=template_data.count,
+                hp_array=json.dumps(hp_array),
+                attacks=template.attacks,
+            )
+            db.add(db_part)
 
     # 2) Уникальные мобы
     for m in participants_data.unique_monsters:
@@ -392,53 +353,37 @@ def add_participants_to_active_encounter(
             initiative_total=roll,
             is_enemy=m.is_enemy,
             attacks=attacks_json,
+            count=1,
+            hp_array=None,
         )
         db.add(db_part)
 
     # 3) Группы мобов
-    group_id_counter = _get_next_group_id(db, encounter_id)
     for g in participants_data.group_monsters:
-        group_id = group_id_counter
-        group_id_counter += 1
+        roll = random.randint(1, 20) + g.initiative_mod
         
         attacks_json = None
         if g.attacks:
             attacks_json = json.dumps([a.dict() for a in g.attacks])
         
-        for i in range(g.count):
-            roll = random.randint(1, 20) + g.initiative_mod
-            db_part = models.Participant(
-                encounter_id=encounter_id,
-                type=models.ParticipantType.npc_group,
-                character_id=None,
-                name=f"{g.name} #{i+1}",
-                max_hp=g.max_hp,
-                current_hp=g.max_hp,
-                ac=g.ac,
-                initiative_total=roll,
-                is_enemy=g.is_enemy,
-                group_id=group_id,
-                attacks=attacks_json,
-            )
-            db.add(db_part)
+        hp_array = [g.max_hp] * g.count
+        
+        db_part = models.Participant(
+            encounter_id=encounter_id,
+            type=models.ParticipantType.npc_group,
+            character_id=None,
+            name=g.name,
+            max_hp=g.max_hp,
+            current_hp=None,
+            ac=g.ac,
+            initiative_total=roll,
+            is_enemy=g.is_enemy,
+            count=g.count,
+            hp_array=json.dumps(hp_array),
+            attacks=attacks_json,
+        )
+        db.add(db_part)
 
-    db.commit()
-    
-    # Пересчитываем current_index после добавления (новые участники могут изменить порядок)
-    # Для этого найдём текущего участника и пересчитаем его позицию
-    participants_sorted = (
-        db.query(models.Participant)
-        .filter(models.Participant.encounter_id == encounter_id)
-        .order_by(models.Participant.initiative_total.desc(), models.Participant.id.asc())
-        .all()
-    )
-    
-    # Если есть участники, находим текущего
-    if participants_sorted and state.current_index < len(participants_sorted):
-        # Текущий индекс остаётся на том же участнике (по ID)
-        # Новые участники вставятся согласно инициативе
-        pass  # current_index оставляем без изменений
-    
     db.commit()
     db.refresh(encounter)
     return encounter
@@ -462,9 +407,8 @@ def start_encounter(db: Session, encounter_id: int):
     )
 
     if not participants:
-        return encounter  # пока просто не трогаем
+        return encounter
 
-    # делаем статус active и ставим текущий индекс = 0
     encounter.status = models.EncounterStatus.active
 
     state = encounter.state
@@ -507,29 +451,57 @@ def get_encounter_state_for_gm(db: Session, encounter_id: int) -> Optional[schem
 
     items: List[schemas.EncounterParticipantGM] = []
     for p in participants:
-        is_alive = p.current_hp is None or (
-            p.current_hp is not None and p.current_hp > 0)
-        
-        # Десериализуем атаки из JSON
-        attacks = None
-        if p.attacks:
-            attacks_data = json.loads(p.attacks)
-            attacks = [schemas.Attack(**a) for a in attacks_data]
-        
-        items.append(
-            schemas.EncounterParticipantGM(
-                id=p.id,
-                type=p.type.value,
-                name=p.name,
-                is_enemy=p.is_enemy,
-                max_hp=p.max_hp,
-                current_hp=p.current_hp,
-                ac=p.ac,
-                initiative_total=p.initiative_total,
-                is_alive=is_alive,
-                attacks=attacks,
+        # Для групп: разворачиваем в отдельные экземпляры
+        if p.type == models.ParticipantType.npc_group and p.count > 1:
+            hp_list = json.loads(p.hp_array) if p.hp_array else [p.max_hp] * p.count
+            attacks = None
+            if p.attacks:
+                attacks_data = json.loads(p.attacks)
+                attacks = [schemas.Attack(**a) for a in attacks_data]
+            
+            for i in range(p.count):
+                current_hp = hp_list[i] if i < len(hp_list) else p.max_hp
+                is_alive = current_hp > 0
+                
+                items.append(
+                    schemas.EncounterParticipantGM(
+                        id=p.id * 1000 + i,  # Виртуальный ID для фронта
+                        type=p.type.value,
+                        name=f"{p.name} #{i+1}",
+                        is_enemy=p.is_enemy,
+                        max_hp=p.max_hp,
+                        current_hp=current_hp,
+                        ac=p.ac,
+                        initiative_total=p.initiative_total,
+                        is_alive=is_alive,
+                        attacks=attacks,
+                        group_participant_id=p.id,  # Реальный ID записи
+                        group_index=i,  # Индекс в группе
+                    )
+                )
+        else:
+            # Уникальные и игроки
+            is_alive = p.current_hp is None or (p.current_hp is not None and p.current_hp > 0)
+            
+            attacks = None
+            if p.attacks:
+                attacks_data = json.loads(p.attacks)
+                attacks = [schemas.Attack(**a) for a in attacks_data]
+            
+            items.append(
+                schemas.EncounterParticipantGM(
+                    id=p.id,
+                    type=p.type.value,
+                    name=p.name,
+                    is_enemy=p.is_enemy,
+                    max_hp=p.max_hp,
+                    current_hp=p.current_hp,
+                    ac=p.ac,
+                    initiative_total=p.initiative_total,
+                    is_alive=is_alive,
+                    attacks=attacks,
+                )
             )
-        )
 
     return schemas.EncounterStateGM(
         encounter_id=encounter.id,
@@ -564,37 +536,67 @@ def get_encounter_state_for_player(db: Session, encounter_id: int) -> Optional[s
 
     items: List[schemas.EncounterParticipantPlayer] = []
     for p in participants:
-        is_alive = p.current_hp is None or (
-            p.current_hp is not None and p.current_hp > 0)
-
-        # игрокам HP мобов не показываем
-        if p.is_enemy:
-            max_hp = None
-            current_hp = None
+        # Для групп: разворачиваем
+        if p.type == models.ParticipantType.npc_group and p.count > 1:
+            hp_list = json.loads(p.hp_array) if p.hp_array else [p.max_hp] * p.count
+            attacks = None
+            if p.attacks:
+                attacks_data = json.loads(p.attacks)
+                attacks = [schemas.Attack(**a) for a in attacks_data]
+            
+            for i in range(p.count):
+                current_hp = hp_list[i] if i < len(hp_list) else p.max_hp
+                is_alive = current_hp > 0
+                
+                # Игрокам HP мобов не показываем
+                if p.is_enemy:
+                    max_hp = None
+                    current_hp = None
+                
+                items.append(
+                    schemas.EncounterParticipantPlayer(
+                        id=p.id * 1000 + i,
+                        type=p.type.value,
+                        name=f"{p.name} #{i+1}",
+                        is_enemy=p.is_enemy,
+                        max_hp=max_hp if not p.is_enemy else None,
+                        current_hp=current_hp if not p.is_enemy else None,
+                        ac=p.ac,
+                        initiative_total=p.initiative_total,
+                        is_alive=is_alive,
+                        attacks=attacks,
+                    )
+                )
         else:
-            max_hp = p.max_hp
-            current_hp = p.current_hp
-        
-        # Десериализуем атаки из JSON
-        attacks = None
-        if p.attacks:
-            attacks_data = json.loads(p.attacks)
-            attacks = [schemas.Attack(**a) for a in attacks_data]
+            is_alive = p.current_hp is None or (p.current_hp is not None and p.current_hp > 0)
 
-        items.append(
-            schemas.EncounterParticipantPlayer(
-                id=p.id,
-                type=p.type.value,
-                name=p.name,
-                is_enemy=p.is_enemy,
-                max_hp=max_hp,
-                current_hp=current_hp,
-                ac=p.ac,
-                initiative_total=p.initiative_total,
-                is_alive=is_alive,
-                attacks=attacks,
+            # Игрокам HP мобов не показываем
+            if p.is_enemy:
+                max_hp = None
+                current_hp = None
+            else:
+                max_hp = p.max_hp
+                current_hp = p.current_hp
+            
+            attacks = None
+            if p.attacks:
+                attacks_data = json.loads(p.attacks)
+                attacks = [schemas.Attack(**a) for a in attacks_data]
+
+            items.append(
+                schemas.EncounterParticipantPlayer(
+                    id=p.id,
+                    type=p.type.value,
+                    name=p.name,
+                    is_enemy=p.is_enemy,
+                    max_hp=max_hp,
+                    current_hp=current_hp,
+                    ac=p.ac,
+                    initiative_total=p.initiative_total,
+                    is_alive=is_alive,
+                    attacks=attacks,
+                )
             )
-        )
 
     return schemas.EncounterStatePlayer(
         encounter_id=encounter.id,
@@ -638,7 +640,11 @@ def next_turn(db: Session, encounter_id: int):
 # ----- HP CHANGE / FINISH / DELETE -----
 
 
-def change_hp(db: Session, participant_id: int, delta: int):
+def change_hp(db: Session, participant_id: int, delta: int, group_index: int = None):
+    """
+    Изменить HP участника.
+    Для групп: group_index указывает на конкретное существо в группе.
+    """
     participant = (
         db.query(models.Participant)
         .filter(models.Participant.id == participant_id)
@@ -647,17 +653,37 @@ def change_hp(db: Session, participant_id: int, delta: int):
     if not participant:
         return None
 
-    # если у участника нет хп (например, игроки без трекинга) — просто игнорируем
-    if participant.current_hp is None:
-        return participant
+    # Группа
+    if participant.type == models.ParticipantType.npc_group and participant.count > 1:
+        if group_index is None:
+            return participant  # Не можем изменить HP без индекса
+        
+        hp_list = json.loads(participant.hp_array) if participant.hp_array else [participant.max_hp] * participant.count
+        
+        if group_index < 0 or group_index >= len(hp_list):
+            return participant
+        
+        new_hp = hp_list[group_index] + delta
+        if new_hp < 0:
+            new_hp = 0
+        if participant.max_hp is not None and new_hp > participant.max_hp:
+            new_hp = participant.max_hp
+        
+        hp_list[group_index] = new_hp
+        participant.hp_array = json.dumps(hp_list)
+    else:
+        # Уникальный или игрок
+        if participant.current_hp is None:
+            return participant
 
-    new_hp = participant.current_hp + delta
-    if new_hp < 0:
-        new_hp = 0
-    if participant.max_hp is not None and new_hp > participant.max_hp:
-        new_hp = participant.max_hp
+        new_hp = participant.current_hp + delta
+        if new_hp < 0:
+            new_hp = 0
+        if participant.max_hp is not None and new_hp > participant.max_hp:
+            new_hp = participant.max_hp
 
-    participant.current_hp = new_hp
+        participant.current_hp = new_hp
+
     db.commit()
     db.refresh(participant)
     return participant
