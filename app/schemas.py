@@ -53,7 +53,7 @@ class Campaign(CampaignBase):
 
 
 class CampaignWithRole(Campaign):
-    """Campaign with user's role (for observer view)"""
+    """Кампания с ролью пользователя (для наблюдателей)"""
     user_role: MemberRole
 
 
@@ -71,7 +71,7 @@ class CampaignMember(BaseModel):
 
 
 class CampaignMemberInfo(BaseModel):
-    """Simplified member info for display"""
+    """Упрощенная информация о члене для отображения"""
     user_id: int
     role: MemberRole
     joined_at: datetime
@@ -101,37 +101,6 @@ class InviteGenerateResponse(BaseModel):
 
 class InviteJoinRequest(BaseModel):
     invite_token: str
-
-
-# ----- НОВОЕ: Библиотека врагов -----
-
-class EnemyBase(BaseModel):
-    name: str
-    max_hp: int
-    ac: int
-    initiative_modifier: int = 0
-    attacks: Optional[List[Attack]] = None
-
-
-class EnemyCreate(EnemyBase):
-    campaign_id: int
-
-
-class Enemy(EnemyBase):
-    id: int
-    campaign_id: int
-    created_at: datetime
-
-    class Config:
-        orm_mode = True
-
-
-class EnemyUpdate(BaseModel):
-    name: Optional[str] = None
-    max_hp: Optional[int] = None
-    ac: Optional[int] = None
-    initiative_modifier: Optional[int] = None
-    attacks: Optional[List[Attack]] = None
 
 
 # ----- Персонажи (игроки кампании) -----
@@ -209,6 +178,10 @@ class EncounterParticipantGM(BaseModel):
     initiative_total: int
     is_alive: bool
     attacks: Optional[List[Attack]] = None
+    
+    # Новые поля для групп
+    group_participant_id: Optional[int] = None  # Реальный ID записи в БД для групп
+    group_index: Optional[int] = None           # Индекс в группе (0, 1, 2, ...)
 
     class Config:
         orm_mode = True
@@ -319,8 +292,8 @@ class EncounterParticipantsCreate(BaseModel):
 # ----- НОВОЕ: схема для добавления участников в активную схватку -----
 
 class AddParticipantsFromLibrary(BaseModel):
-    """Добавление врагов из библиотеки"""
-    enemy_id: int
+    """Добавление врагов из прошлых схваток"""
+    enemy_id: int  # ID participant из прошлой схватки
     count: int = 1
 
 
@@ -342,3 +315,4 @@ class NextTurnRequest(BaseModel):
 
 class HpChangeRequest(BaseModel):
     delta: int  # отрицательное значение = урон, положительное = хил
+    group_index: Optional[int] = None  # Для групп: индекс существа
