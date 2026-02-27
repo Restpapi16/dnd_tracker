@@ -39,21 +39,14 @@ def get_my_stats(
     db: Session = Depends(get_db),
     tg_user_id: int = Depends(get_current_tg_user_id),
 ):
-    """Получить статистику пользователя: количество GM-кампаний и Observer-кампаний"""
+    """Получить статистику пользователя: количество GM-кампаний"""
     # GM-кампании (где я владелец)
     gm_campaigns = db.query(models.Campaign).filter(
         models.Campaign.owner_id == tg_user_id
     ).count()
     
-    # Observer-кампании (где я observer)
-    observer_campaigns = db.query(models.CampaignMember).filter(
-        models.CampaignMember.user_id == tg_user_id,
-        models.CampaignMember.role == models.MemberRole.observer
-    ).count()
-    
     return {
-        "gm_campaigns_count": gm_campaigns,
-        "observer_campaigns_count": observer_campaigns
+        "gm_campaigns_count": gm_campaigns
     }
 
 
@@ -93,16 +86,6 @@ def read_campaign(
 
 
 # ----- MULTIPLAYER: CAMPAIGNS API -----
-
-@app.get("/campaigns/observer/my", response_model=List[schemas.Campaign])
-def list_observer_campaigns(
-    db: Session = Depends(get_db),
-    tg_user_id: int = Depends(get_current_tg_user_id),
-):
-    """Получить список кампаний, где я observer"""
-    campaigns = crud_multiplayer.get_campaigns_for_observer(db, tg_user_id)
-    return campaigns
-
 
 @app.post("/campaigns/{campaign_id}/invite")
 def generate_campaign_invite(
@@ -347,15 +330,13 @@ def start_encounter(
 @app.get("/encounters/{encounter_id}/state")
 def get_encounter_state(
     encounter_id: int,
-    role: str = Query("gm", regex="^(gm|player|observer)$"),
+    role: str = Query("gm", regex="^(gm|player)$"),
     db: Session = Depends(get_db),
     tg_user_id: int = Depends(get_current_tg_user_id),
 ):
     """Получить состояние схватки с учётом роли пользователя"""
     if role == "gm":
         state = crud.get_encounter_state_for_gm(db, encounter_id)
-    elif role == "observer":
-        state = crud_multiplayer.get_encounter_state_for_observer(db, encounter_id)
     else:
         state = crud.get_encounter_state_for_player(db, encounter_id)
 
@@ -396,29 +377,6 @@ def my_encounters(db: Session = Depends(get_db),
         "campaign_id": e.campaign_id,
         "campaign_name": e.campaign.name
     } for e in encs]
-
-
-# ----- MULTIPLAYER: OBSERVER ENCOUNTERS -----
-
-@app.get("/campaigns/{campaign_id}/encounters/active")
-def get_active_encounters(
-    campaign_id: int,
-    db: Session = Depends(get_db),
-    tg_user_id: int = Depends(get_current_tg_user_id),
-):
-    """Получить активные схватки кампании (observers могут смотреть)"""
-    # Проверяем доступ
-    if not crud_multiplayer.has_campaign_access(db, campaign_id, tg_user_id):
-        raise HTTPException(status_code=403, detail="Нет доступа")
-    
-    encounters = crud_multiplayer.get_active_encounters_for_campaign(db, campaign_id)
-    
-    return [{
-        "id": e.id,
-        "name": e.name,
-        "status": e.status.value,
-        "campaign_id": e.campaign_id
-    } for e in encounters]
 
 
 # ----- HP CHANGE / FINISH / DELETE API -----
