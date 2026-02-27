@@ -285,6 +285,14 @@ class EncounterParticipantsCreate(BaseModel):
     group_monsters: List[GroupMonsterInput] = []
 
 
+# ----- НОВОЕ: схема для добавления участников в активную схватку -----
+
+class AddParticipantsToActiveEncounter(BaseModel):
+    """Схема для добавления новых участников во время боя"""
+    unique_monsters: List[UniqueMonsterInput] = []
+    group_monsters: List[GroupMonsterInput] = []
+
+
 class EncounterStartRequest(BaseModel):
     as_active: bool = True  # пока просто флаг, можно не менять
 
