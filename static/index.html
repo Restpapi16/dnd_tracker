@@ -84,11 +84,6 @@
             background: linear-gradient(180deg, rgba(251, 191, 36, 0.08), rgba(245, 158, 11, 0.05));
         }
 
-        .role-card.observer {
-            border-color: rgba(100, 116, 139, 0.4);
-            background: linear-gradient(180deg, rgba(100, 116, 139, 0.08), rgba(71, 85, 105, 0.05));
-        }
-
         .role-icon {
             font-size: 32px;
             margin-bottom: 8px;
@@ -110,10 +105,6 @@
             font-size: 14px;
             font-weight: 700;
             color: var(--accent);
-        }
-
-        .role-count.observer-text {
-            color: #94a3b8;
         }
 
         .loading {
@@ -170,12 +161,11 @@
         function renderMenu(stats) {
             const userName = getTgDisplayName();
             const gmCount = stats.gm_campaigns_count || 0;
-            const observerCount = stats.observer_campaigns_count || 0;
 
             const html = `
                 <div class="top-card">
                     <div class="top-title">🎲 D&D Tracker</div>
-                    <div class="top-sub">Выбери роль</div>
+                    <div class="top-sub">Трекер схваток для D&D 5e</div>
                 </div>
 
                 <div class="greeting">
@@ -185,15 +175,8 @@
                 <div class="role-card gm" onclick="openGM()">
                     <div class="role-icon">🎭</div>
                     <div class="role-title">Мастер (GM)</div>
-                    <div class="role-desc">Управляй своими кампаниями</div>
+                    <div class="role-desc">Управляй своими кампаниями и схватками</div>
                     <div class="role-count">→ ${gmCount} кампани${gmCount === 1 ? 'я' : 'й'}</div>
-                </div>
-
-                <div class="role-card observer" onclick="openObserver()">
-                    <div class="role-icon">👁️</div>
-                    <div class="role-title">Наблюдатель</div>
-                    <div class="role-desc">Следи за своими играми</div>
-                    <div class="role-count observer-text">→ ${observerCount} кампани${observerCount === 1 ? 'я' : 'й'}</div>
                 </div>
             `;
 
@@ -202,10 +185,6 @@
 
         function openGM() {
             window.location.href = '/static/gm_campaigns.html';
-        }
-
-        function openObserver() {
-            window.location.href = '/static/observer_campaigns.html';
         }
 
         if (tg && tg.ready) tg.ready();
