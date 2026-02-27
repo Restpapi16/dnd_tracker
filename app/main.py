@@ -297,6 +297,27 @@ def add_participants(
     return {"status": "ok"}
 
 
+# ----- НОВОЕ: Добавление участников в активную схватку -----
+
+@app.post("/encounters/{encounter_id}/add_participants")
+def add_participants_to_active(
+    encounter_id: int,
+    participants_data: schemas.AddParticipantsToActiveEncounter,
+    db: Session = Depends(get_db),
+    tg_user_id: int = Depends(get_current_tg_user_id),
+):
+    """
+    Добавить новых участников в активную схватку (во время боя).
+    Новые участники автоматически получают инициативу и встают в порядок ходов.
+    """
+    encounter = crud.add_participants_to_active_encounter(
+        db, encounter_id, participants_data
+    )
+    if encounter is None:
+        raise HTTPException(status_code=404, detail="Encounter not found")
+    return {"status": "ok", "message": "Участники добавлены"}
+
+
 # ----- ENCOUNTERS CONTROL API -----
 
 
