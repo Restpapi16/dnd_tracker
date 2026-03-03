@@ -236,20 +236,20 @@ def get_encounter_state_for_observer(
         items.append(
             schemas.EncounterParticipantObserver(
                 id=p.id,
-                type=p.type.value,
+                type=p.type,  # Уже enum, не нужно .value
                 name=p.name,
                 is_enemy=p.is_enemy,
                 initiative_total=p.initiative_total,
                 is_alive=is_alive,
-                current_hp=p.current_hp,  # Добавлено для трещин
-                max_hp=p.max_hp,          # Добавлено для трещин
+                current_hp=p.current_hp,
+                max_hp=p.max_hp,
             )
         )
     
     return schemas.EncounterStateObserver(
         encounter_id=encounter.id,
         campaign_id=encounter.campaign_id,
-        status=encounter.status.value,
+        status=encounter.status,  # Уже enum, не нужно .value
         round=state.round,
         current_index=state.current_index,
         encounter_name=encounter.name,
