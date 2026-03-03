@@ -592,6 +592,12 @@ async function openEncounterSetup() {
     screenEncounterSetup.style.display = 'block';
     document.getElementById('encSetupTitle').innerText = 'Подготовка схватки';
     document.getElementById('encSetupSubtitle').innerText = `Кампания: ${currentCampaignName}`;
+    
+    // Показываем подсказки для мобов
+    const uniqueHint = document.getElementById('uniqueInitHint');
+    const groupHint = document.getElementById('groupInitHint');
+    if (uniqueHint) uniqueHint.style.display = 'block';
+    if (groupHint) groupHint.style.display = 'block';
 }
 
 function renderSetupPlayers() {
