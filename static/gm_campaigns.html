@@ -41,6 +41,7 @@
         .bottom-bar { position: fixed; left: 0; right: 0; bottom: 0; padding: 12px 14px calc(12px + env(safe-area-inset-bottom)); background: rgba(2, 6, 23, .92); backdrop-filter: blur(10px); border-top: 1px solid var(--stroke); z-index: 1500; }
         .bottom-row { display: flex; gap: 10px; } .bottom-row .input { flex: 1; }
         .hint { font-size: 12px; color: var(--muted); margin: 6px 2px 0; } .hint.warning { color: #fbbf24; font-weight: 700; }
+        .hint.info { color: #60a5fa; }
         .toast { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%) translateY(20px); min-width: 220px; padding: 10px 14px; border-radius: 999px; background: rgba(15, 23, 42, 0.95); border: 1px solid #78350f; color: #f9fafb; font-size: 12px; text-align: center; opacity: 0; transition: opacity 0.25s, transform 0.25s; z-index: 2000; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
@@ -83,7 +84,11 @@
 
     <div id="screenEncounterSetup" style="display:none;">
         <div class="top-card"><div class="top-title" id="encSetupTitle">Подготовка схватки</div><div class="top-sub" id="encSetupSubtitle">Выберите участников</div></div>
-        <div class="setup-block players"><div class="section-title" style="margin-top:0;">🛡️ Игроки кампании</div><div id="encPlayersList" class="list"></div></div>
+        <div class="setup-block players">
+            <div class="section-title" style="margin-top:0;">🛡️ Игроки кампании</div>
+            <div id="encPlayersList" class="list"></div>
+            <div id="playersInitHint" class="hint info" style="display:none;">🎯 В поля справа впишите итоговую инициативу (базовая + бросок)</div>
+        </div>
         
         <div class="setup-block unique">
             <div class="section-title" style="margin-top:0;">👹 Уникальные мобы</div>
