@@ -629,18 +629,6 @@ function renderSetupPlayers() {
             pill.className = 'pill ' + (p.include ? 'ok' : '');
             pill.innerText = p.include ? 'В бою' : 'Не в бою';
             
-            // Контейнер для подсказки + input
-            const initWrapper = document.createElement('div');
-            initWrapper.style.display = 'flex';
-            initWrapper.style.alignItems = 'center';
-            initWrapper.style.gap = '4px';
-            
-            const initLabel = document.createElement('span');
-            initLabel.style.fontSize = '11px';
-            initLabel.style.color = 'rgba(248, 250, 252, 0.5)';
-            initLabel.style.whiteSpace = 'nowrap';
-            initLabel.innerText = 'Итого:';
-            
             const initInput = document.createElement('input');
             initInput.className = 'input small';
             initInput.type = 'number';
@@ -652,11 +640,8 @@ function renderSetupPlayers() {
                 if (!isNaN(val)) setupPlayers[idx].initiative_total = val;
             };
             
-            initWrapper.appendChild(initLabel);
-            initWrapper.appendChild(initInput);
-            
             right.appendChild(pill);
-            right.appendChild(initWrapper);
+            right.appendChild(initInput);
             row.appendChild(left);
             row.appendChild(right);
             row.onclick = () => {
