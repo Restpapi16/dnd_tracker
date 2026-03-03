@@ -261,7 +261,8 @@
 
         async function loadEncounter() {
             try {
-                const state = await apiGet(`/encounters/${encounterId}/state?role=observer`);
+                // ИСПРАВЛЕНО: используем правильный endpoint для observer
+                const state = await apiGet(`/encounters/${encounterId}/observer/state`);
                 renderEncounter(state);
             } catch (e) {
                 console.error(e);
