@@ -71,7 +71,7 @@ class CampaignMember(BaseModel):
 
 
 class CampaignMemberInfo(BaseModel):
-    """Simplified member info for display"""
+    """Симплифицированная информация о члене для отображения"""
     user_id: int
     role: MemberRole
     joined_at: datetime
@@ -220,8 +220,7 @@ class EncounterParticipantObserver(BaseModel):
     max_hp: Optional[int] = None
     # AC, attacks - скрыты
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class EncounterStateObserver(EncounterStateBase):
