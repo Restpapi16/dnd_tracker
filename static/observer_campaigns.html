@@ -2,6 +2,9 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>Наблюдатель</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -222,23 +225,27 @@
         }
 
         async function openCampaign(id, name) {
-            // Показать активные схватки кампании
+            console.log('[DEBUG] openCampaign called with id:', id, 'name:', name);
             try {
                 const encounters = await apiGet(`/campaigns/${id}/encounters/active`);
+                console.log('[DEBUG] encounters:', encounters);
+                
                 if (encounters.length === 0) {
                     alert(`В кампании "${name}" нет активных схваток`);
                     return;
                 }
-                // Если одна схватка - открываем сразу
+                
                 if (encounters.length === 1) {
+                    console.log('[DEBUG] Single encounter, redirecting to observer_encounter.html');
                     window.location.href = `/static/observer_encounter.html?encounter_id=${encounters[0].id}`;
                     return;
                 }
-                // Если несколько - открываем страницу выбора
+                
+                console.log('[DEBUG] Multiple encounters, redirecting to observer_encounters.html');
                 window.location.href = `/static/observer_encounters.html?campaign_id=${id}&campaign_name=${encodeURIComponent(name)}`;
             } catch (e) {
-                console.error(e);
-                alert('Ошибка загрузки схваток');
+                console.error('[ERROR] openCampaign failed:', e);
+                alert('Ошибка загрузки схваток: ' + e.message);
             }
         }
 
