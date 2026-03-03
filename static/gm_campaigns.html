@@ -42,6 +42,7 @@
         .bottom-row { display: flex; gap: 10px; } .bottom-row .input { flex: 1; }
         .hint { font-size: 12px; color: var(--muted); margin: 6px 2px 0; } .hint.warning { color: #fbbf24; font-weight: 700; }
         .hint.info { color: #60a5fa; }
+        .hint.danger { color: #ef4444; }
         .toast { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%) translateY(20px); min-width: 220px; padding: 10px 14px; border-radius: 999px; background: rgba(15, 23, 42, 0.95); border: 1px solid #78350f; color: #f9fafb; font-size: 12px; text-align: center; opacity: 0; transition: opacity 0.25s, transform 0.25s; z-index: 2000; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
@@ -93,6 +94,7 @@
         <div class="setup-block unique">
             <div class="section-title" style="margin-top:0;">👹 Уникальные мобы</div>
             <div id="encUniqueMonsters" class="list"></div>
+            <div id="uniqueInitHint" class="hint danger" style="display:none;">👹 В поля ИНИЦ+ впишите только модификатор+</div>
             <div class="row-inline">
                 <input id="uniqueName" class="input" type="text" placeholder="Имя">
                 <input id="uniqueHP" class="input small" type="number" placeholder="ХП">
@@ -117,6 +119,7 @@
         <div class="setup-block groups">
             <div class="section-title" style="margin-top:0;">👥 Группы мобов</div>
             <div id="encGroupMonsters" class="list"></div>
+            <div id="groupInitHint" class="hint warning" style="display:none;">👥 В поля ИНИЦ+ впишите только модификатор+</div>
             <div class="row-inline">
                 <input id="groupName" class="input" type="text" placeholder="Имя группы">
                 <input id="groupCount" class="input small" type="number" placeholder="xN">
@@ -142,6 +145,6 @@
         <div class="chips" style="margin-top:20px;"><button id="startEncounterBtn" class="btn">Начать</button><button class="btn secondary" id="backToCharsBtn">← Персонажи</button></div>
     </div>
 
-    <script src="/static/gm_campaigns.js?v=2"></script>
+    <script src="/static/gm_campaigns.js?v=3"></script>
 </body>
 </html>
