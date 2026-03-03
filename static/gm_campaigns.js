@@ -76,6 +76,30 @@ function formatDamage(numDice, dieSize, bonus) {
     return result;
 }
 
+// === HELPER: Сохранение и восстановление фокуса ===
+function preserveFocus(callback) {
+    const activeElement = document.activeElement;
+    const activeId = activeElement?.id;
+    const activeTagName = activeElement?.tagName;
+    
+    // Выполняем колбэк (перерисовку)
+    callback();
+    
+    // Восстанавливаем фокус
+    setTimeout(() => {
+        if (activeId && activeTagName === 'INPUT') {
+            const element = document.getElementById(activeId);
+            if (element) {
+                element.focus();
+                // Если это input, передвигаем курсор в конец
+                if (element.type === 'text' || element.type === 'number') {
+                    element.setSelectionRange(element.value.length, element.value.length);
+                }
+            }
+        }
+    }, 0);
+}
+
 // === ATTACKS MANAGEMENT - UNIQUE ===
 const toggleUniqueAttacksBtn = document.getElementById("toggleUniqueAttacksBtn");
 const uniqueAttacksSection = document.getElementById("uniqueAttacksSection");
@@ -104,46 +128,48 @@ function updateUniqueAttacksButton() {
 }
 
 function renderUniqueAttacksList() {
-    uniqueAttacksList.innerHTML = '';
-    if (uniqueMonsterAttacks.length === 0) {
-        uniqueAttacksList.innerHTML = '<div class="hint">Атак пока нет</div>';
-        return;
-    }
+    preserveFocus(() => {
+        uniqueAttacksList.innerHTML = '';
+        if (uniqueMonsterAttacks.length === 0) {
+            uniqueAttacksList.innerHTML = '<div class="hint">Атак пока нет</div>';
+            return;
+        }
 
-    uniqueMonsterAttacks.forEach((attack, idx) => {
-        const attackDiv = document.createElement('div');
-        attackDiv.className = 'attack-item';
+        uniqueMonsterAttacks.forEach((attack, idx) => {
+            const attackDiv = document.createElement('div');
+            attackDiv.className = 'attack-item';
 
-        const infoDiv = document.createElement('div');
-        infoDiv.className = 'attack-info';
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'attack-info';
 
-        const nameDiv = document.createElement('div');
-        nameDiv.className = 'attack-name';
-        nameDiv.innerText = attack.name;
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'attack-name';
+            nameDiv.innerText = attack.name;
 
-        const statsDiv = document.createElement('div');
-        statsDiv.className = 'attack-stats';
-        const dmgStr = formatDamage(attack.damage_dice || 0, attack.damage_die || 0, attack.damage_bonus || 0);
-        statsDiv.innerText = `+${attack.hit_bonus} попадание, ${dmgStr} урон (${attack.damage_type}), ${attack.range} футов`;
+            const statsDiv = document.createElement('div');
+            statsDiv.className = 'attack-stats';
+            const dmgStr = formatDamage(attack.damage_dice || 0, attack.damage_die || 0, attack.damage_bonus || 0);
+            statsDiv.innerText = `+${attack.hit_bonus} попадание, ${dmgStr} урон (${attack.damage_type}), ${attack.range} футов`;
 
-        infoDiv.appendChild(nameDiv);
-        infoDiv.appendChild(statsDiv);
+            infoDiv.appendChild(nameDiv);
+            infoDiv.appendChild(statsDiv);
 
-        const delBtn = document.createElement('button');
-        delBtn.className = 'btn danger';
-        delBtn.style.height = '36px';
-        delBtn.style.padding = '0 12px';
-        delBtn.style.fontSize = '12px';
-        delBtn.innerText = '✕';
-        delBtn.onclick = () => {
-            uniqueMonsterAttacks.splice(idx, 1);
-            renderUniqueAttacksList();
-            updateUniqueAttacksButton();
-        };
+            const delBtn = document.createElement('button');
+            delBtn.className = 'btn danger';
+            delBtn.style.height = '36px';
+            delBtn.style.padding = '0 12px';
+            delBtn.style.fontSize = '12px';
+            delBtn.innerText = '✕';
+            delBtn.onclick = () => {
+                uniqueMonsterAttacks.splice(idx, 1);
+                renderUniqueAttacksList();
+                updateUniqueAttacksButton();
+            };
 
-        attackDiv.appendChild(infoDiv);
-        attackDiv.appendChild(delBtn);
-        uniqueAttacksList.appendChild(attackDiv);
+            attackDiv.appendChild(infoDiv);
+            attackDiv.appendChild(delBtn);
+            uniqueAttacksList.appendChild(attackDiv);
+        });
     });
 }
 
@@ -221,46 +247,48 @@ function updateGroupAttacksButton() {
 }
 
 function renderGroupAttacksList() {
-    groupAttacksList.innerHTML = '';
-    if (groupMonsterAttacks.length === 0) {
-        groupAttacksList.innerHTML = '<div class="hint">Атак пока нет</div>';
-        return;
-    }
+    preserveFocus(() => {
+        groupAttacksList.innerHTML = '';
+        if (groupMonsterAttacks.length === 0) {
+            groupAttacksList.innerHTML = '<div class="hint">Атак пока нет</div>';
+            return;
+        }
 
-    groupMonsterAttacks.forEach((attack, idx) => {
-        const attackDiv = document.createElement('div');
-        attackDiv.className = 'attack-item';
+        groupMonsterAttacks.forEach((attack, idx) => {
+            const attackDiv = document.createElement('div');
+            attackDiv.className = 'attack-item';
 
-        const infoDiv = document.createElement('div');
-        infoDiv.className = 'attack-info';
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'attack-info';
 
-        const nameDiv = document.createElement('div');
-        nameDiv.className = 'attack-name';
-        nameDiv.innerText = attack.name;
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'attack-name';
+            nameDiv.innerText = attack.name;
 
-        const statsDiv = document.createElement('div');
-        statsDiv.className = 'attack-stats';
-        const dmgStr = formatDamage(attack.damage_dice || 0, attack.damage_die || 0, attack.damage_bonus || 0);
-        statsDiv.innerText = `+${attack.hit_bonus} попадание, ${dmgStr} урон (${attack.damage_type}), ${attack.range} футов`;
+            const statsDiv = document.createElement('div');
+            statsDiv.className = 'attack-stats';
+            const dmgStr = formatDamage(attack.damage_dice || 0, attack.damage_die || 0, attack.damage_bonus || 0);
+            statsDiv.innerText = `+${attack.hit_bonus} попадание, ${dmgStr} урон (${attack.damage_type}), ${attack.range} футов`;
 
-        infoDiv.appendChild(nameDiv);
-        infoDiv.appendChild(statsDiv);
+            infoDiv.appendChild(nameDiv);
+            infoDiv.appendChild(statsDiv);
 
-        const delBtn = document.createElement('button');
-        delBtn.className = 'btn danger';
-        delBtn.style.height = '36px';
-        delBtn.style.padding = '0 12px';
-        delBtn.style.fontSize = '12px';
-        delBtn.innerText = '✕';
-        delBtn.onclick = () => {
-            groupMonsterAttacks.splice(idx, 1);
-            renderGroupAttacksList();
-            updateGroupAttacksButton();
-        };
+            const delBtn = document.createElement('button');
+            delBtn.className = 'btn danger';
+            delBtn.style.height = '36px';
+            delBtn.style.padding = '0 12px';
+            delBtn.style.fontSize = '12px';
+            delBtn.innerText = '✕';
+            delBtn.onclick = () => {
+                groupMonsterAttacks.splice(idx, 1);
+                renderGroupAttacksList();
+                updateGroupAttacksButton();
+            };
 
-        attackDiv.appendChild(infoDiv);
-        attackDiv.appendChild(delBtn);
-        groupAttacksList.appendChild(attackDiv);
+            attackDiv.appendChild(infoDiv);
+            attackDiv.appendChild(delBtn);
+            groupAttacksList.appendChild(attackDiv);
+        });
     });
 }
 
@@ -567,123 +595,130 @@ async function openEncounterSetup() {
 }
 
 function renderSetupPlayers() {
-    const list = document.getElementById('encPlayersList');
-    list.innerHTML = '';
-    if (setupPlayers.length === 0) {
-        list.innerHTML = '<div class="item"><div><div class="item-title">Нет персонажей</div><div class="item-sub">Вернись и добавь хотя бы одного</div></div><div class="pill warn">Пусто</div></div>';
-        return;
-    }
-    setupPlayers.forEach((p, idx) => {
-        const row = document.createElement('div');
-        row.className = 'item pick' + (p.include ? ' selected' : '');
-        const left = document.createElement('div');
-        const name = document.createElement('div');
-        name.className = 'item-title';
-        name.innerText = p.name;
-        const sub = document.createElement('div');
-        sub.className = 'item-sub';
-        sub.innerText = `КД: ${p.ac}, баз. ИНИЦ: ${p.base_initiative}`;
-        left.appendChild(name);
-        left.appendChild(sub);
-        const right = document.createElement('div');
-        right.style.display = 'flex';
-        right.style.alignItems = 'center';
-        right.style.gap = '10px';
-        const pill = document.createElement('div');
-        pill.className = 'pill ' + (p.include ? 'ok' : '');
-        pill.innerText = p.include ? 'В бою' : 'Не в бою';
-        const initInput = document.createElement('input');
-        initInput.className = 'input small';
-        initInput.type = 'number';
-        initInput.value = p.initiative_total;
-        initInput.onclick = (e) => e.stopPropagation();
-        initInput.onchange = () => {
-            const val = parseInt(initInput.value, 10);
-            if (!isNaN(val)) setupPlayers[idx].initiative_total = val;
-        };
-        right.appendChild(pill);
-        right.appendChild(initInput);
-        row.appendChild(left);
-        row.appendChild(right);
-        row.onclick = () => {
-            setupPlayers[idx].include = !setupPlayers[idx].include;
-            renderSetupPlayers();
-        };
-        list.appendChild(row);
+    preserveFocus(() => {
+        const list = document.getElementById('encPlayersList');
+        list.innerHTML = '';
+        if (setupPlayers.length === 0) {
+            list.innerHTML = '<div class="item"><div><div class="item-title">Нет персонажей</div><div class="item-sub">Вернись и добавь хотя бы одного</div></div><div class="pill warn">Пусто</div></div>';
+            return;
+        }
+        setupPlayers.forEach((p, idx) => {
+            const row = document.createElement('div');
+            row.className = 'item pick' + (p.include ? ' selected' : '');
+            const left = document.createElement('div');
+            const name = document.createElement('div');
+            name.className = 'item-title';
+            name.innerText = p.name;
+            const sub = document.createElement('div');
+            sub.className = 'item-sub';
+            sub.innerText = `КД: ${p.ac}, баз. ИНИЦ: ${p.base_initiative}`;
+            left.appendChild(name);
+            left.appendChild(sub);
+            const right = document.createElement('div');
+            right.style.display = 'flex';
+            right.style.alignItems = 'center';
+            right.style.gap = '10px';
+            const pill = document.createElement('div');
+            pill.className = 'pill ' + (p.include ? 'ok' : '');
+            pill.innerText = p.include ? 'В бою' : 'Не в бою';
+            const initInput = document.createElement('input');
+            initInput.className = 'input small';
+            initInput.type = 'number';
+            initInput.value = p.initiative_total;
+            initInput.id = `player_init_${idx}`; // Добавляем ID для сохранения фокуса
+            initInput.onclick = (e) => e.stopPropagation();
+            initInput.onchange = () => {
+                const val = parseInt(initInput.value, 10);
+                if (!isNaN(val)) setupPlayers[idx].initiative_total = val;
+            };
+            right.appendChild(pill);
+            right.appendChild(initInput);
+            row.appendChild(left);
+            row.appendChild(right);
+            row.onclick = () => {
+                setupPlayers[idx].include = !setupPlayers[idx].include;
+                renderSetupPlayers();
+            };
+            list.appendChild(row);
+        });
     });
 }
 
 function renderSetupUnique() {
-    const list = document.getElementById('encUniqueMonsters');
-    list.innerHTML = '';
-    if (setupUniqueMonsters.length === 0) {
-        list.innerHTML = '<div class="item"><div><div class="item-title">Пока нет уникальных мобов</div><div class="item-sub">Добавь ниже (имя, ХП, КД, ИНИЦ+)</div></div><div class="pill warn">0</div></div>';
-        return;
-    }
-    setupUniqueMonsters.forEach((m, idx) => {
-        const row = document.createElement('div');
-        row.className = 'item';
-        const left = document.createElement('div');
-        const name = document.createElement('div');
-        name.className = 'item-title';
-        name.innerText = m.name;
-        const sub = document.createElement('div');
-        sub.className = 'item-sub';
-        sub.innerText = `ХП: ${m.max_hp}, КД: ${m.ac}, ИНИЦ+: ${m.initiative_mod}`;
-        if (m.attacks && m.attacks.length > 0) {
-            sub.innerText += ` • ⚔️ ${m.attacks.length} атак`;
+    preserveFocus(() => {
+        const list = document.getElementById('encUniqueMonsters');
+        list.innerHTML = '';
+        if (setupUniqueMonsters.length === 0) {
+            list.innerHTML = '<div class="item"><div><div class="item-title">Пока нет уникальных мобов</div><div class="item-sub">Добавь ниже (имя, ХП, КД, ИНИЦ+)</div></div><div class="pill warn">0</div></div>';
+            return;
         }
-        left.appendChild(name);
-        left.appendChild(sub);
-        const delBtn = document.createElement('button');
-        delBtn.className = 'btn danger';
-        delBtn.style.height = '44px';
-        delBtn.style.padding = '0 14px';
-        delBtn.innerText = '✕';
-        delBtn.onclick = () => {
-            setupUniqueMonsters.splice(idx, 1);
-            renderSetupUnique();
-        };
-        row.appendChild(left);
-        row.appendChild(delBtn);
-        list.appendChild(row);
+        setupUniqueMonsters.forEach((m, idx) => {
+            const row = document.createElement('div');
+            row.className = 'item';
+            const left = document.createElement('div');
+            const name = document.createElement('div');
+            name.className = 'item-title';
+            name.innerText = m.name;
+            const sub = document.createElement('div');
+            sub.className = 'item-sub';
+            sub.innerText = `ХП: ${m.max_hp}, КД: ${m.ac}, ИНИЦ+: ${m.initiative_mod}`;
+            if (m.attacks && m.attacks.length > 0) {
+                sub.innerText += ` • ⚔️ ${m.attacks.length} атак`;
+            }
+            left.appendChild(name);
+            left.appendChild(sub);
+            const delBtn = document.createElement('button');
+            delBtn.className = 'btn danger';
+            delBtn.style.height = '44px';
+            delBtn.style.padding = '0 14px';
+            delBtn.innerText = '✕';
+            delBtn.onclick = () => {
+                setupUniqueMonsters.splice(idx, 1);
+                renderSetupUnique();
+            };
+            row.appendChild(left);
+            row.appendChild(delBtn);
+            list.appendChild(row);
+        });
     });
 }
 
 function renderSetupGroups() {
-    const list = document.getElementById('encGroupMonsters');
-    list.innerHTML = '';
-    if (setupGroupMonsters.length === 0) {
-        list.innerHTML = '<div class="item"><div><div class="item-title">Пока нет групп</div><div class="item-sub">Добавь ниже (имя, xN, ХП, КД, ИНИЦ+)</div></div><div class="pill warn">0</div></div>';
-        return;
-    }
-    setupGroupMonsters.forEach((g, idx) => {
-        const row = document.createElement('div');
-        row.className = 'item';
-        const left = document.createElement('div');
-        const name = document.createElement('div');
-        name.className = 'item-title';
-        name.innerText = `${g.name} (x${g.count})`;
-        const sub = document.createElement('div');
-        sub.className = 'item-sub';
-        sub.innerText = `ХП: ${g.max_hp}, КД: ${g.ac}, ИНИЦ+: ${g.initiative_mod}`;
-        if (g.attacks && g.attacks.length > 0) {
-            sub.innerText += ` • ⚔️ ${g.attacks.length} атак`;
+    preserveFocus(() => {
+        const list = document.getElementById('encGroupMonsters');
+        list.innerHTML = '';
+        if (setupGroupMonsters.length === 0) {
+            list.innerHTML = '<div class="item"><div><div class="item-title">Пока нет групп</div><div class="item-sub">Добавь ниже (имя, xN, ХП, КД, ИНИЦ+)</div></div><div class="pill warn">0</div></div>';
+            return;
         }
-        left.appendChild(name);
-        left.appendChild(sub);
-        const delBtn = document.createElement('button');
-        delBtn.className = 'btn danger';
-        delBtn.style.height = '44px';
-        delBtn.style.padding = '0 14px';
-        delBtn.innerText = '✕';
-        delBtn.onclick = () => {
-            setupGroupMonsters.splice(idx, 1);
-            renderSetupGroups();
-        };
-        row.appendChild(left);
-        row.appendChild(delBtn);
-        list.appendChild(row);
+        setupGroupMonsters.forEach((g, idx) => {
+            const row = document.createElement('div');
+            row.className = 'item';
+            const left = document.createElement('div');
+            const name = document.createElement('div');
+            name.className = 'item-title';
+            name.innerText = `${g.name} (x${g.count})`;
+            const sub = document.createElement('div');
+            sub.className = 'item-sub';
+            sub.innerText = `ХП: ${g.max_hp}, КД: ${g.ac}, ИНИЦ+: ${g.initiative_mod}`;
+            if (g.attacks && g.attacks.length > 0) {
+                sub.innerText += ` • ⚔️ ${g.attacks.length} атак`;
+            }
+            left.appendChild(name);
+            left.appendChild(sub);
+            const delBtn = document.createElement('button');
+            delBtn.className = 'btn danger';
+            delBtn.style.height = '44px';
+            delBtn.style.padding = '0 14px';
+            delBtn.innerText = '✕';
+            delBtn.onclick = () => {
+                setupGroupMonsters.splice(idx, 1);
+                renderSetupGroups();
+            };
+            row.appendChild(left);
+            row.appendChild(delBtn);
+            list.appendChild(row);
+        });
     });
 }
 
