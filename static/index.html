@@ -18,6 +18,8 @@
             --accent: #fbbf24;
             --accent2: #f59e0b;
             --onAccent: #111827;
+            --observer: #94a3b8;
+            --observer2: #64748b;
         }
 
         body {
@@ -84,6 +86,11 @@
             background: linear-gradient(180deg, rgba(251, 191, 36, 0.08), rgba(245, 158, 11, 0.05));
         }
 
+        .role-card.observer {
+            border-color: rgba(148, 163, 184, .4);
+            background: linear-gradient(180deg, rgba(148, 163, 184, 0.08), rgba(100, 116, 139, 0.05));
+        }
+
         .role-icon {
             font-size: 32px;
             margin-bottom: 8px;
@@ -104,7 +111,14 @@
         .role-count {
             font-size: 14px;
             font-weight: 700;
+        }
+
+        .role-card.gm .role-count {
             color: var(--accent);
+        }
+
+        .role-card.observer .role-count {
+            color: var(--observer);
         }
 
         .loading {
@@ -161,6 +175,7 @@
         function renderMenu(stats) {
             const userName = getTgDisplayName();
             const gmCount = stats.gm_campaigns_count || 0;
+            const observerCount = stats.observer_campaigns_count || 0;
 
             const html = `
                 <div class="top-card">
@@ -178,6 +193,13 @@
                     <div class="role-desc">Управляй своими кампаниями и схватками</div>
                     <div class="role-count">→ ${gmCount} кампани${gmCount === 1 ? 'я' : 'й'}</div>
                 </div>
+
+                <div class="role-card observer" onclick="openObserver()">
+                    <div class="role-icon">👁️</div>
+                    <div class="role-title">Наблюдатель</div>
+                    <div class="role-desc">Следи за своими играми</div>
+                    <div class="role-count">→ ${observerCount} кампани${observerCount === 1 ? 'я' : 'й'}</div>
+                </div>
             `;
 
             document.getElementById('content').innerHTML = html;
@@ -185,6 +207,10 @@
 
         function openGM() {
             window.location.href = '/static/gm_campaigns.html';
+        }
+
+        function openObserver() {
+            window.location.href = '/static/observer_campaigns.html';
         }
 
         if (tg && tg.ready) tg.ready();
