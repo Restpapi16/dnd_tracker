@@ -39,14 +39,21 @@ def get_my_stats(
     db: Session = Depends(get_db),
     tg_user_id: int = Depends(get_current_tg_user_id),
 ):
-    """Получить статистику пользователя: количество GM-кампаний"""
+    """Получить статистику пользователя: количество GM-кампаний и кампаний наблюдателя"""
     # GM-кампании (где я владелец)
     gm_campaigns = db.query(models.Campaign).filter(
         models.Campaign.owner_id == tg_user_id
     ).count()
     
+    # Кампании наблюдателя
+    observer_campaigns = db.query(models.CampaignMember).filter(
+        models.CampaignMember.user_id == tg_user_id,
+        models.CampaignMember.role == models.MemberRole.observer
+    ).count()
+    
     return {
-        "gm_campaigns_count": gm_campaigns
+        "gm_campaigns_count": gm_campaigns,
+        "observer_campaigns_count": observer_campaigns
     }
 
 
