@@ -194,6 +194,12 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const campaignId = urlParams.get('campaign_id');
+        const campaignName = urlParams.get('campaign_name');
+
+        // Отображаем название кампании, если оно передано
+        if (campaignName) {
+            document.getElementById('campaignName').textContent = decodeURIComponent(campaignName);
+        }
 
         if (!campaignId) {
             document.getElementById('encountersList').innerHTML = `
