@@ -234,13 +234,8 @@
                     window.location.href = `/static/observer_encounter.html?encounter_id=${encounters[0].id}`;
                     return;
                 }
-                // Если несколько - показываем список
-                let msg = `Активные схватки "${name}":\n\n`;
-                encounters.forEach((e, i) => {
-                    msg += `${i+1}. ${e.name || `Схватка #${e.id}`}\n`;
-                });
-                msg += `\nПерейди по прямой ссылке от GM`;
-                alert(msg);
+                // Если несколько - открываем страницу выбора
+                window.location.href = `/static/observer_encounters.html?campaign_id=${id}&campaign_name=${encodeURIComponent(name)}`;
             } catch (e) {
                 console.error(e);
                 alert('Ошибка загрузки схваток');
