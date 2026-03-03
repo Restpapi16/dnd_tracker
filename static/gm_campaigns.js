@@ -597,11 +597,18 @@ async function openEncounterSetup() {
 function renderSetupPlayers() {
     preserveFocus(() => {
         const list = document.getElementById('encPlayersList');
+        const hint = document.getElementById('playersInitHint');
+        
         list.innerHTML = '';
         if (setupPlayers.length === 0) {
             list.innerHTML = '<div class="item"><div><div class="item-title">Нет персонажей</div><div class="item-sub">Вернись и добавь хотя бы одного</div></div><div class="pill warn">Пусто</div></div>';
+            hint.style.display = 'none';
             return;
         }
+        
+        // Показываем подсказку только когда есть игроки
+        hint.style.display = 'block';
+        
         setupPlayers.forEach((p, idx) => {
             const row = document.createElement('div');
             row.className = 'item pick' + (p.include ? ' selected' : '');
