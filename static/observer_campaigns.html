@@ -230,11 +230,7 @@
                     return;
                 }
                 
-                if (encounters.length === 1) {
-                    window.location.href = `/static/observer_encounter.html?encounter_id=${encounters[0].id}`;
-                    return;
-                }
-                
+                // Всегда открываем страницу выбора схваток
                 window.location.href = `/static/observer_encounters.html?campaign_id=${id}&campaign_name=${encodeURIComponent(name)}`;
             } catch (e) {
                 console.error(e);
