@@ -602,12 +602,12 @@ function renderSetupPlayers() {
         list.innerHTML = '';
         if (setupPlayers.length === 0) {
             list.innerHTML = '<div class="item"><div><div class="item-title">Нет персонажей</div><div class="item-sub">Вернись и добавь хотя бы одного</div></div><div class="pill warn">Пусто</div></div>';
-            hint.style.display = 'none';
+            if (hint) hint.style.display = 'none';
             return;
         }
         
         // Показываем подсказку только когда есть игроки
-        hint.style.display = 'block';
+        if (hint) hint.style.display = 'block';
         
         setupPlayers.forEach((p, idx) => {
             const row = document.createElement('div');
@@ -631,8 +631,9 @@ function renderSetupPlayers() {
             const initInput = document.createElement('input');
             initInput.className = 'input small';
             initInput.type = 'number';
+            initInput.placeholder = 'Итого'; // Подсказка!
             initInput.value = p.initiative_total;
-            initInput.id = `player_init_${idx}`; // Добавляем ID для сохранения фокуса
+            initInput.id = `player_init_${idx}`;
             initInput.onclick = (e) => e.stopPropagation();
             initInput.onchange = () => {
                 const val = parseInt(initInput.value, 10);
