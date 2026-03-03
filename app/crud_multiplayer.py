@@ -23,12 +23,30 @@ def get_user_role_in_campaign(db: Session, campaign_id: int, user_id: int) -> Op
 
 def is_campaign_gm(db: Session, campaign_id: int, user_id: int) -> bool:
     """Проверить, является ли пользователь GM кампании"""
+    # Проверяем, является ли owner_id
+    campaign = db.query(models.Campaign).filter(
+        models.Campaign.id == campaign_id
+    ).first()
+    
+    if campaign and campaign.owner_id == user_id:
+        return True
+    
+    # Проверяем роль в CampaignMember
     role = get_user_role_in_campaign(db, campaign_id, user_id)
     return role == models.MemberRole.gm
 
 
 def has_campaign_access(db: Session, campaign_id: int, user_id: int) -> bool:
     """Проверить, имеет ли пользователь доступ к кампании (GM или observer)"""
+    # Проверяем, является ли owner_id (GM)
+    campaign = db.query(models.Campaign).filter(
+        models.Campaign.id == campaign_id
+    ).first()
+    
+    if campaign and campaign.owner_id == user_id:
+        return True
+    
+    # Проверяем членство
     role = get_user_role_in_campaign(db, campaign_id, user_id)
     return role is not None
 
