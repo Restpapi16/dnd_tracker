@@ -163,6 +163,67 @@ def join_campaign(
     }
 
 
+# ----- OBSERVER API -----
+
+@app.get("/campaigns/observer/my", response_model=List[schemas.Campaign])
+def get_observer_campaigns(
+    db: Session = Depends(get_db),
+    tg_user_id: int = Depends(get_current_tg_user_id),
+):
+    """Получить список кампаний, где пользователь является наблюдателем"""
+    campaigns = crud_multiplayer.get_campaigns_for_observer(db, tg_user_id)
+    return campaigns
+
+
+@app.get("/campaigns/{campaign_id}/encounters/active")
+def get_active_encounters(
+    campaign_id: int,
+    db: Session = Depends(get_db),
+    tg_user_id: int = Depends(get_current_tg_user_id),
+):
+    """Получить активные схватки кампании (доступно GM и наблюдателям)"""
+    # Проверяем доступ: GM или наблюдатель
+    has_access = crud_multiplayer.has_campaign_access(db, campaign_id, tg_user_id)
+    if not has_access:
+        raise HTTPException(status_code=403, detail="Нет доступа к этой кампании")
+    
+    encounters = crud_multiplayer.get_active_encounters_for_campaign(db, campaign_id)
+    
+    return [{
+        "id": e.id,
+        "name": e.name,
+        "status": e.status.value,
+        "campaign_id": e.campaign_id
+    } for e in encounters]
+
+
+@app.get("/encounters/{encounter_id}/observer/state")
+def get_encounter_state_observer(
+    encounter_id: int,
+    db: Session = Depends(get_db),
+    tg_user_id: int = Depends(get_current_tg_user_id),
+):
+    """Получить состояние схватки для наблюдателя"""
+    # Получаем encounter
+    encounter = db.query(models.Encounter).filter(
+        models.Encounter.id == encounter_id
+    ).first()
+    
+    if not encounter:
+        raise HTTPException(status_code=404, detail="Схватка не найдена")
+    
+    # Проверяем доступ: наблюдатель или GM
+    has_access = crud_multiplayer.has_campaign_access(db, encounter.campaign_id, tg_user_id)
+    if not has_access:
+        raise HTTPException(status_code=403, detail="Нет доступа к этой схватке")
+    
+    state = crud_multiplayer.get_encounter_state_for_observer(db, encounter_id)
+    if state is None:
+        raise HTTPException(status_code=404, detail="Состояние схватки не найдено")
+    
+    return state
+
+
 @app.get("/campaigns/{campaign_id}/members", response_model=List[schemas.CampaignMemberInfo])
 def get_campaign_members_list(
     campaign_id: int,
