@@ -163,17 +163,22 @@
 
         async function apiGet(path) {
             const res = await fetch(API_BASE + path, { headers: { ...authHeaders() } });
-            if (!res.ok) throw new Error("HTTP " + res.status);
+            if (!res.ok) {
+                const text = await res.text();
+                console.error('API Error:', res.status, text);
+                throw new Error(`HTTP ${res.status}: ${text}`);
+            }
             return await res.json();
         }
 
         async function loadCampaigns() {
             try {
                 const campaigns = await apiGet("/campaigns/observer/my");
+                console.log('Campaigns loaded:', campaigns);
                 renderCampaigns(campaigns);
             } catch (e) {
-                console.error(e);
-                document.getElementById('campaignList').innerHTML = '<div class="item"><div class="item-title">Ошибка загрузки</div></div>';
+                console.error('Load campaigns error:', e);
+                document.getElementById('campaignList').innerHTML = '<div class="item"><div class="item-title">Ошибка загрузки: ' + e.message + '</div></div>';
             }
         }
 
@@ -223,7 +228,9 @@
 
         async function openCampaign(id, name) {
             try {
+                console.log('Opening campaign:', id, name);
                 const encounters = await apiGet(`/campaigns/${id}/encounters/active`);
+                console.log('Encounters loaded:', encounters);
                 
                 if (encounters.length === 0) {
                     alert(`В кампании "${name}" нет активных схваток`);
@@ -233,15 +240,14 @@
                 // Всегда открываем страницу выбора схваток
                 window.location.href = `/static/observer_encounters.html?campaign_id=${id}&campaign_name=${encodeURIComponent(name)}`;
             } catch (e) {
-                console.error(e);
-                alert('Ошибка загрузки схваток');
+                console.error('Open campaign error:', e);
+                alert('Ошибка загрузки: ' + e.message);
             }
         }
 
         function goHome() {
             window.location.href = '/static/index.html';
         }
-
         if (tg && tg.ready) tg.ready();
         loadCampaigns();
     </script>
